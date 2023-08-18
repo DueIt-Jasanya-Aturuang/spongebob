@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS m_user_config;

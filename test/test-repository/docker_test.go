@@ -1,4 +1,4 @@
-package test
+package testrepository
 
 import (
 	"database/sql"
@@ -18,12 +18,13 @@ import (
 )
 
 var (
-	db          *sql.DB
-	profileRepo = repositories.NewProfileRepoImpl()
-	userRepo    = repositories.NewUserRepoImpl()
+	db             *sql.DB
+	profileRepo    = repositories.NewProfileRepoImpl()
+	userRepo       = repositories.NewUserRepoImpl()
+	profileCfgRepo = repositories.NewProfileCfgRepoImpl()
 )
 
-func TestMain(m *testing.M) {
+func TestMain(t *testing.M) {
 	log.Logger = log.Output(zerolog.Nop())
 	pool := initDocker()
 
@@ -33,14 +34,13 @@ func TestMain(m *testing.M) {
 	db = dbPg
 	startMigration(url, db)
 	// Run tests
-	code := m.Run()
+	code := t.Run()
 
 	// You can't defer this because os.Exit doesn't care for defer
 	if err := pool.Purge(resource); err != nil {
 		log.Err(err).Msgf("Could not purge resource: %s", err)
 		os.Exit(1)
 	}
-
 	os.Exit(code)
 }
 
@@ -150,7 +150,7 @@ func startMigration(url string, db *sql.DB) {
 	}
 
 	migrates, err = migrate.NewWithDatabaseInstance(
-		"file://../../../../Jasanya-Auth/migrations",
+		"file://jasanya-auth",
 		"postgres", driver)
 	if err != nil {
 		fmt.Println(err)

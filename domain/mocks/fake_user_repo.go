@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"sync"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
+	domain "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-user"
 )
 
 type FakeUserRepo struct {

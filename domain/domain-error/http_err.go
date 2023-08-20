@@ -1,17 +1,8 @@
-package domain
+package domainerror
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
-)
-
-var (
-	LogErrScanning        = "ERROR SCANNING DATA"
-	LogErrSTMT            = "ERROR START PREPARED STATEMENT"
-	LogErrExec            = "ERROR EXEC TO DATA"
-	LogErrQuery           = "ERROR QUERY TO DATA"
-	ErrUsernameAlvailable = errors.New("USERNAME ALVALILABLE")
 )
 
 type ErrResp struct {

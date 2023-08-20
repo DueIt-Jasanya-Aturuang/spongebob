@@ -70,21 +70,21 @@ func (repo *ProfileRepoImpl) GetProfileByUserId(ctx context.Context, db *sql.DB,
 	return profile, nil
 }
 
-func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, tx *sql.Tx, entity domainprofile.Profile) (*domainprofile.Profile, error) {
+func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, tx *sql.Tx, entity domainprofile.Profile) (domainprofile.Profile, error) {
 	query := "SELECT EXISTS (SELECT 1 FROM dueit.m_profiles WHERE user_id = $1)"
 	var exists bool
 
 	querySTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
 		log.Err(err).Msg(domainerror.LogErrSTMT)
-		return nil, err
+		return domainprofile.Profile{}, err
 	}
 	if err = querySTMT.QueryRowContext(ctx, entity.UserId).Scan(&exists); err != nil {
 		log.Err(err).Msg(domainerror.LogErrQuery)
-		return nil, err
+		return domainprofile.Profile{}, err
 	}
 	if exists {
-		return nil, domainerror.ErrProfileAlvailable
+		return domainprofile.Profile{}, domainerror.ErrProfileAlvailable
 	}
 
 	// insert proses
@@ -92,7 +92,7 @@ func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, tx *sql.Tx, entit
 	execSTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
 		log.Err(err).Msg(domainerror.LogErrSTMT)
-		return nil, err
+		return domainprofile.Profile{}, err
 	}
 
 	if _, err := execSTMT.ExecContext(
@@ -105,10 +105,10 @@ func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, tx *sql.Tx, entit
 		entity.UpdatedAt,
 	); err != nil {
 		log.Err(err).Msg(domainerror.LogErrExec)
-		return nil, err
+		return domainprofile.Profile{}, err
 	}
 
-	return &entity, nil
+	return entity, nil
 }
 
 func (repo *ProfileRepoImpl) UpdateProfile(ctx context.Context, tx *sql.Tx, entity domainprofile.Profile) (*domainprofile.Profile, error) {

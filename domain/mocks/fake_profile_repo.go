@@ -40,7 +40,7 @@ type FakeProfileRepo struct {
 		result1 *domainprofile.Profile
 		result2 error
 	}
-	StoreProfileStub        func(context.Context, *sql.Tx, domainprofile.Profile) (*domainprofile.Profile, error)
+	StoreProfileStub        func(context.Context, *sql.Tx, domainprofile.Profile) (domainprofile.Profile, error)
 	storeProfileMutex       sync.RWMutex
 	storeProfileArgsForCall []struct {
 		arg1 context.Context
@@ -48,11 +48,11 @@ type FakeProfileRepo struct {
 		arg3 domainprofile.Profile
 	}
 	storeProfileReturns struct {
-		result1 *domainprofile.Profile
+		result1 domainprofile.Profile
 		result2 error
 	}
 	storeProfileReturnsOnCall map[int]struct {
-		result1 *domainprofile.Profile
+		result1 domainprofile.Profile
 		result2 error
 	}
 	UpdateProfileStub        func(context.Context, *sql.Tx, domainprofile.Profile) (*domainprofile.Profile, error)
@@ -206,7 +206,7 @@ func (fake *FakeProfileRepo) GetProfileByUserIdReturnsOnCall(i int, result1 *dom
 	}{result1, result2}
 }
 
-func (fake *FakeProfileRepo) StoreProfile(arg1 context.Context, arg2 *sql.Tx, arg3 domainprofile.Profile) (*domainprofile.Profile, error) {
+func (fake *FakeProfileRepo) StoreProfile(arg1 context.Context, arg2 *sql.Tx, arg3 domainprofile.Profile) (domainprofile.Profile, error) {
 	fake.storeProfileMutex.Lock()
 	ret, specificReturn := fake.storeProfileReturnsOnCall[len(fake.storeProfileArgsForCall)]
 	fake.storeProfileArgsForCall = append(fake.storeProfileArgsForCall, struct {
@@ -233,7 +233,7 @@ func (fake *FakeProfileRepo) StoreProfileCallCount() int {
 	return len(fake.storeProfileArgsForCall)
 }
 
-func (fake *FakeProfileRepo) StoreProfileCalls(stub func(context.Context, *sql.Tx, domainprofile.Profile) (*domainprofile.Profile, error)) {
+func (fake *FakeProfileRepo) StoreProfileCalls(stub func(context.Context, *sql.Tx, domainprofile.Profile) (domainprofile.Profile, error)) {
 	fake.storeProfileMutex.Lock()
 	defer fake.storeProfileMutex.Unlock()
 	fake.StoreProfileStub = stub
@@ -246,28 +246,28 @@ func (fake *FakeProfileRepo) StoreProfileArgsForCall(i int) (context.Context, *s
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeProfileRepo) StoreProfileReturns(result1 *domainprofile.Profile, result2 error) {
+func (fake *FakeProfileRepo) StoreProfileReturns(result1 domainprofile.Profile, result2 error) {
 	fake.storeProfileMutex.Lock()
 	defer fake.storeProfileMutex.Unlock()
 	fake.StoreProfileStub = nil
 	fake.storeProfileReturns = struct {
-		result1 *domainprofile.Profile
+		result1 domainprofile.Profile
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileRepo) StoreProfileReturnsOnCall(i int, result1 *domainprofile.Profile, result2 error) {
+func (fake *FakeProfileRepo) StoreProfileReturnsOnCall(i int, result1 domainprofile.Profile, result2 error) {
 	fake.storeProfileMutex.Lock()
 	defer fake.storeProfileMutex.Unlock()
 	fake.StoreProfileStub = nil
 	if fake.storeProfileReturnsOnCall == nil {
 		fake.storeProfileReturnsOnCall = make(map[int]struct {
-			result1 *domainprofile.Profile
+			result1 domainprofile.Profile
 			result2 error
 		})
 	}
 	fake.storeProfileReturnsOnCall[i] = struct {
-		result1 *domainprofile.Profile
+		result1 domainprofile.Profile
 		result2 error
 	}{result1, result2}
 }

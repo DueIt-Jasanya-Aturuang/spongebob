@@ -1,4 +1,4 @@
-package testrepository
+package integration
 
 import (
 	"context"

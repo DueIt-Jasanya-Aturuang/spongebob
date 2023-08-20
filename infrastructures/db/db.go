@@ -15,6 +15,8 @@ func NewPgConn() *sql.DB {
 	fDB := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		config.PgHost, config.PgPort, config.PgUser, config.PgPass, config.PgName, config.PgSSL)
 
+	log.Info().Msgf("postgres config %v", fDB)
+
 	db, err := sql.Open("postgres", fDB)
 	if err != nil {
 		log.Err(err).Msg("cannot open db")

@@ -13,6 +13,7 @@ type ProfileCfgRepo interface {
 	GetProfileCfgByScheduler(context.Context, *sql.DB, ProfileCfgScheduler) (*[]ProfileCfg, error)
 }
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o ./../mocks . ProfileCfgUsecase
 type ProfileCfgUsecase interface {
 	CreateProfileCfg(context.Context, ProfileCfgReq) (*ProfileCfgResp, error)
 	GetProfileCfgById(context.Context, string) (*ProfileCfgResp, error)

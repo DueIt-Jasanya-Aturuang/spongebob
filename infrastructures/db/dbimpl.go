@@ -6,23 +6,34 @@ import (
 	"fmt"
 )
 
-type DBimpl struct {
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o ./mocks . SQL
+type SQL interface {
+	StartTX(context.Context, *sql.TxOptions) (*sql.Tx, error)
+	Transaction(context.Context, *sql.TxOptions, func(*sql.Tx) error) error
+	SqlDB() *sql.DB
+}
+
+type SQLImpl struct {
 	*sql.DB
 }
 
-func NewDB() *DBimpl {
-	return &DBimpl{
+func NewSQLImpl() SQL {
+	return &SQLImpl{
 		NewPgConn(),
 	}
 }
 
-func (db *DBimpl) StartTX(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
-	tx, err := db.DB.BeginTx(ctx, opts)
+func (sql *SQLImpl) SqlDB() *sql.DB {
+	return sql.DB
+}
+
+func (sql *SQLImpl) StartTX(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
+	tx, err := sql.BeginTx(ctx, opts)
 	return tx, err
 }
 
-func (db *DBimpl) Transaction(ctx context.Context, opts *sql.TxOptions, fn func(*sql.Tx) error) error {
-	tx, err := db.StartTX(ctx, opts)
+func (sql *SQLImpl) Transaction(ctx context.Context, opts *sql.TxOptions, fn func(*sql.Tx) error) error {
+	tx, err := sql.StartTX(ctx, opts)
 	if err != nil {
 		return err
 	}

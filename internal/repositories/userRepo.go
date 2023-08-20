@@ -116,7 +116,6 @@ func (repo *UserRepoImpl) UpdateUsername(ctx context.Context, tx *sql.Tx, entity
 		return nil, err
 	}
 	defer rows.Close()
-
 	if rows.Next() {
 		log.Info().Msg(domainerror.ErrUsernameAlvailable.Error())
 		return nil, domainerror.ErrUsernameAlvailable

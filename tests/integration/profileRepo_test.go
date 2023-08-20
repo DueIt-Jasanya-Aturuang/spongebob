@@ -1,4 +1,4 @@
-package testrepository
+package integration
 
 import (
 	"context"
@@ -35,7 +35,7 @@ func ProfileRepo(t *testing.T) {
 		}
 		profile, err := profileRepo.StoreProfile(context.Background(), tx, dataProfile)
 		assert.NoError(t, err)
-		assert.NotNil(t, profile)
+		assert.Equal(t, dataProfile, profile)
 		tx.Commit()
 	})
 
@@ -46,7 +46,7 @@ func ProfileRepo(t *testing.T) {
 		}
 		profile, err := profileRepo.StoreProfile(context.Background(), tx, dataProfile)
 		assert.Error(t, err)
-		assert.Nil(t, profile)
+		assert.NotEqual(t, dataProfile, profile)
 		assert.Equal(t, domainerror.ErrProfileAlvailable, err)
 		tx.Rollback()
 	})

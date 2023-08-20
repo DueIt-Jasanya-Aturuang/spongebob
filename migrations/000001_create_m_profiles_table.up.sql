@@ -8,9 +8,4 @@ CREATE TABLE m_profiles (
    updated_by VARCHAR(64),
    deleted_at DECIMAL,
    deleted_by VARCHAR(64)
-   -- CONSTRAINT fk_m_user
-   --    FOREIGN KEY (user_id)
-   -- REFERENCES auth.m_users(id)
-   --    ON DELETE CASCADE
-   --    ON UPDATE CASCADE
 );

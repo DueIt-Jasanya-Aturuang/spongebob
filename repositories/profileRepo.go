@@ -35,14 +35,14 @@ func (repo *ProfileRepoImpl) scanRow(row *sql.Row) (*domain.Profile, error) {
 }
 
 func (repo *ProfileRepoImpl) GetProfileById(ctx context.Context, db *sql.DB, id string) (*domain.Profile, error) {
-	query := "SELECT id, user_id, quotes, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM dueit.m_profiles WHERE id = $1 AND deleted_at IS $2"
+	query := "SELECT id, user_id, quotes, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM dueit.m_profiles WHERE id = $1 AND deleted_at IS NULL"
 	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Err(err).Msg(domain.LogErrSTMT)
 		return nil, err
 	}
 
-	row := stmt.QueryRowContext(ctx, id, "NULL")
+	row := stmt.QueryRowContext(ctx, id)
 
 	profile, err := repo.scanRow(row)
 	if err != nil {
@@ -52,14 +52,14 @@ func (repo *ProfileRepoImpl) GetProfileById(ctx context.Context, db *sql.DB, id 
 }
 
 func (repo *ProfileRepoImpl) GetProfileByUserId(ctx context.Context, db *sql.DB, userId string) (*domain.Profile, error) {
-	query := "SELECT id, user_id, quotes, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM dueit.m_profiles WHERE user_id = $1 AND deleted_at IS $2"
+	query := "SELECT id, user_id, quotes, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM dueit.m_profiles WHERE user_id = $1 AND deleted_at IS NULL"
 	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Err(err).Msg(domain.LogErrSTMT)
 		return nil, err
 	}
 
-	row := stmt.QueryRowContext(ctx, userId, "NULL")
+	row := stmt.QueryRowContext(ctx, userId)
 
 	profile, err := repo.scanRow(row)
 	if err != nil {

@@ -3,242 +3,143 @@ package test
 import (
 	"context"
 	"database/sql"
-	"regexp"
+	"fmt"
+	"os"
 	"testing"
 	"time"
 
-	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/repositories"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	gender      = "male"
-	userColumns = []string{"id", "fullname", "gender", "image", "email", "username", "password", "phone_number", "email_verified_at", "created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"}
-	userRepo    = repositories.NewUserRepoImpl()
-	image       = "default-male.png"
-	email       = "ibanrama29@gmail.com"
-)
-
-func TestGetUserById(t *testing.T) {
-	log.Logger = log.Output(zerolog.Nop())
-	unix := time.Now().Unix()
-	expectUser := domain.User{
-		ID:              userId1,
+	unixUser   = time.Now().Unix()
+	createUser = domain.User{
+		ID:              "userId1",
 		FullName:        "rama",
-		Gender:          gender,
-		Image:           image,
+		Gender:          "undefinied",
+		Image:           "default-male.png",
 		Username:        "ibanrmaa",
-		Email:           email,
+		Email:           "ibanrama29@gmail.com",
 		Password:        "123456",
-		PhoneNumber:     sql.NullString{String: "12345678", Valid: true},
-		EmailVerifiedAt: true,
-		CreatedAt:       unix,
-		CreatedBy:       userId1,
-		UpdatedAt:       unix,
+		PhoneNumber:     sql.NullString{},
+		EmailVerifiedAt: false,
+		CreatedAt:       unixUser,
+		CreatedBy:       "userId1",
+		UpdatedAt:       unixUser,
 		UpdatedBy:       sql.NullString{},
 		DeletedAt:       sql.NullInt64{},
 		DeletedBy:       sql.NullString{},
 	}
+)
 
-	db, mocksql, err := sqlmock.New()
+func createUserFunc() {
+	SQL := "INSERT INTO auth.m_users (id, fullname, image, username, email, password, email_verified_at, created_at, created_by, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING gender"
+	_, err := db.ExecContext(
+		context.TODO(), SQL,
+		createUser.ID,
+		createUser.FullName,
+		createUser.Image,
+		createUser.Username,
+		createUser.Email,
+		createUser.Password,
+		createUser.EmailVerifiedAt,
+		createUser.CreatedAt,
+		createUser.CreatedBy,
+		createUser.UpdatedAt,
+	)
 	if err != nil {
-		t.Fatal(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
-	defer db.Close()
-
-	query := regexp.QuoteMeta("SELECT id, fullname, gender, image, username, email, password, phone_number, email_verified_at, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM auth.m_users WHERE id = $1 AND deleted_at IS $2")
-	t.Run("success", func(t *testing.T) {
-		rows := sqlmock.NewRows(userColumns)
-		rows.AddRow(userId1, "rama", gender, image, "ibanrmaa", email, "123456", "12345678", true, unix, userId1, unix, nil, nil, nil)
-		rows.AddRow(userId2, "2rama", gender, image, "2ibanrmaa", "2ibanrmaa29@gmail.com", "1234567", "123456789", true, unix, userId2, unix, nil, nil, nil)
-
-		mocksql.ExpectPrepare(query)
-		mocksql.ExpectQuery(query).WithArgs(userId1, "NULL").WillReturnRows(rows)
-
-		user, err := userRepo.GetUserById(context.TODO(), db, userId1)
-		assert.NoError(t, err)
-		assert.NotNil(t, user)
-		assert.Equal(t, &expectUser, user)
-
-		err = mocksql.ExpectationsWereMet()
-		assert.NoError(t, err)
-	})
-
-	t.Run("error deleted not nul", func(t *testing.T) {
-		rows := sqlmock.NewRows(userColumns)
-		rows.AddRow(userId1, "rama", gender, image, "ibanrmaa", email, "123456", "12345678", true, unix, userId1, unix, nil, unix, "admin")
-		rows.AddRow(userId2, "2rama", gender, image, "2ibanrmaa", "2ibanrmaa29@gmail.com", "1234567", "123456789", true, unix, userId2, unix, nil, nil, nil)
-
-		mocksql.ExpectPrepare(query)
-		mocksql.ExpectQuery(query).WithArgs(userId1, "NULL").WillReturnRows(rows)
-
-		user, err := userRepo.GetUserById(context.TODO(), db, userId1)
-		assert.NoError(t, err)
-		assert.NotNil(t, user)
-		assert.NotEqual(t, &expectUser, user)
-
-		err = mocksql.ExpectationsWereMet()
-		assert.NoError(t, err)
-	})
-
-	t.Run("error", func(t *testing.T) {
-		mocksql.ExpectPrepare(query)
-		mocksql.ExpectQuery(query).WithArgs(userId1, isNull).WillReturnRows(sqlmock.NewRows(userColumns))
-
-		user, err := userRepo.GetUserById(context.TODO(), db, userId1)
-		assert.Error(t, err)
-		assert.Nil(t, user)
-		assert.NotEqual(t, &expectUser, user)
-
-		err = mocksql.ExpectationsWereMet()
-		assert.NoError(t, err)
-	})
+	SQL = "INSERT INTO auth.m_users (id, fullname, image, username, email, password, email_verified_at, created_at, created_by, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING gender"
+	createUser.Username = "rama2"
+	createUser.Email = "ibanrama292@gmail.com"
+	createUser.ID = "userId2"
+	_, err = db.ExecContext(
+		context.TODO(), SQL,
+		createUser.ID,
+		createUser.FullName,
+		createUser.Image,
+		createUser.Username,
+		createUser.Email,
+		createUser.Password,
+		createUser.EmailVerifiedAt,
+		createUser.CreatedAt,
+		createUser.CreatedBy,
+		createUser.UpdatedAt,
+	)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
 
-func TestUpdateUser(t *testing.T) {
-	log.Logger = log.Output(zerolog.Nop())
-	unix := time.Now().Unix()
+func TestUserRepo(t *testing.T) {
 	updateUser := domain.User{
-		ID:              userId1,
+		ID:              "userId1",
 		FullName:        "rama",
-		Gender:          gender,
-		Image:           image,
+		Gender:          "male",
+		Image:           "default-male.png",
 		Username:        "ibanrmaa",
-		Email:           email,
+		Email:           "ibanrama29@gmail.com",
 		Password:        "123456",
 		PhoneNumber:     sql.NullString{String: "12345678", Valid: true},
 		EmailVerifiedAt: true,
-		CreatedAt:       unix,
-		CreatedBy:       userId1,
-		UpdatedAt:       unix,
-		UpdatedBy:       sql.NullString{String: userId1, Valid: true},
+		CreatedAt:       unixUser,
+		CreatedBy:       "userId1",
+		UpdatedAt:       unixUser,
+		UpdatedBy:       sql.NullString{String: "userId1", Valid: true},
 		DeletedAt:       sql.NullInt64{},
 		DeletedBy:       sql.NullString{},
 	}
-
-	db, mocksql, err := sqlmock.New()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db.Close()
-
-	query := regexp.QuoteMeta("UPDATE auth.m_users SET fullname = $1, gender = $2, image = $3, phone_number = $4, updated_at = $5, updated_by = $6 WHERE id = $7 AND deleted_at IS NULL")
-	t.Run("success", func(t *testing.T) {
-		mocksql.ExpectBegin()
-		mocksql.ExpectPrepare(query)
-		mocksql.ExpectExec(query).WithArgs(
-			"rama",
-			gender,
-			image,
-			"12345678",
-			unix,
-			userId1,
-			userId1,
-		).WillReturnResult(sqlmock.NewResult(1, 1))
-
-		tx, err := db.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+	createUserFunc()
+	t.Run("success get by id", func(t *testing.T) {
+		user, err := userRepo.GetUserById(context.Background(), db, createUser.ID)
 		assert.NoError(t, err)
+		assert.NotNil(t, user)
+		assert.Equal(t, &createUser, user)
+	})
 
+	t.Run("error get by id", func(t *testing.T) {
+		user, err := userRepo.GetUserById(context.Background(), db, "createUser.ID")
+		assert.Error(t, err)
+		assert.Nil(t, user)
+		assert.Equal(t, err, sql.ErrNoRows)
+	})
+
+	t.Run("update user by id success", func(t *testing.T) {
+		tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
+		if err != nil {
+			t.Fatal(err)
+		}
 		user, err := userRepo.UpdateUser(context.TODO(), tx, updateUser)
 		assert.NoError(t, err)
 		assert.NotNil(t, user)
-		assert.Equal(t, user, &updateUser)
-
-		err = mocksql.ExpectationsWereMet()
-		assert.NoError(t, err)
-	})
-}
-
-func TestUpdateUserUsername(t *testing.T) {
-	log.Logger = log.Output(zerolog.Nop())
-	unix := time.Now().Unix()
-	updateUser := domain.User{
-		ID:              userId1,
-		FullName:        "rama",
-		Gender:          gender,
-		Image:           image,
-		Username:        "ibanrmaa",
-		Email:           email,
-		Password:        "123456",
-		PhoneNumber:     sql.NullString{String: "12345678", Valid: true},
-		EmailVerifiedAt: true,
-		CreatedAt:       unix,
-		CreatedBy:       userId1,
-		UpdatedAt:       unix,
-		UpdatedBy:       sql.NullString{String: userId1, Valid: true},
-		DeletedAt:       sql.NullInt64{},
-		DeletedBy:       sql.NullString{},
-	}
-
-	db, mocksql, err := sqlmock.New()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db.Close()
-
-	query := regexp.QuoteMeta("SELECT username, id FROM auth.m_users WHERE username=$1 AND id<>$2 AND deleted_at IS NULL")
-	query1 := regexp.QuoteMeta("UPDATE auth.m_users SET username = $1, updated_at = $2, updated_by = $3 WHERE id = $4 AND deleted_at IS NULL")
-	t.Run("success", func(t *testing.T) {
-		mocksql.ExpectBegin()
-		mocksql.ExpectPrepare(query)
-		mocksql.ExpectQuery(query).WithArgs(
-			updateUser.Username,
-			updateUser.ID,
-		).WillReturnRows(sqlmock.NewRows(userColumns))
-
-		mocksql.ExpectPrepare(query1)
-		mocksql.ExpectExec(query1).WithArgs(
-			updateUser.Username,
-			unix,
-			updateUser.ID,
-			updateUser.ID,
-		).WillReturnResult(sqlmock.NewResult(1, 1))
-
-		tx, err := db.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
-		assert.NoError(t, err)
-
-		user, err := userRepo.UpdateUsername(context.TODO(), tx, updateUser)
-		assert.NoError(t, err)
-		assert.NotNil(t, user)
-		assert.Equal(t, user, &updateUser)
-
-		err = mocksql.ExpectationsWereMet()
-		assert.NoError(t, err)
+		assert.Equal(t, &updateUser, user)
+		assert.NotEqual(t, &createUser, user)
 	})
 
-	t.Run("username alvailable", func(t *testing.T) {
-		rows := sqlmock.NewRows(userColumns)
-		rows.AddRow(userId1, "rama", gender, image, "ibanrmaa", "ibanrama29@gmail.com", "123456", "12345678", true, unix, userId1, unix, nil, unix, "admin")
-
-		mocksql.ExpectBegin()
-		mocksql.ExpectPrepare(query)
-		mocksql.ExpectQuery(query).WithArgs(
-			updateUser.Username,
-			updateUser.ID,
-		).WillReturnRows(rows)
-
-		mocksql.ExpectPrepare(query1)
-		mocksql.ExpectExec(query1).WithArgs(
-			updateUser.Username,
-			unix,
-			updateUser.ID,
-			updateUser.ID,
-		).WillReturnResult(sqlmock.NewResult(1, 1))
-
-		tx, err := db.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
-		assert.NoError(t, err)
-
+	t.Run("error update username", func(t *testing.T) {
+		tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
+		if err != nil {
+			t.Fatal(err)
+		}
+		updateUser.Username = "rama2"
 		user, err := userRepo.UpdateUsername(context.TODO(), tx, updateUser)
-		t.Log(err)
 		assert.Error(t, err)
 		assert.Nil(t, user)
-		assert.NotEqual(t, user, &updateUser)
+		assert.Equal(t, err, domain.ErrUsernameAlvailable)
+	})
 
-		err = mocksql.ExpectationsWereMet()
+	t.Run("success update username", func(t *testing.T) {
+		tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
+		if err != nil {
+			t.Fatal(err)
+		}
+		user, err := userRepo.UpdateUsername(context.TODO(), tx, updateUser)
 		assert.Error(t, err)
+		assert.Nil(t, user)
+		assert.Equal(t, err, domain.ErrUsernameAlvailable)
 	})
 }

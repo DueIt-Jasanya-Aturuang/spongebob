@@ -40,14 +40,14 @@ func (repo *UserRepoImpl) scanRow(row *sql.Row) (*domain.User, error) {
 }
 
 func (repo *UserRepoImpl) GetUserById(ctx context.Context, db *sql.DB, id string) (*domain.User, error) {
-	query := "SELECT id, fullname, gender, image, username, email, password, phone_number, email_verified_at, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM auth.m_users WHERE id = $1 AND deleted_at IS $2"
+	query := "SELECT id, fullname, gender, image, username, email, password, phone_number, email_verified_at, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM auth.m_users WHERE id = $1 AND deleted_at IS NULL"
 	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Err(err).Msg(domain.LogErrSTMT)
 		return nil, err
 	}
 
-	row := stmt.QueryRowContext(ctx, id, "NULL")
+	row := stmt.QueryRowContext(ctx, id)
 
 	user, err := repo.scanRow(row)
 	if err != nil {
@@ -98,6 +98,7 @@ func (repo *UserRepoImpl) UpdateUsername(ctx context.Context, tx *sql.Tx, entity
 	defer rows.Close()
 
 	if rows.Next() {
+		log.Info().Msg(domain.ErrUsernameAlvailable.Error())
 		return nil, domain.ErrUsernameAlvailable
 	}
 

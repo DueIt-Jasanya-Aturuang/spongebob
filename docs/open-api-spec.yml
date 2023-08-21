@@ -1,0 +1,12 @@
+openapi: '3.0.2'
+info:
+  title: ACCOUNT SERVICE
+  version: '1.0'
+servers:
+  - url: https://dueit.jasanya.tech
+paths:
+  /test:
+    get:
+      responses:
+        '200':
+          description: OK

@@ -6,9 +6,8 @@ import (
 	"testing"
 	"time"
 
-	domainprofile "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-profile"
 	domainmock "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/mocks"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/db/mocks"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/usecase"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,19 +15,18 @@ import (
 func TestProfileUsecaseGetById(t *testing.T) {
 	// log.Logger = log.Output(zerolog.Nop())
 	profileRepoMock := &domainmock.FakeProfileRepo{}
-	sqlMock := &mocks.FakeSQL{}
+	sqlMock := &domainmock.FakeSqlTransactionRepo{}
 	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, sqlMock, 5*time.Second)
 
-	profileMockData := domainprofile.Profile{}
+	profileMockData := model.Profile{}
 	profileMockData.UserId = "userid1"
 	profileMockData = profileMockData.DefaultValue()
 
-	profileRepoMock.GetProfileById(context.Background(), sqlMock.SqlDB(), profileMockData.UserId)
+	profileRepoMock.GetProfileById(context.Background(), profileMockData.UserId)
 	profileRepoMock.GetProfileByIdReturns(&profileMockData, nil)
-	ctxMock, dbMock, idMock := profileRepoMock.GetProfileByIdArgsForCall(0)
+	ctxMock, idMock := profileRepoMock.GetProfileByIdArgsForCall(0)
 	assert.Equal(t, 1, profileRepoMock.GetProfileByIdCallCount())
 	assert.Equal(t, context.Background(), ctxMock)
-	assert.Equal(t, sqlMock.SqlDB(), dbMock)
 	assert.Equal(t, profileMockData.UserId, idMock)
 
 	profile, err := profileUsecase.GetProfileById(context.Background(), profileMockData.UserId)
@@ -40,27 +38,25 @@ func TestProfileUsecaseGetById(t *testing.T) {
 func TestProfileUsecaseGetByUserId(t *testing.T) {
 	// log.Logger = log.Output(zerolog.Nop())
 	profileRepoMock := &domainmock.FakeProfileRepo{}
-	sqlMock := &mocks.FakeSQL{}
+	sqlMock := &domainmock.FakeSqlTransactionRepo{}
 	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, sqlMock, 5*time.Second)
 
-	profileMockData := domainprofile.Profile{}
+	profileMockData := model.Profile{}
 	profileMockData.UserId = "userid1"
 	profileMockData = profileMockData.DefaultValue()
 
-	profileRepoMock.GetProfileById(context.Background(), sqlMock.SqlDB(), profileMockData.UserId)
+	profileRepoMock.GetProfileById(context.Background(), profileMockData.UserId)
 	profileRepoMock.GetProfileByIdReturns(nil, sql.ErrNoRows)
-	ctxMock, dbMock, idMock := profileRepoMock.GetProfileByIdArgsForCall(0)
+	ctxMock, idMock := profileRepoMock.GetProfileByIdArgsForCall(0)
 	assert.Equal(t, 1, profileRepoMock.GetProfileByIdCallCount())
 	assert.Equal(t, context.Background(), ctxMock)
-	assert.Equal(t, sqlMock.SqlDB(), dbMock)
 	assert.Equal(t, profileMockData.UserId, idMock)
 
-	profileRepoMock.GetProfileByUserId(context.Background(), sqlMock.SqlDB(), profileMockData.UserId)
+	profileRepoMock.GetProfileByUserId(context.Background(), profileMockData.UserId)
 	profileRepoMock.GetProfileByUserIdReturns(&profileMockData, nil)
-	ctxMock, dbMock, idMock = profileRepoMock.GetProfileByUserIdArgsForCall(0)
+	ctxMock, idMock = profileRepoMock.GetProfileByUserIdArgsForCall(0)
 	assert.Equal(t, 1, profileRepoMock.GetProfileByUserIdCallCount())
 	assert.Equal(t, context.Background(), ctxMock)
-	assert.Equal(t, sqlMock.SqlDB(), dbMock)
 	assert.Equal(t, profileMockData.UserId, idMock)
 
 	profile, err := profileUsecase.GetProfileById(context.Background(), profileMockData.UserId)
@@ -72,27 +68,25 @@ func TestProfileUsecaseGetByUserId(t *testing.T) {
 func TestProfileUsecaseGetByIdWithStore(t *testing.T) {
 	// log.Logger = log.Output(zerolog.Nop())
 	profileRepoMock := &domainmock.FakeProfileRepo{}
-	sqlMock := &mocks.FakeSQL{}
+	sqlMock := &domainmock.FakeSqlTransactionRepo{}
 	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, sqlMock, 5*time.Second)
 
-	profileMockData := domainprofile.Profile{}
+	profileMockData := model.Profile{}
 	profileMockData.UserId = "userid1"
 	profileMockData = profileMockData.DefaultValue()
 
-	profileRepoMock.GetProfileById(context.Background(), sqlMock.SqlDB(), "userid2")
+	profileRepoMock.GetProfileById(context.Background(), "userid2")
 	profileRepoMock.GetProfileByIdReturns(nil, sql.ErrNoRows)
-	ctxMock, dbMock, idMock := profileRepoMock.GetProfileByIdArgsForCall(0)
+	ctxMock, idMock := profileRepoMock.GetProfileByIdArgsForCall(0)
 	assert.Equal(t, context.Background(), ctxMock)
-	assert.Equal(t, sqlMock.SqlDB(), dbMock)
 	assert.Equal(t, "userid2", idMock)
 
-	profileRepoMock.GetProfileByUserId(context.Background(), sqlMock.SqlDB(), "userid2")
+	profileRepoMock.GetProfileByUserId(context.Background(), "userid2")
 	profileRepoMock.GetProfileByUserIdReturnsOnCall(1, &profileMockData, nil)
 	profileMockData.UserId = "userid2"
 	profileMockData = profileMockData.DefaultValue()
-	ctxMock, dbMock, idMock = profileRepoMock.GetProfileByUserIdArgsForCall(0)
+	ctxMock, idMock = profileRepoMock.GetProfileByUserIdArgsForCall(0)
 	assert.Equal(t, context.Background(), ctxMock)
-	assert.Equal(t, sqlMock.SqlDB(), dbMock)
 	assert.Equal(t, "userid2", idMock)
 
 	profileRepoMock.StoreProfile(context.Background(), &sql.Tx{}, profileMockData)

@@ -5,38 +5,37 @@ import (
 	"context"
 	"sync"
 
-	domainaccount "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-account"
-	domainprofile "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-profile"
-	domainuser "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-user"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
 )
 
 type FakeAccountUsecase struct {
-	AccountUpdateStub        func(context.Context, domainaccount.UpdateAccountReq) (*domainuser.UserResp, *domainprofile.ProfileResp, error)
+	AccountUpdateStub        func(context.Context, dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error)
 	accountUpdateMutex       sync.RWMutex
 	accountUpdateArgsForCall []struct {
 		arg1 context.Context
-		arg2 domainaccount.UpdateAccountReq
+		arg2 dto.UpdateAccountReq
 	}
 	accountUpdateReturns struct {
-		result1 *domainuser.UserResp
-		result2 *domainprofile.ProfileResp
+		result1 *dto.UserResp
+		result2 *dto.ProfileResp
 		result3 error
 	}
 	accountUpdateReturnsOnCall map[int]struct {
-		result1 *domainuser.UserResp
-		result2 *domainprofile.ProfileResp
+		result1 *dto.UserResp
+		result2 *dto.ProfileResp
 		result3 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAccountUsecase) AccountUpdate(arg1 context.Context, arg2 domainaccount.UpdateAccountReq) (*domainuser.UserResp, *domainprofile.ProfileResp, error) {
+func (fake *FakeAccountUsecase) AccountUpdate(arg1 context.Context, arg2 dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error) {
 	fake.accountUpdateMutex.Lock()
 	ret, specificReturn := fake.accountUpdateReturnsOnCall[len(fake.accountUpdateArgsForCall)]
 	fake.accountUpdateArgsForCall = append(fake.accountUpdateArgsForCall, struct {
 		arg1 context.Context
-		arg2 domainaccount.UpdateAccountReq
+		arg2 dto.UpdateAccountReq
 	}{arg1, arg2})
 	stub := fake.AccountUpdateStub
 	fakeReturns := fake.accountUpdateReturns
@@ -57,44 +56,44 @@ func (fake *FakeAccountUsecase) AccountUpdateCallCount() int {
 	return len(fake.accountUpdateArgsForCall)
 }
 
-func (fake *FakeAccountUsecase) AccountUpdateCalls(stub func(context.Context, domainaccount.UpdateAccountReq) (*domainuser.UserResp, *domainprofile.ProfileResp, error)) {
+func (fake *FakeAccountUsecase) AccountUpdateCalls(stub func(context.Context, dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error)) {
 	fake.accountUpdateMutex.Lock()
 	defer fake.accountUpdateMutex.Unlock()
 	fake.AccountUpdateStub = stub
 }
 
-func (fake *FakeAccountUsecase) AccountUpdateArgsForCall(i int) (context.Context, domainaccount.UpdateAccountReq) {
+func (fake *FakeAccountUsecase) AccountUpdateArgsForCall(i int) (context.Context, dto.UpdateAccountReq) {
 	fake.accountUpdateMutex.RLock()
 	defer fake.accountUpdateMutex.RUnlock()
 	argsForCall := fake.accountUpdateArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeAccountUsecase) AccountUpdateReturns(result1 *domainuser.UserResp, result2 *domainprofile.ProfileResp, result3 error) {
+func (fake *FakeAccountUsecase) AccountUpdateReturns(result1 *dto.UserResp, result2 *dto.ProfileResp, result3 error) {
 	fake.accountUpdateMutex.Lock()
 	defer fake.accountUpdateMutex.Unlock()
 	fake.AccountUpdateStub = nil
 	fake.accountUpdateReturns = struct {
-		result1 *domainuser.UserResp
-		result2 *domainprofile.ProfileResp
+		result1 *dto.UserResp
+		result2 *dto.ProfileResp
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeAccountUsecase) AccountUpdateReturnsOnCall(i int, result1 *domainuser.UserResp, result2 *domainprofile.ProfileResp, result3 error) {
+func (fake *FakeAccountUsecase) AccountUpdateReturnsOnCall(i int, result1 *dto.UserResp, result2 *dto.ProfileResp, result3 error) {
 	fake.accountUpdateMutex.Lock()
 	defer fake.accountUpdateMutex.Unlock()
 	fake.AccountUpdateStub = nil
 	if fake.accountUpdateReturnsOnCall == nil {
 		fake.accountUpdateReturnsOnCall = make(map[int]struct {
-			result1 *domainuser.UserResp
-			result2 *domainprofile.ProfileResp
+			result1 *dto.UserResp
+			result2 *dto.ProfileResp
 			result3 error
 		})
 	}
 	fake.accountUpdateReturnsOnCall[i] = struct {
-		result1 *domainuser.UserResp
-		result2 *domainprofile.ProfileResp
+		result1 *dto.UserResp
+		result2 *dto.ProfileResp
 		result3 error
 	}{result1, result2, result3}
 }
@@ -123,4 +122,4 @@ func (fake *FakeAccountUsecase) recordInvocation(key string, args []interface{})
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ domainaccount.AccountUsecase = new(FakeAccountUsecase)
+var _ usecase.AccountUsecase = new(FakeAccountUsecase)

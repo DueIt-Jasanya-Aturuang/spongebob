@@ -5,63 +5,64 @@ import (
 	"context"
 	"sync"
 
-	domainprofilecfg "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-profile-cfg"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
 )
 
 type FakeProfileCfgUsecase struct {
-	CreateProfileCfgStub        func(context.Context, domainprofilecfg.ProfileCfgReq) (*domainprofilecfg.ProfileCfgResp, error)
+	CreateProfileCfgStub        func(context.Context, dto.ProfileCfgReq) (*dto.ProfileCfgResp, error)
 	createProfileCfgMutex       sync.RWMutex
 	createProfileCfgArgsForCall []struct {
 		arg1 context.Context
-		arg2 domainprofilecfg.ProfileCfgReq
+		arg2 dto.ProfileCfgReq
 	}
 	createProfileCfgReturns struct {
-		result1 *domainprofilecfg.ProfileCfgResp
+		result1 *dto.ProfileCfgResp
 		result2 error
 	}
 	createProfileCfgReturnsOnCall map[int]struct {
-		result1 *domainprofilecfg.ProfileCfgResp
+		result1 *dto.ProfileCfgResp
 		result2 error
 	}
-	GetProfileCfgByIdStub        func(context.Context, string) (*domainprofilecfg.ProfileCfgResp, error)
+	GetProfileCfgByIdStub        func(context.Context, string) (*dto.ProfileCfgResp, error)
 	getProfileCfgByIdMutex       sync.RWMutex
 	getProfileCfgByIdArgsForCall []struct {
 		arg1 context.Context
 		arg2 string
 	}
 	getProfileCfgByIdReturns struct {
-		result1 *domainprofilecfg.ProfileCfgResp
+		result1 *dto.ProfileCfgResp
 		result2 error
 	}
 	getProfileCfgByIdReturnsOnCall map[int]struct {
-		result1 *domainprofilecfg.ProfileCfgResp
+		result1 *dto.ProfileCfgResp
 		result2 error
 	}
-	UpdateProfileCfgStub        func(context.Context, domainprofilecfg.ProfileCfgReq, string) (*domainprofilecfg.ProfileCfgResp, error)
+	UpdateProfileCfgStub        func(context.Context, dto.ProfileCfgReq, string) (*dto.ProfileCfgResp, error)
 	updateProfileCfgMutex       sync.RWMutex
 	updateProfileCfgArgsForCall []struct {
 		arg1 context.Context
-		arg2 domainprofilecfg.ProfileCfgReq
+		arg2 dto.ProfileCfgReq
 		arg3 string
 	}
 	updateProfileCfgReturns struct {
-		result1 *domainprofilecfg.ProfileCfgResp
+		result1 *dto.ProfileCfgResp
 		result2 error
 	}
 	updateProfileCfgReturnsOnCall map[int]struct {
-		result1 *domainprofilecfg.ProfileCfgResp
+		result1 *dto.ProfileCfgResp
 		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeProfileCfgUsecase) CreateProfileCfg(arg1 context.Context, arg2 domainprofilecfg.ProfileCfgReq) (*domainprofilecfg.ProfileCfgResp, error) {
+func (fake *FakeProfileCfgUsecase) CreateProfileCfg(arg1 context.Context, arg2 dto.ProfileCfgReq) (*dto.ProfileCfgResp, error) {
 	fake.createProfileCfgMutex.Lock()
 	ret, specificReturn := fake.createProfileCfgReturnsOnCall[len(fake.createProfileCfgArgsForCall)]
 	fake.createProfileCfgArgsForCall = append(fake.createProfileCfgArgsForCall, struct {
 		arg1 context.Context
-		arg2 domainprofilecfg.ProfileCfgReq
+		arg2 dto.ProfileCfgReq
 	}{arg1, arg2})
 	stub := fake.CreateProfileCfgStub
 	fakeReturns := fake.createProfileCfgReturns
@@ -82,46 +83,46 @@ func (fake *FakeProfileCfgUsecase) CreateProfileCfgCallCount() int {
 	return len(fake.createProfileCfgArgsForCall)
 }
 
-func (fake *FakeProfileCfgUsecase) CreateProfileCfgCalls(stub func(context.Context, domainprofilecfg.ProfileCfgReq) (*domainprofilecfg.ProfileCfgResp, error)) {
+func (fake *FakeProfileCfgUsecase) CreateProfileCfgCalls(stub func(context.Context, dto.ProfileCfgReq) (*dto.ProfileCfgResp, error)) {
 	fake.createProfileCfgMutex.Lock()
 	defer fake.createProfileCfgMutex.Unlock()
 	fake.CreateProfileCfgStub = stub
 }
 
-func (fake *FakeProfileCfgUsecase) CreateProfileCfgArgsForCall(i int) (context.Context, domainprofilecfg.ProfileCfgReq) {
+func (fake *FakeProfileCfgUsecase) CreateProfileCfgArgsForCall(i int) (context.Context, dto.ProfileCfgReq) {
 	fake.createProfileCfgMutex.RLock()
 	defer fake.createProfileCfgMutex.RUnlock()
 	argsForCall := fake.createProfileCfgArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeProfileCfgUsecase) CreateProfileCfgReturns(result1 *domainprofilecfg.ProfileCfgResp, result2 error) {
+func (fake *FakeProfileCfgUsecase) CreateProfileCfgReturns(result1 *dto.ProfileCfgResp, result2 error) {
 	fake.createProfileCfgMutex.Lock()
 	defer fake.createProfileCfgMutex.Unlock()
 	fake.CreateProfileCfgStub = nil
 	fake.createProfileCfgReturns = struct {
-		result1 *domainprofilecfg.ProfileCfgResp
+		result1 *dto.ProfileCfgResp
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileCfgUsecase) CreateProfileCfgReturnsOnCall(i int, result1 *domainprofilecfg.ProfileCfgResp, result2 error) {
+func (fake *FakeProfileCfgUsecase) CreateProfileCfgReturnsOnCall(i int, result1 *dto.ProfileCfgResp, result2 error) {
 	fake.createProfileCfgMutex.Lock()
 	defer fake.createProfileCfgMutex.Unlock()
 	fake.CreateProfileCfgStub = nil
 	if fake.createProfileCfgReturnsOnCall == nil {
 		fake.createProfileCfgReturnsOnCall = make(map[int]struct {
-			result1 *domainprofilecfg.ProfileCfgResp
+			result1 *dto.ProfileCfgResp
 			result2 error
 		})
 	}
 	fake.createProfileCfgReturnsOnCall[i] = struct {
-		result1 *domainprofilecfg.ProfileCfgResp
+		result1 *dto.ProfileCfgResp
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileCfgUsecase) GetProfileCfgById(arg1 context.Context, arg2 string) (*domainprofilecfg.ProfileCfgResp, error) {
+func (fake *FakeProfileCfgUsecase) GetProfileCfgById(arg1 context.Context, arg2 string) (*dto.ProfileCfgResp, error) {
 	fake.getProfileCfgByIdMutex.Lock()
 	ret, specificReturn := fake.getProfileCfgByIdReturnsOnCall[len(fake.getProfileCfgByIdArgsForCall)]
 	fake.getProfileCfgByIdArgsForCall = append(fake.getProfileCfgByIdArgsForCall, struct {
@@ -147,7 +148,7 @@ func (fake *FakeProfileCfgUsecase) GetProfileCfgByIdCallCount() int {
 	return len(fake.getProfileCfgByIdArgsForCall)
 }
 
-func (fake *FakeProfileCfgUsecase) GetProfileCfgByIdCalls(stub func(context.Context, string) (*domainprofilecfg.ProfileCfgResp, error)) {
+func (fake *FakeProfileCfgUsecase) GetProfileCfgByIdCalls(stub func(context.Context, string) (*dto.ProfileCfgResp, error)) {
 	fake.getProfileCfgByIdMutex.Lock()
 	defer fake.getProfileCfgByIdMutex.Unlock()
 	fake.GetProfileCfgByIdStub = stub
@@ -160,38 +161,38 @@ func (fake *FakeProfileCfgUsecase) GetProfileCfgByIdArgsForCall(i int) (context.
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeProfileCfgUsecase) GetProfileCfgByIdReturns(result1 *domainprofilecfg.ProfileCfgResp, result2 error) {
+func (fake *FakeProfileCfgUsecase) GetProfileCfgByIdReturns(result1 *dto.ProfileCfgResp, result2 error) {
 	fake.getProfileCfgByIdMutex.Lock()
 	defer fake.getProfileCfgByIdMutex.Unlock()
 	fake.GetProfileCfgByIdStub = nil
 	fake.getProfileCfgByIdReturns = struct {
-		result1 *domainprofilecfg.ProfileCfgResp
+		result1 *dto.ProfileCfgResp
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileCfgUsecase) GetProfileCfgByIdReturnsOnCall(i int, result1 *domainprofilecfg.ProfileCfgResp, result2 error) {
+func (fake *FakeProfileCfgUsecase) GetProfileCfgByIdReturnsOnCall(i int, result1 *dto.ProfileCfgResp, result2 error) {
 	fake.getProfileCfgByIdMutex.Lock()
 	defer fake.getProfileCfgByIdMutex.Unlock()
 	fake.GetProfileCfgByIdStub = nil
 	if fake.getProfileCfgByIdReturnsOnCall == nil {
 		fake.getProfileCfgByIdReturnsOnCall = make(map[int]struct {
-			result1 *domainprofilecfg.ProfileCfgResp
+			result1 *dto.ProfileCfgResp
 			result2 error
 		})
 	}
 	fake.getProfileCfgByIdReturnsOnCall[i] = struct {
-		result1 *domainprofilecfg.ProfileCfgResp
+		result1 *dto.ProfileCfgResp
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileCfgUsecase) UpdateProfileCfg(arg1 context.Context, arg2 domainprofilecfg.ProfileCfgReq, arg3 string) (*domainprofilecfg.ProfileCfgResp, error) {
+func (fake *FakeProfileCfgUsecase) UpdateProfileCfg(arg1 context.Context, arg2 dto.ProfileCfgReq, arg3 string) (*dto.ProfileCfgResp, error) {
 	fake.updateProfileCfgMutex.Lock()
 	ret, specificReturn := fake.updateProfileCfgReturnsOnCall[len(fake.updateProfileCfgArgsForCall)]
 	fake.updateProfileCfgArgsForCall = append(fake.updateProfileCfgArgsForCall, struct {
 		arg1 context.Context
-		arg2 domainprofilecfg.ProfileCfgReq
+		arg2 dto.ProfileCfgReq
 		arg3 string
 	}{arg1, arg2, arg3})
 	stub := fake.UpdateProfileCfgStub
@@ -213,41 +214,41 @@ func (fake *FakeProfileCfgUsecase) UpdateProfileCfgCallCount() int {
 	return len(fake.updateProfileCfgArgsForCall)
 }
 
-func (fake *FakeProfileCfgUsecase) UpdateProfileCfgCalls(stub func(context.Context, domainprofilecfg.ProfileCfgReq, string) (*domainprofilecfg.ProfileCfgResp, error)) {
+func (fake *FakeProfileCfgUsecase) UpdateProfileCfgCalls(stub func(context.Context, dto.ProfileCfgReq, string) (*dto.ProfileCfgResp, error)) {
 	fake.updateProfileCfgMutex.Lock()
 	defer fake.updateProfileCfgMutex.Unlock()
 	fake.UpdateProfileCfgStub = stub
 }
 
-func (fake *FakeProfileCfgUsecase) UpdateProfileCfgArgsForCall(i int) (context.Context, domainprofilecfg.ProfileCfgReq, string) {
+func (fake *FakeProfileCfgUsecase) UpdateProfileCfgArgsForCall(i int) (context.Context, dto.ProfileCfgReq, string) {
 	fake.updateProfileCfgMutex.RLock()
 	defer fake.updateProfileCfgMutex.RUnlock()
 	argsForCall := fake.updateProfileCfgArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeProfileCfgUsecase) UpdateProfileCfgReturns(result1 *domainprofilecfg.ProfileCfgResp, result2 error) {
+func (fake *FakeProfileCfgUsecase) UpdateProfileCfgReturns(result1 *dto.ProfileCfgResp, result2 error) {
 	fake.updateProfileCfgMutex.Lock()
 	defer fake.updateProfileCfgMutex.Unlock()
 	fake.UpdateProfileCfgStub = nil
 	fake.updateProfileCfgReturns = struct {
-		result1 *domainprofilecfg.ProfileCfgResp
+		result1 *dto.ProfileCfgResp
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileCfgUsecase) UpdateProfileCfgReturnsOnCall(i int, result1 *domainprofilecfg.ProfileCfgResp, result2 error) {
+func (fake *FakeProfileCfgUsecase) UpdateProfileCfgReturnsOnCall(i int, result1 *dto.ProfileCfgResp, result2 error) {
 	fake.updateProfileCfgMutex.Lock()
 	defer fake.updateProfileCfgMutex.Unlock()
 	fake.UpdateProfileCfgStub = nil
 	if fake.updateProfileCfgReturnsOnCall == nil {
 		fake.updateProfileCfgReturnsOnCall = make(map[int]struct {
-			result1 *domainprofilecfg.ProfileCfgResp
+			result1 *dto.ProfileCfgResp
 			result2 error
 		})
 	}
 	fake.updateProfileCfgReturnsOnCall[i] = struct {
-		result1 *domainprofilecfg.ProfileCfgResp
+		result1 *dto.ProfileCfgResp
 		result2 error
 	}{result1, result2}
 }
@@ -280,4 +281,4 @@ func (fake *FakeProfileCfgUsecase) recordInvocation(key string, args []interface
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ domainprofilecfg.ProfileCfgUsecase = new(FakeProfileCfgUsecase)
+var _ usecase.ProfileCfgUsecase = new(FakeProfileCfgUsecase)

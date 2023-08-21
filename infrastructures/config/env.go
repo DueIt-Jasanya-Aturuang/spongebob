@@ -26,18 +26,25 @@ func EnvInit() {
 	PgName = os.Getenv("DB_POSTGRESQL_NAME")
 	PgSSL = os.Getenv("DB_POSTGRESQL_SSL")
 
-	dbInt, _ := strconv.Atoi(os.Getenv("REDIS_DB"))
+	dbInt, err := strconv.Atoi(os.Getenv("REDIS_DB"))
+	if err != nil {
+		panic(err)
+	}
 	RedisHost = os.Getenv("REDIS_HOST")
 	RedisPort = os.Getenv("REDIS_PORT")
 	RedisDb = dbInt
 	RedisPass = os.Getenv("REDIS_PASS")
 
-	MinIoAccessKey = os.Getenv("MINIO_ACCESSKEY")
+	miniosslBool, err := strconv.ParseBool(os.Getenv("MINIO_SSL"))
+	if err != nil {
+		panic(err)
+	}
+	MinIoId = os.Getenv("MINIO_ID")
 	MinIoSecretKey = os.Getenv("MINIO_SECRETKEY")
 	MinIoEndpoint = os.Getenv("MINIO_ENDPOINT")
 	MinIoPort = os.Getenv("MINIO_PORT")
 	MinIoBucket = os.Getenv("MINIO_BUCKET")
-	MinIoSSL = os.Getenv("MINIO_SSL")
+	MinIoSSL = miniosslBool
 
 	DefaultImage = os.Getenv("DEFAULT_DEFAULT_IMAGE")
 	AesCFB = os.Getenv("DEFAULT_AES_CFB_KEY")
@@ -46,3 +53,33 @@ func EnvInit() {
 
 	log.Info().Msg("config initialization successfully")
 }
+
+var (
+	AppPort      string
+	AppStatus    string
+	AppGracefull string
+
+	PgHost string
+	PgPort string
+	PgUser string
+	PgPass string
+	PgName string
+	PgSSL  string
+
+	RedisHost string
+	RedisPort string
+	RedisDb   int
+	RedisPass string
+
+	MinIoId        string
+	MinIoSecretKey string
+	MinIoEndpoint  string
+	MinIoPort      string
+	MinIoBucket    string
+	MinIoSSL       bool
+
+	DefaultImage string
+	AesCFB       string
+	AesCBC       string
+	AesCBCIV     string
+)

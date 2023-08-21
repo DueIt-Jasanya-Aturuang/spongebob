@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	domainerror "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-error"
-	domainprofile "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-profile"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/repositories"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exceptions"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repositories"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
@@ -18,25 +18,24 @@ import (
 )
 
 var (
-	id1         = uuid.NewV4().String()
-	id2         = uuid.NewV4().String()
-	id3         = uuid.NewV4().String()
-	userId1     = "user id 1"
-	userId2     = "user id 2"
-	userId3     = "user id 3"
-	columns     = []string{"id", "user_id", "quotes", "created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"}
-	profileRepo = repositories.NewProfileRepoImpl()
+	id1     = uuid.NewV4().String()
+	id2     = uuid.NewV4().String()
+	id3     = uuid.NewV4().String()
+	userId1 = "user id 1"
+	userId2 = "user id 2"
+	userId3 = "user id 3"
+	columns = []string{"id", "user_id", "quotes", "created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"}
 )
 
 func TestGetProfileById(t *testing.T) {
-	log.Logger = log.Output(zerolog.Nop())
 	db, mocksql, err := sqlmock.New()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer db.Close()
+	profileRepo := repositories.NewProfileRepoImpl(db)
 
-	expectProfile := &domainprofile.Profile{
+	expectProfile := &model.Profile{
 		ProfileId: id1,
 		UserId:    userId1,
 		Quote:     sql.NullString{String: "semangat", Valid: true},
@@ -59,7 +58,7 @@ func TestGetProfileById(t *testing.T) {
 		mocksql.ExpectPrepare(prepareQuery)
 		mocksql.ExpectQuery(prepareQuery).WithArgs(id1).WillReturnRows(rows)
 
-		profile, err := profileRepo.GetProfileById(context.TODO(), db, id1)
+		profile, err := profileRepo.GetProfileById(context.TODO(), id1)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.Equal(t, expectProfile, profile)
@@ -76,7 +75,7 @@ func TestGetProfileById(t *testing.T) {
 		mocksql.ExpectPrepare(prepareQuery)
 		mocksql.ExpectQuery(prepareQuery).WithArgs(id1).WillReturnRows(rows)
 
-		profile, err := profileRepo.GetProfileById(context.TODO(), db, id1)
+		profile, err := profileRepo.GetProfileById(context.TODO(), id1)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.NotEqual(t, expectProfile, profile)
@@ -88,7 +87,7 @@ func TestGetProfileById(t *testing.T) {
 		mocksql.ExpectPrepare(prepareQuery)
 		mocksql.ExpectQuery(prepareQuery).WithArgs(id1).WillReturnRows(sqlmock.NewRows(columns))
 
-		profile, err := profileRepo.GetProfileById(context.TODO(), db, id1)
+		profile, err := profileRepo.GetProfileById(context.TODO(), id1)
 		assert.Error(t, err)
 		assert.Nil(t, profile)
 		assert.NotEqual(t, expectProfile, profile)
@@ -99,14 +98,13 @@ func TestGetProfileById(t *testing.T) {
 }
 
 func TestGetProfileByUserId(t *testing.T) {
-	log.Logger = log.Output(zerolog.Nop())
 	db, mocksql, err := sqlmock.New()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer db.Close()
-
-	expectProfile := &domainprofile.Profile{
+	profileRepo := repositories.NewProfileRepoImpl(db)
+	expectProfile := &model.Profile{
 		ProfileId: id1,
 		UserId:    userId1,
 		Quote:     sql.NullString{String: "semangat", Valid: true},
@@ -129,7 +127,7 @@ func TestGetProfileByUserId(t *testing.T) {
 		mocksql.ExpectPrepare(prepareQuery)
 		mocksql.ExpectQuery(prepareQuery).WithArgs(userId1).WillReturnRows(rows)
 
-		profile, err := profileRepo.GetProfileByUserId(context.TODO(), db, userId1)
+		profile, err := profileRepo.GetProfileByUserId(context.TODO(), userId1)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.Equal(t, expectProfile, profile)
@@ -146,7 +144,7 @@ func TestGetProfileByUserId(t *testing.T) {
 		mocksql.ExpectPrepare(prepareQuery)
 		mocksql.ExpectQuery(prepareQuery).WithArgs(id1).WillReturnRows(rows)
 
-		profile, err := profileRepo.GetProfileByUserId(context.TODO(), db, id1)
+		profile, err := profileRepo.GetProfileByUserId(context.TODO(), id1)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.NotEqual(t, expectProfile, profile)
@@ -159,7 +157,7 @@ func TestGetProfileByUserId(t *testing.T) {
 		mocksql.ExpectQuery(prepareQuery).WithArgs(id1).
 			WillReturnRows(sqlmock.NewRows(columns))
 
-		profile, err := profileRepo.GetProfileByUserId(context.TODO(), db, id1)
+		profile, err := profileRepo.GetProfileByUserId(context.TODO(), id1)
 		assert.Error(t, err)
 		assert.Nil(t, profile)
 		assert.NotEqual(t, expectProfile, profile)
@@ -172,7 +170,7 @@ func TestGetProfileByUserId(t *testing.T) {
 func TestStoreProfile(t *testing.T) {
 	// log.Logger = log.Output(zerolog.Nop())
 	unix := time.Now().Unix()
-	createProfile := &domainprofile.Profile{
+	createProfile := &model.Profile{
 		ProfileId: id1,
 		UserId:    userId1,
 		Quote:     sql.NullString{String: "semagat", Valid: true},
@@ -189,6 +187,7 @@ func TestStoreProfile(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
+	profileRepo := repositories.NewProfileRepoImpl(db)
 
 	query := regexp.QuoteMeta("SELECT EXISTS (SELECT 1 FROM dueit.m_profiles WHERE user_id = $1)")
 	query2 := regexp.QuoteMeta("INSERT INTO dueit.m_profiles (id, user_id, quotes, created_at, created_by, updated_at) VALUES ($1, $2, $3, $4, $5, $6)")
@@ -234,7 +233,7 @@ func TestStoreProfile(t *testing.T) {
 		}
 		_, err = profileRepo.StoreProfile(context.TODO(), tx, *createProfile)
 		assert.Error(t, err)
-		assert.Equal(t, domainerror.ErrProfileAlvailable, err)
+		assert.Equal(t, exceptions.ErrProfileAlvailable, err)
 
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
@@ -244,7 +243,7 @@ func TestStoreProfile(t *testing.T) {
 func TestUpdateProfile(t *testing.T) {
 	log.Logger = log.Output(zerolog.Nop())
 	unix := time.Now().Unix()
-	updateProfile := &domainprofile.Profile{
+	updateProfile := &model.Profile{
 		ProfileId: id1,
 		UserId:    userId1,
 		Quote:     sql.NullString{String: "semagat", Valid: true},
@@ -261,6 +260,7 @@ func TestUpdateProfile(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
+	profileRepo := repositories.NewProfileRepoImpl(db)
 
 	query := regexp.QuoteMeta("UPDATE dueit.m_profiles SET quotes = $1, updated_by = $2, updated_at = $3 WHERE user_id = $4 AND id = $5 AND deleted_at IS NULL")
 

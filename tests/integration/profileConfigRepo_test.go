@@ -9,8 +9,10 @@ import (
 	"testing"
 	"time"
 
-	domainerror "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-error"
-	domainprofilecfg "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-profile-cfg"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exceptions"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repositories"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 )
@@ -25,7 +27,7 @@ func marshal(data any) string {
 }
 
 var (
-	unix              = time.Now().Unix()
+	unixProfileCfg    = time.Now().Unix()
 	profileCfgPeriod1 = map[string]any{
 		"config_date": 29,
 		"token":       "123",
@@ -38,41 +40,41 @@ var (
 		"days":                   []string{"monday", "sunday"},
 		"token":                  "1234",
 	}
-	profileConfig1 = domainprofilecfg.ProfileCfg{
+	profileConfig1 = model.ProfileCfg{
 		ID:          "profileCfgid1",
 		ProfileId:   "profileid1",
 		ConfigName:  "USER PERIOD",
 		ConfigValue: marshal(profileCfgPeriod1),
 		Status:      "on",
-		CreatedAt:   unix,
+		CreatedAt:   unixProfileCfg,
 		CreatedBy:   "profileCfgid1",
-		UpdatedAt:   unix,
+		UpdatedAt:   unixProfileCfg,
 		UpdatedBy:   sql.NullString{},
 		DeletedAt:   sql.NullInt64{},
 		DeletedBy:   sql.NullString{},
 	}
-	profileConfigUpdate1 = domainprofilecfg.ProfileCfg{
+	profileConfigUpdate1 = model.ProfileCfg{
 		ID:          "profileCfgid1",
 		ProfileId:   "profileid1",
 		ConfigName:  "USER PERIOD",
 		ConfigValue: marshal(profileCfgPeriod1),
 		Status:      "off",
-		CreatedAt:   unix,
+		CreatedAt:   unixProfileCfg,
 		CreatedBy:   "profileCfgid1",
-		UpdatedAt:   unix,
+		UpdatedAt:   unixProfileCfg,
 		UpdatedBy:   sql.NullString{String: "profileid1", Valid: true},
 		DeletedAt:   sql.NullInt64{},
 		DeletedBy:   sql.NullString{},
 	}
-	profileConfig2 = domainprofilecfg.ProfileCfg{
+	profileConfig2 = model.ProfileCfg{
 		ID:          "profileCfgid2",
 		ProfileId:   "profileid1",
 		ConfigName:  "DAILY NOTIF",
 		ConfigValue: marshal(profileCfgDay1),
 		Status:      "on",
-		CreatedAt:   unix,
+		CreatedAt:   unixProfileCfg,
 		CreatedBy:   "profileid1",
-		UpdatedAt:   unix,
+		UpdatedAt:   unixProfileCfg,
 		UpdatedBy:   sql.NullString{},
 		DeletedAt:   sql.NullInt64{},
 		DeletedBy:   sql.NullString{},
@@ -80,6 +82,7 @@ var (
 )
 
 func TestProfileConfigRepo(t *testing.T) {
+	profileCfgRepo := repositories.NewProfileCfgRepoImpl(db)
 	t.Run("TestProfileRepo", ProfileRepo)
 	fmt.Println("RUNNING TEST PROFILE CONFIG REPOSITORY")
 
@@ -102,31 +105,31 @@ func TestProfileConfigRepo(t *testing.T) {
 		}
 		err = profileCfgRepo.StoreProfileCfg(context.Background(), tx, profileConfig1)
 		assert.Error(t, err)
-		assert.Equal(t, domainerror.ErrProfileConfigAlvailable, err)
+		assert.Equal(t, exceptions.ErrProfileConfigAlvailable, err)
 		tx.Rollback()
 	})
 
 	t.Run("SUCCESS_Get-By-Id-Or-UserId", func(t *testing.T) {
-		profileCfg, err := profileCfgRepo.GetProfileCfgById(context.Background(), db, profileConfig1.ID)
+		profileCfg, err := profileCfgRepo.GetProfileCfgById(context.Background(), profileConfig1.ID)
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfg)
 		assert.Equal(t, profileConfig1.ID, profileCfg.ID)
 	})
 
 	t.Run("ERROR_Get-By-Id-Or-UserId", func(t *testing.T) {
-		profileCfg, err := profileCfgRepo.GetProfileCfgById(context.Background(), db, profileConfig1.ConfigName)
+		profileCfg, err := profileCfgRepo.GetProfileCfgById(context.Background(), profileConfig1.ConfigName)
 		assert.Error(t, err)
 		assert.Nil(t, profileCfg)
 		assert.Equal(t, sql.ErrNoRows, err)
 	})
 
 	t.Run("SUCCESS_Get-Scheduler", func(t *testing.T) {
-		scheduler := domainprofilecfg.ProfileCfgScheduler{
+		scheduler := dto.ProfileCfgScheduler{
 			Day:  "monday",
 			Time: "02:00",
 		}
 
-		profileCfgs, err := profileCfgRepo.GetProfileCfgByScheduler(context.Background(), db, scheduler)
+		profileCfgs, err := profileCfgRepo.GetProfileCfgByScheduler(context.Background(), scheduler)
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfgs)
 		if len(*profileCfgs) < 1 {
@@ -136,12 +139,12 @@ func TestProfileConfigRepo(t *testing.T) {
 	})
 
 	t.Run("ERROR_Get-Scheduler", func(t *testing.T) {
-		scheduler := domainprofilecfg.ProfileCfgScheduler{
+		scheduler := dto.ProfileCfgScheduler{
 			Day:  "saturday",
 			Time: "02:00",
 		}
 
-		profileCfgs, err := profileCfgRepo.GetProfileCfgByScheduler(context.Background(), db, scheduler)
+		profileCfgs, err := profileCfgRepo.GetProfileCfgByScheduler(context.Background(), scheduler)
 		assert.NoError(t, err)
 		if len(*profileCfgs) >= 1 {
 			fmt.Println(len(*profileCfgs))

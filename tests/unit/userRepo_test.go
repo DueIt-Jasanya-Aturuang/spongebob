@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	domainerror "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-error"
-	domainuser "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-user"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/repositories"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exceptions"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repositories"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
@@ -19,15 +19,15 @@ import (
 var (
 	gender      = "male"
 	userColumns = []string{"id", "fullname", "gender", "image", "email", "username", "password", "phone_number", "email_verified_at", "created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"}
-	userRepo    = repositories.NewUserRepoImpl()
-	image       = "default-male.png"
-	email       = "ibanrama29@gmail.com"
+
+	image = "default-male.png"
+	email = "ibanrama29@gmail.com"
 )
 
 func TestGetUserById(t *testing.T) {
 	log.Logger = log.Output(zerolog.Nop())
 	unix := time.Now().Unix()
-	expectUser := domainuser.User{
+	expectUser := model.User{
 		ID:              userId1,
 		FullName:        "rama",
 		Gender:          gender,
@@ -50,7 +50,7 @@ func TestGetUserById(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-
+	userRepo := repositories.NewUserRepoImpl(db)
 	query := regexp.QuoteMeta("SELECT id, fullname, gender, image, username, email, password, phone_number, email_verified_at, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM auth.m_users WHERE id = $1 AND deleted_at IS NULL")
 	t.Run("success", func(t *testing.T) {
 		rows := sqlmock.NewRows(userColumns)
@@ -60,7 +60,7 @@ func TestGetUserById(t *testing.T) {
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectQuery(query).WithArgs(userId1).WillReturnRows(rows)
 
-		user, err := userRepo.GetUserById(context.TODO(), db, userId1)
+		user, err := userRepo.GetUserById(context.TODO(), userId1)
 		assert.NoError(t, err)
 		assert.NotNil(t, user)
 		assert.Equal(t, &expectUser, user)
@@ -77,7 +77,7 @@ func TestGetUserById(t *testing.T) {
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectQuery(query).WithArgs(userId1).WillReturnRows(rows)
 
-		user, err := userRepo.GetUserById(context.TODO(), db, userId1)
+		user, err := userRepo.GetUserById(context.TODO(), userId1)
 		assert.NoError(t, err)
 		assert.NotNil(t, user)
 		assert.NotEqual(t, &expectUser, user)
@@ -90,7 +90,7 @@ func TestGetUserById(t *testing.T) {
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectQuery(query).WithArgs(userId1).WillReturnRows(sqlmock.NewRows(userColumns))
 
-		user, err := userRepo.GetUserById(context.TODO(), db, userId1)
+		user, err := userRepo.GetUserById(context.TODO(), userId1)
 		assert.Error(t, err)
 		assert.Nil(t, user)
 		assert.NotEqual(t, &expectUser, user)
@@ -103,7 +103,7 @@ func TestGetUserById(t *testing.T) {
 func TestUpdateUser(t *testing.T) {
 	// log.Logger = log.Output(zerolog.Nop())
 	unix := time.Now().Unix()
-	updateUser := domainuser.User{
+	updateUser := model.User{
 		ID:              userId1,
 		FullName:        "rama",
 		Gender:          gender,
@@ -126,7 +126,7 @@ func TestUpdateUser(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-
+	userRepo := repositories.NewUserRepoImpl(db)
 	query := regexp.QuoteMeta("SELECT phone_number, id FROM auth.m_users WHERE phone_number=$1 AND id<>$2 AND deleted_at IS NULL")
 	query2 := regexp.QuoteMeta("UPDATE auth.m_users SET fullname = $1, gender = $2, image = $3, phone_number = $4, updated_at = $5, updated_by = $6 WHERE id = $7 AND deleted_at IS NULL")
 	t.Run("success", func(t *testing.T) {
@@ -170,7 +170,7 @@ func TestUpdateUser(t *testing.T) {
 		user, err := userRepo.UpdateUser(context.TODO(), tx, updateUser)
 		assert.Error(t, err)
 		assert.Nil(t, user)
-		assert.Equal(t, domainerror.ErrPhoneAlvailable, err)
+		assert.Equal(t, exceptions.ErrPhoneAlvailable, err)
 
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
@@ -180,7 +180,7 @@ func TestUpdateUser(t *testing.T) {
 func TestUpdateUserUsername(t *testing.T) {
 	// log.Logger = log.Output(zerolog.Nop())
 	unix := time.Now().Unix()
-	updateUser := domainuser.User{
+	updateUser := model.User{
 		ID:              userId1,
 		FullName:        "rama",
 		Gender:          gender,
@@ -203,6 +203,7 @@ func TestUpdateUserUsername(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
+	userRepo := repositories.NewUserRepoImpl(db)
 
 	query := regexp.QuoteMeta("SELECT username, id FROM auth.m_users WHERE username=$1 AND id<>$2 AND deleted_at IS NULL")
 	query1 := regexp.QuoteMeta("UPDATE auth.m_users SET username = $1, updated_at = $2, updated_by = $3 WHERE id = $4 AND deleted_at IS NULL")
@@ -252,7 +253,7 @@ func TestUpdateUserUsername(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, user)
 		assert.NotEqual(t, user, &updateUser)
-		assert.Equal(t, domainerror.ErrUsernameAlvailable, err)
+		assert.Equal(t, exceptions.ErrUsernameAlvailable, err)
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
 	})

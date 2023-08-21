@@ -6,46 +6,46 @@ import (
 	"database/sql"
 	"sync"
 
-	domainprofilecfg "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-profile-cfg"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
 )
 
 type FakeProfileCfgRepo struct {
-	GetProfileCfgByIdStub        func(context.Context, *sql.DB, string) (*domainprofilecfg.ProfileCfg, error)
+	GetProfileCfgByIdStub        func(context.Context, string) (*model.ProfileCfg, error)
 	getProfileCfgByIdMutex       sync.RWMutex
 	getProfileCfgByIdArgsForCall []struct {
 		arg1 context.Context
-		arg2 *sql.DB
-		arg3 string
+		arg2 string
 	}
 	getProfileCfgByIdReturns struct {
-		result1 *domainprofilecfg.ProfileCfg
+		result1 *model.ProfileCfg
 		result2 error
 	}
 	getProfileCfgByIdReturnsOnCall map[int]struct {
-		result1 *domainprofilecfg.ProfileCfg
+		result1 *model.ProfileCfg
 		result2 error
 	}
-	GetProfileCfgBySchedulerStub        func(context.Context, *sql.DB, domainprofilecfg.ProfileCfgScheduler) (*[]domainprofilecfg.ProfileCfg, error)
+	GetProfileCfgBySchedulerStub        func(context.Context, dto.ProfileCfgScheduler) (*[]model.ProfileCfg, error)
 	getProfileCfgBySchedulerMutex       sync.RWMutex
 	getProfileCfgBySchedulerArgsForCall []struct {
 		arg1 context.Context
-		arg2 *sql.DB
-		arg3 domainprofilecfg.ProfileCfgScheduler
+		arg2 dto.ProfileCfgScheduler
 	}
 	getProfileCfgBySchedulerReturns struct {
-		result1 *[]domainprofilecfg.ProfileCfg
+		result1 *[]model.ProfileCfg
 		result2 error
 	}
 	getProfileCfgBySchedulerReturnsOnCall map[int]struct {
-		result1 *[]domainprofilecfg.ProfileCfg
+		result1 *[]model.ProfileCfg
 		result2 error
 	}
-	StoreProfileCfgStub        func(context.Context, *sql.Tx, domainprofilecfg.ProfileCfg) error
+	StoreProfileCfgStub        func(context.Context, *sql.Tx, model.ProfileCfg) error
 	storeProfileCfgMutex       sync.RWMutex
 	storeProfileCfgArgsForCall []struct {
 		arg1 context.Context
 		arg2 *sql.Tx
-		arg3 domainprofilecfg.ProfileCfg
+		arg3 model.ProfileCfg
 	}
 	storeProfileCfgReturns struct {
 		result1 error
@@ -53,12 +53,12 @@ type FakeProfileCfgRepo struct {
 	storeProfileCfgReturnsOnCall map[int]struct {
 		result1 error
 	}
-	UpdateProfileCfgStub        func(context.Context, *sql.Tx, domainprofilecfg.ProfileCfg) error
+	UpdateProfileCfgStub        func(context.Context, *sql.Tx, model.ProfileCfg) error
 	updateProfileCfgMutex       sync.RWMutex
 	updateProfileCfgArgsForCall []struct {
 		arg1 context.Context
 		arg2 *sql.Tx
-		arg3 domainprofilecfg.ProfileCfg
+		arg3 model.ProfileCfg
 	}
 	updateProfileCfgReturns struct {
 		result1 error
@@ -70,20 +70,19 @@ type FakeProfileCfgRepo struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgById(arg1 context.Context, arg2 *sql.DB, arg3 string) (*domainprofilecfg.ProfileCfg, error) {
+func (fake *FakeProfileCfgRepo) GetProfileCfgById(arg1 context.Context, arg2 string) (*model.ProfileCfg, error) {
 	fake.getProfileCfgByIdMutex.Lock()
 	ret, specificReturn := fake.getProfileCfgByIdReturnsOnCall[len(fake.getProfileCfgByIdArgsForCall)]
 	fake.getProfileCfgByIdArgsForCall = append(fake.getProfileCfgByIdArgsForCall, struct {
 		arg1 context.Context
-		arg2 *sql.DB
-		arg3 string
-	}{arg1, arg2, arg3})
+		arg2 string
+	}{arg1, arg2})
 	stub := fake.GetProfileCfgByIdStub
 	fakeReturns := fake.getProfileCfgByIdReturns
-	fake.recordInvocation("GetProfileCfgById", []interface{}{arg1, arg2, arg3})
+	fake.recordInvocation("GetProfileCfgById", []interface{}{arg1, arg2})
 	fake.getProfileCfgByIdMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3)
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -97,59 +96,58 @@ func (fake *FakeProfileCfgRepo) GetProfileCfgByIdCallCount() int {
 	return len(fake.getProfileCfgByIdArgsForCall)
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgByIdCalls(stub func(context.Context, *sql.DB, string) (*domainprofilecfg.ProfileCfg, error)) {
+func (fake *FakeProfileCfgRepo) GetProfileCfgByIdCalls(stub func(context.Context, string) (*model.ProfileCfg, error)) {
 	fake.getProfileCfgByIdMutex.Lock()
 	defer fake.getProfileCfgByIdMutex.Unlock()
 	fake.GetProfileCfgByIdStub = stub
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgByIdArgsForCall(i int) (context.Context, *sql.DB, string) {
+func (fake *FakeProfileCfgRepo) GetProfileCfgByIdArgsForCall(i int) (context.Context, string) {
 	fake.getProfileCfgByIdMutex.RLock()
 	defer fake.getProfileCfgByIdMutex.RUnlock()
 	argsForCall := fake.getProfileCfgByIdArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgByIdReturns(result1 *domainprofilecfg.ProfileCfg, result2 error) {
+func (fake *FakeProfileCfgRepo) GetProfileCfgByIdReturns(result1 *model.ProfileCfg, result2 error) {
 	fake.getProfileCfgByIdMutex.Lock()
 	defer fake.getProfileCfgByIdMutex.Unlock()
 	fake.GetProfileCfgByIdStub = nil
 	fake.getProfileCfgByIdReturns = struct {
-		result1 *domainprofilecfg.ProfileCfg
+		result1 *model.ProfileCfg
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgByIdReturnsOnCall(i int, result1 *domainprofilecfg.ProfileCfg, result2 error) {
+func (fake *FakeProfileCfgRepo) GetProfileCfgByIdReturnsOnCall(i int, result1 *model.ProfileCfg, result2 error) {
 	fake.getProfileCfgByIdMutex.Lock()
 	defer fake.getProfileCfgByIdMutex.Unlock()
 	fake.GetProfileCfgByIdStub = nil
 	if fake.getProfileCfgByIdReturnsOnCall == nil {
 		fake.getProfileCfgByIdReturnsOnCall = make(map[int]struct {
-			result1 *domainprofilecfg.ProfileCfg
+			result1 *model.ProfileCfg
 			result2 error
 		})
 	}
 	fake.getProfileCfgByIdReturnsOnCall[i] = struct {
-		result1 *domainprofilecfg.ProfileCfg
+		result1 *model.ProfileCfg
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgByScheduler(arg1 context.Context, arg2 *sql.DB, arg3 domainprofilecfg.ProfileCfgScheduler) (*[]domainprofilecfg.ProfileCfg, error) {
+func (fake *FakeProfileCfgRepo) GetProfileCfgByScheduler(arg1 context.Context, arg2 dto.ProfileCfgScheduler) (*[]model.ProfileCfg, error) {
 	fake.getProfileCfgBySchedulerMutex.Lock()
 	ret, specificReturn := fake.getProfileCfgBySchedulerReturnsOnCall[len(fake.getProfileCfgBySchedulerArgsForCall)]
 	fake.getProfileCfgBySchedulerArgsForCall = append(fake.getProfileCfgBySchedulerArgsForCall, struct {
 		arg1 context.Context
-		arg2 *sql.DB
-		arg3 domainprofilecfg.ProfileCfgScheduler
-	}{arg1, arg2, arg3})
+		arg2 dto.ProfileCfgScheduler
+	}{arg1, arg2})
 	stub := fake.GetProfileCfgBySchedulerStub
 	fakeReturns := fake.getProfileCfgBySchedulerReturns
-	fake.recordInvocation("GetProfileCfgByScheduler", []interface{}{arg1, arg2, arg3})
+	fake.recordInvocation("GetProfileCfgByScheduler", []interface{}{arg1, arg2})
 	fake.getProfileCfgBySchedulerMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3)
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -163,52 +161,52 @@ func (fake *FakeProfileCfgRepo) GetProfileCfgBySchedulerCallCount() int {
 	return len(fake.getProfileCfgBySchedulerArgsForCall)
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgBySchedulerCalls(stub func(context.Context, *sql.DB, domainprofilecfg.ProfileCfgScheduler) (*[]domainprofilecfg.ProfileCfg, error)) {
+func (fake *FakeProfileCfgRepo) GetProfileCfgBySchedulerCalls(stub func(context.Context, dto.ProfileCfgScheduler) (*[]model.ProfileCfg, error)) {
 	fake.getProfileCfgBySchedulerMutex.Lock()
 	defer fake.getProfileCfgBySchedulerMutex.Unlock()
 	fake.GetProfileCfgBySchedulerStub = stub
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgBySchedulerArgsForCall(i int) (context.Context, *sql.DB, domainprofilecfg.ProfileCfgScheduler) {
+func (fake *FakeProfileCfgRepo) GetProfileCfgBySchedulerArgsForCall(i int) (context.Context, dto.ProfileCfgScheduler) {
 	fake.getProfileCfgBySchedulerMutex.RLock()
 	defer fake.getProfileCfgBySchedulerMutex.RUnlock()
 	argsForCall := fake.getProfileCfgBySchedulerArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgBySchedulerReturns(result1 *[]domainprofilecfg.ProfileCfg, result2 error) {
+func (fake *FakeProfileCfgRepo) GetProfileCfgBySchedulerReturns(result1 *[]model.ProfileCfg, result2 error) {
 	fake.getProfileCfgBySchedulerMutex.Lock()
 	defer fake.getProfileCfgBySchedulerMutex.Unlock()
 	fake.GetProfileCfgBySchedulerStub = nil
 	fake.getProfileCfgBySchedulerReturns = struct {
-		result1 *[]domainprofilecfg.ProfileCfg
+		result1 *[]model.ProfileCfg
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgBySchedulerReturnsOnCall(i int, result1 *[]domainprofilecfg.ProfileCfg, result2 error) {
+func (fake *FakeProfileCfgRepo) GetProfileCfgBySchedulerReturnsOnCall(i int, result1 *[]model.ProfileCfg, result2 error) {
 	fake.getProfileCfgBySchedulerMutex.Lock()
 	defer fake.getProfileCfgBySchedulerMutex.Unlock()
 	fake.GetProfileCfgBySchedulerStub = nil
 	if fake.getProfileCfgBySchedulerReturnsOnCall == nil {
 		fake.getProfileCfgBySchedulerReturnsOnCall = make(map[int]struct {
-			result1 *[]domainprofilecfg.ProfileCfg
+			result1 *[]model.ProfileCfg
 			result2 error
 		})
 	}
 	fake.getProfileCfgBySchedulerReturnsOnCall[i] = struct {
-		result1 *[]domainprofilecfg.ProfileCfg
+		result1 *[]model.ProfileCfg
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileCfgRepo) StoreProfileCfg(arg1 context.Context, arg2 *sql.Tx, arg3 domainprofilecfg.ProfileCfg) error {
+func (fake *FakeProfileCfgRepo) StoreProfileCfg(arg1 context.Context, arg2 *sql.Tx, arg3 model.ProfileCfg) error {
 	fake.storeProfileCfgMutex.Lock()
 	ret, specificReturn := fake.storeProfileCfgReturnsOnCall[len(fake.storeProfileCfgArgsForCall)]
 	fake.storeProfileCfgArgsForCall = append(fake.storeProfileCfgArgsForCall, struct {
 		arg1 context.Context
 		arg2 *sql.Tx
-		arg3 domainprofilecfg.ProfileCfg
+		arg3 model.ProfileCfg
 	}{arg1, arg2, arg3})
 	stub := fake.StoreProfileCfgStub
 	fakeReturns := fake.storeProfileCfgReturns
@@ -229,13 +227,13 @@ func (fake *FakeProfileCfgRepo) StoreProfileCfgCallCount() int {
 	return len(fake.storeProfileCfgArgsForCall)
 }
 
-func (fake *FakeProfileCfgRepo) StoreProfileCfgCalls(stub func(context.Context, *sql.Tx, domainprofilecfg.ProfileCfg) error) {
+func (fake *FakeProfileCfgRepo) StoreProfileCfgCalls(stub func(context.Context, *sql.Tx, model.ProfileCfg) error) {
 	fake.storeProfileCfgMutex.Lock()
 	defer fake.storeProfileCfgMutex.Unlock()
 	fake.StoreProfileCfgStub = stub
 }
 
-func (fake *FakeProfileCfgRepo) StoreProfileCfgArgsForCall(i int) (context.Context, *sql.Tx, domainprofilecfg.ProfileCfg) {
+func (fake *FakeProfileCfgRepo) StoreProfileCfgArgsForCall(i int) (context.Context, *sql.Tx, model.ProfileCfg) {
 	fake.storeProfileCfgMutex.RLock()
 	defer fake.storeProfileCfgMutex.RUnlock()
 	argsForCall := fake.storeProfileCfgArgsForCall[i]
@@ -265,13 +263,13 @@ func (fake *FakeProfileCfgRepo) StoreProfileCfgReturnsOnCall(i int, result1 erro
 	}{result1}
 }
 
-func (fake *FakeProfileCfgRepo) UpdateProfileCfg(arg1 context.Context, arg2 *sql.Tx, arg3 domainprofilecfg.ProfileCfg) error {
+func (fake *FakeProfileCfgRepo) UpdateProfileCfg(arg1 context.Context, arg2 *sql.Tx, arg3 model.ProfileCfg) error {
 	fake.updateProfileCfgMutex.Lock()
 	ret, specificReturn := fake.updateProfileCfgReturnsOnCall[len(fake.updateProfileCfgArgsForCall)]
 	fake.updateProfileCfgArgsForCall = append(fake.updateProfileCfgArgsForCall, struct {
 		arg1 context.Context
 		arg2 *sql.Tx
-		arg3 domainprofilecfg.ProfileCfg
+		arg3 model.ProfileCfg
 	}{arg1, arg2, arg3})
 	stub := fake.UpdateProfileCfgStub
 	fakeReturns := fake.updateProfileCfgReturns
@@ -292,13 +290,13 @@ func (fake *FakeProfileCfgRepo) UpdateProfileCfgCallCount() int {
 	return len(fake.updateProfileCfgArgsForCall)
 }
 
-func (fake *FakeProfileCfgRepo) UpdateProfileCfgCalls(stub func(context.Context, *sql.Tx, domainprofilecfg.ProfileCfg) error) {
+func (fake *FakeProfileCfgRepo) UpdateProfileCfgCalls(stub func(context.Context, *sql.Tx, model.ProfileCfg) error) {
 	fake.updateProfileCfgMutex.Lock()
 	defer fake.updateProfileCfgMutex.Unlock()
 	fake.UpdateProfileCfgStub = stub
 }
 
-func (fake *FakeProfileCfgRepo) UpdateProfileCfgArgsForCall(i int) (context.Context, *sql.Tx, domainprofilecfg.ProfileCfg) {
+func (fake *FakeProfileCfgRepo) UpdateProfileCfgArgsForCall(i int) (context.Context, *sql.Tx, model.ProfileCfg) {
 	fake.updateProfileCfgMutex.RLock()
 	defer fake.updateProfileCfgMutex.RUnlock()
 	argsForCall := fake.updateProfileCfgArgsForCall[i]
@@ -358,4 +356,4 @@ func (fake *FakeProfileCfgRepo) recordInvocation(key string, args []interface{})
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ domainprofilecfg.ProfileCfgRepo = new(FakeProfileCfgRepo)
+var _ repository.ProfileCfgRepo = new(FakeProfileCfgRepo)

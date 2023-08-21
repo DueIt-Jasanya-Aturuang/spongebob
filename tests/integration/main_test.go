@@ -5,26 +5,32 @@ import (
 	"os"
 	"testing"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/repositories"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/config"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/tests/integration/utils"
+	"github.com/minio/minio-go/v7"
 	"github.com/rs/zerolog/log"
 )
 
 var (
-	db             *sql.DB
-	profileRepo    = repositories.NewProfileRepoImpl()
-	userRepo       = repositories.NewUserRepoImpl()
-	profileCfgRepo = repositories.NewProfileCfgRepoImpl()
+	db          *sql.DB
+	minioClient *minio.Client
 )
 
 func TestMain(t *testing.M) {
-	// log.Logger = log.Output(zerolog.Nop())
 	pool := utils.InitDocker()
 
-	// pulls an image, creates a container based on it and runs it
 	resource, dbPg, url := utils.PostgresStart(pool)
-
 	db = dbPg
+	if db == nil {
+		panic("db nil")
+	}
+
+	endpoint := utils.MinioStart(utils.InitDocker())
+	minioConn, err := config.NewMinioConn(endpoint, "MYACCESSKEY", "MYSECRETKEY", false)
+	if err != nil {
+		panic(err)
+	}
+	minioClient = minioConn
 	utils.StartMigration(url, db)
 	// Run tests
 	code := t.Run()

@@ -7,16 +7,17 @@ import (
 	"testing"
 	"time"
 
-	domainerror "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-error"
-	domainprofile "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-profile"
-	_ "github.com/lib/pq"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exceptions"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repositories"
 	"github.com/stretchr/testify/assert"
 )
 
 func ProfileRepo(t *testing.T) {
+	profileRepo := repositories.NewProfileRepoImpl(db)
 	fmt.Println("RUNNING TEST PROFILE REPOSITORY")
 	unix := time.Now().Unix()
-	dataProfile := domainprofile.Profile{
+	dataProfile := model.Profile{
 		ProfileId: "profileid1",
 		UserId:    "userId1",
 		Quote:     sql.NullString{String: "semagat", Valid: true},
@@ -47,39 +48,40 @@ func ProfileRepo(t *testing.T) {
 		profile, err := profileRepo.StoreProfile(context.Background(), tx, dataProfile)
 		assert.Error(t, err)
 		assert.NotEqual(t, dataProfile, profile)
-		assert.Equal(t, domainerror.ErrProfileAlvailable, err)
+		assert.Equal(t, exceptions.ErrProfileAlvailable, err)
 		tx.Rollback()
 	})
 
 	t.Run("SUCCESS_Get-By-Id", func(t *testing.T) {
-		profile, err := profileRepo.GetProfileById(context.TODO(), db, dataProfile.ProfileId)
+		profile, err := profileRepo.GetProfileById(context.TODO(), dataProfile.ProfileId)
+		t.Log(err)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.Equal(t, &dataProfile, profile)
 	})
 
 	t.Run("ERROR_Get-By-Id", func(t *testing.T) {
-		profile, err := profileRepo.GetProfileById(context.TODO(), db, "nil")
+		profile, err := profileRepo.GetProfileById(context.TODO(), "nil")
 		assert.Error(t, err)
 		assert.Nil(t, profile)
 		assert.Equal(t, err, sql.ErrNoRows)
 	})
 	t.Run("SUCCESS_Get-By-User-Id", func(t *testing.T) {
-		profile, err := profileRepo.GetProfileByUserId(context.TODO(), db, dataProfile.UserId)
+		profile, err := profileRepo.GetProfileByUserId(context.TODO(), dataProfile.UserId)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.Equal(t, &dataProfile, profile)
 	})
 
 	t.Run("ERROR_Get-By-User-Id", func(t *testing.T) {
-		profile, err := profileRepo.GetProfileByUserId(context.TODO(), db, "nil")
+		profile, err := profileRepo.GetProfileByUserId(context.TODO(), "nil")
 		assert.Error(t, err)
 		assert.Nil(t, profile)
 		assert.Equal(t, err, sql.ErrNoRows)
 	})
 
 	t.Run("SUCCESS_Update", func(t *testing.T) {
-		updateProfile := domainprofile.Profile{
+		updateProfile := model.Profile{
 			ProfileId: "id1",
 			UserId:    "userId1",
 			Quote:     sql.NullString{String: "semagat", Valid: true},

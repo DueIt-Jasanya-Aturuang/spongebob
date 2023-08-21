@@ -5,29 +5,30 @@ import (
 	"context"
 	"sync"
 
-	domainprofile "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-profile"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
 )
 
 type FakeProfileUsecase struct {
-	GetProfileByIdStub        func(context.Context, string) (*domainprofile.ProfileResp, error)
+	GetProfileByIdStub        func(context.Context, string) (*dto.ProfileResp, error)
 	getProfileByIdMutex       sync.RWMutex
 	getProfileByIdArgsForCall []struct {
 		arg1 context.Context
 		arg2 string
 	}
 	getProfileByIdReturns struct {
-		result1 *domainprofile.ProfileResp
+		result1 *dto.ProfileResp
 		result2 error
 	}
 	getProfileByIdReturnsOnCall map[int]struct {
-		result1 *domainprofile.ProfileResp
+		result1 *dto.ProfileResp
 		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeProfileUsecase) GetProfileById(arg1 context.Context, arg2 string) (*domainprofile.ProfileResp, error) {
+func (fake *FakeProfileUsecase) GetProfileById(arg1 context.Context, arg2 string) (*dto.ProfileResp, error) {
 	fake.getProfileByIdMutex.Lock()
 	ret, specificReturn := fake.getProfileByIdReturnsOnCall[len(fake.getProfileByIdArgsForCall)]
 	fake.getProfileByIdArgsForCall = append(fake.getProfileByIdArgsForCall, struct {
@@ -53,7 +54,7 @@ func (fake *FakeProfileUsecase) GetProfileByIdCallCount() int {
 	return len(fake.getProfileByIdArgsForCall)
 }
 
-func (fake *FakeProfileUsecase) GetProfileByIdCalls(stub func(context.Context, string) (*domainprofile.ProfileResp, error)) {
+func (fake *FakeProfileUsecase) GetProfileByIdCalls(stub func(context.Context, string) (*dto.ProfileResp, error)) {
 	fake.getProfileByIdMutex.Lock()
 	defer fake.getProfileByIdMutex.Unlock()
 	fake.GetProfileByIdStub = stub
@@ -66,28 +67,28 @@ func (fake *FakeProfileUsecase) GetProfileByIdArgsForCall(i int) (context.Contex
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeProfileUsecase) GetProfileByIdReturns(result1 *domainprofile.ProfileResp, result2 error) {
+func (fake *FakeProfileUsecase) GetProfileByIdReturns(result1 *dto.ProfileResp, result2 error) {
 	fake.getProfileByIdMutex.Lock()
 	defer fake.getProfileByIdMutex.Unlock()
 	fake.GetProfileByIdStub = nil
 	fake.getProfileByIdReturns = struct {
-		result1 *domainprofile.ProfileResp
+		result1 *dto.ProfileResp
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileUsecase) GetProfileByIdReturnsOnCall(i int, result1 *domainprofile.ProfileResp, result2 error) {
+func (fake *FakeProfileUsecase) GetProfileByIdReturnsOnCall(i int, result1 *dto.ProfileResp, result2 error) {
 	fake.getProfileByIdMutex.Lock()
 	defer fake.getProfileByIdMutex.Unlock()
 	fake.GetProfileByIdStub = nil
 	if fake.getProfileByIdReturnsOnCall == nil {
 		fake.getProfileByIdReturnsOnCall = make(map[int]struct {
-			result1 *domainprofile.ProfileResp
+			result1 *dto.ProfileResp
 			result2 error
 		})
 	}
 	fake.getProfileByIdReturnsOnCall[i] = struct {
-		result1 *domainprofile.ProfileResp
+		result1 *dto.ProfileResp
 		result2 error
 	}{result1, result2}
 }
@@ -116,4 +117,4 @@ func (fake *FakeProfileUsecase) recordInvocation(key string, args []interface{})
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ domainprofile.ProfileUsecase = new(FakeProfileUsecase)
+var _ usecase.ProfileUsecase = new(FakeProfileUsecase)

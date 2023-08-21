@@ -8,15 +8,16 @@ import (
 	"testing"
 	"time"
 
-	domainerror "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-error"
-	domainuser "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/domain-user"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exceptions"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repositories"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
 	unixUser   = time.Now().Unix()
 	image      = "default-male.png"
-	createUser = domainuser.User{
+	createUser = model.User{
 		ID:              "userId1",
 		FullName:        "rama",
 		Gender:          "undefinied",
@@ -78,8 +79,9 @@ func createUserFunc() {
 }
 
 func TestUserRepo(t *testing.T) {
+	userRepo := repositories.NewUserRepoImpl(db)
 	fmt.Println("RUNNING TEST USER REPOSITORY")
-	updateUser := domainuser.User{
+	updateUser := model.User{
 		ID:              "userId1",
 		FullName:        "rama",
 		Gender:          "male",
@@ -96,7 +98,7 @@ func TestUserRepo(t *testing.T) {
 		DeletedAt:       sql.NullInt64{},
 		DeletedBy:       sql.NullString{},
 	}
-	updateUser1 := domainuser.User{
+	updateUser1 := model.User{
 		ID:              "userId2",
 		FullName:        "rama2",
 		Gender:          "male",
@@ -115,14 +117,14 @@ func TestUserRepo(t *testing.T) {
 	}
 	createUserFunc()
 	t.Run("SUCCESS_Get-By-Id", func(t *testing.T) {
-		user, err := userRepo.GetUserById(context.Background(), db, createUser.ID)
+		user, err := userRepo.GetUserById(context.Background(), createUser.ID)
 		assert.NoError(t, err)
 		assert.NotNil(t, user)
 		assert.Equal(t, &createUser, user)
 	})
 
 	t.Run("FAILED_Get-By-Id", func(t *testing.T) {
-		user, err := userRepo.GetUserById(context.Background(), db, "createUser.ID")
+		user, err := userRepo.GetUserById(context.Background(), "createUser.ID")
 		assert.Error(t, err)
 		assert.Nil(t, user)
 		assert.Equal(t, err, sql.ErrNoRows)
@@ -149,7 +151,7 @@ func TestUserRepo(t *testing.T) {
 		user, err := userRepo.UpdateUser(context.TODO(), tx, updateUser)
 		assert.Error(t, err)
 		assert.Nil(t, user)
-		assert.Equal(t, err, domainerror.ErrPhoneAlvailable)
+		assert.Equal(t, err, exceptions.ErrPhoneAlvailable)
 		tx.Commit()
 	})
 
@@ -162,7 +164,7 @@ func TestUserRepo(t *testing.T) {
 		user, err := userRepo.UpdateUsername(context.TODO(), tx, updateUser)
 		assert.Error(t, err)
 		assert.Nil(t, user)
-		assert.Equal(t, err, domainerror.ErrUsernameAlvailable)
+		assert.Equal(t, err, exceptions.ErrUsernameAlvailable)
 		tx.Commit()
 	})
 
@@ -174,7 +176,7 @@ func TestUserRepo(t *testing.T) {
 		user, err := userRepo.UpdateUsername(context.TODO(), tx, updateUser)
 		assert.Error(t, err)
 		assert.Nil(t, user)
-		assert.Equal(t, err, domainerror.ErrUsernameAlvailable)
+		assert.Equal(t, err, exceptions.ErrUsernameAlvailable)
 		tx.Commit()
 	})
 }

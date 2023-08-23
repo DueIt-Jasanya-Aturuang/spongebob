@@ -16,7 +16,7 @@ type ProfileCfgReq struct {
 
 type ProfileCfgResp struct {
 	ID          string `json:"user_config_id"`
-	ProfileId   string `json:"profile_id"`
+	ProfileID   string `json:"profile_id"`
 	ConfigName  string `json:"config_name"`
 	ConfigValue string `json:"config_value"`
 	Status      string `json:"status"`

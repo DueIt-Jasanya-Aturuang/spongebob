@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"time"
 
 	"github.com/rs/zerolog/log"
 )
@@ -20,7 +19,7 @@ func NewPgConn() *sql.DB {
 		log.Err(err).Msg("cannot open db")
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), pgPingTimeOut)
 	defer cancel()
 
 	err = db.PingContext(ctx)
@@ -28,10 +27,10 @@ func NewPgConn() *sql.DB {
 		log.Err(err).Msg("cannot ping db")
 	}
 
-	db.SetMaxIdleConns(10)
-	db.SetMaxOpenConns(100)
-	db.SetConnMaxIdleTime(5 * time.Minute)
-	db.SetConnMaxLifetime(60 * time.Minute)
+	db.SetMaxIdleConns(setMaxIdleConnsDB)
+	db.SetMaxOpenConns(setMaxOpenConnsDB)
+	db.SetConnMaxIdleTime(setMaxIdleConnsDB)
+	db.SetConnMaxLifetime(setConnMaxLifetimeDB)
 
 	log.Info().Msgf("connection postgres successfully : %s", PgName)
 	return db

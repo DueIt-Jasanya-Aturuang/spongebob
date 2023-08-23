@@ -12,91 +12,84 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestProfileUsecaseGetById(t *testing.T) {
-	// log.Logger = log.Output(zerolog.Nop())
+func TestProfileGetByIDUSECASE(t *testing.T) {
 	profileRepoMock := &domainmock.FakeProfileRepo{}
-	sqlMock := &domainmock.FakeSqlTransactionRepo{}
-	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, sqlMock, 5*time.Second)
+	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, 5*time.Second)
 
 	profileMockData := model.Profile{}
-	profileMockData.UserId = "userid1"
+	profileMockData.UserID = "userid1"
 	profileMockData = profileMockData.DefaultValue()
 
-	profileRepoMock.GetProfileById(context.Background(), profileMockData.UserId)
-	profileRepoMock.GetProfileByIdReturns(&profileMockData, nil)
-	ctxMock, idMock := profileRepoMock.GetProfileByIdArgsForCall(0)
-	assert.Equal(t, 1, profileRepoMock.GetProfileByIdCallCount())
+	profileRepoMock.GetProfileByID(context.Background(), profileMockData.UserID)
+	profileRepoMock.GetProfileByIDReturns(&profileMockData, nil)
+	ctxMock, idMock := profileRepoMock.GetProfileByIDArgsForCall(0)
+	assert.Equal(t, 1, profileRepoMock.GetProfileByIDCallCount())
 	assert.Equal(t, context.Background(), ctxMock)
-	assert.Equal(t, profileMockData.UserId, idMock)
+	assert.Equal(t, profileMockData.UserID, idMock)
 
-	profile, err := profileUsecase.GetProfileById(context.Background(), profileMockData.UserId)
+	profile, err := profileUsecase.GetProfileByID(context.Background(), profileMockData.UserID)
 	t.Log(profile)
 	assert.NotNil(t, profile)
 	assert.NoError(t, err)
 }
 
-func TestProfileUsecaseGetByUserId(t *testing.T) {
-	// log.Logger = log.Output(zerolog.Nop())
+func TestProfileGetByUserIDUSECASE(t *testing.T) {
 	profileRepoMock := &domainmock.FakeProfileRepo{}
-	sqlMock := &domainmock.FakeSqlTransactionRepo{}
-	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, sqlMock, 5*time.Second)
+	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, 5*time.Second)
 
 	profileMockData := model.Profile{}
-	profileMockData.UserId = "userid1"
+	profileMockData.UserID = "userid1"
 	profileMockData = profileMockData.DefaultValue()
 
-	profileRepoMock.GetProfileById(context.Background(), profileMockData.UserId)
-	profileRepoMock.GetProfileByIdReturns(nil, sql.ErrNoRows)
-	ctxMock, idMock := profileRepoMock.GetProfileByIdArgsForCall(0)
-	assert.Equal(t, 1, profileRepoMock.GetProfileByIdCallCount())
+	profileRepoMock.GetProfileByID(context.Background(), profileMockData.UserID)
+	profileRepoMock.GetProfileByIDReturns(nil, sql.ErrNoRows)
+	ctxMock, idMock := profileRepoMock.GetProfileByIDArgsForCall(0)
+	assert.Equal(t, 1, profileRepoMock.GetProfileByIDCallCount())
 	assert.Equal(t, context.Background(), ctxMock)
-	assert.Equal(t, profileMockData.UserId, idMock)
+	assert.Equal(t, profileMockData.UserID, idMock)
 
-	profileRepoMock.GetProfileByUserId(context.Background(), profileMockData.UserId)
-	profileRepoMock.GetProfileByUserIdReturns(&profileMockData, nil)
-	ctxMock, idMock = profileRepoMock.GetProfileByUserIdArgsForCall(0)
-	assert.Equal(t, 1, profileRepoMock.GetProfileByUserIdCallCount())
+	profileRepoMock.GetProfileByUserID(context.Background(), profileMockData.UserID)
+	profileRepoMock.GetProfileByUserIDReturns(&profileMockData, nil)
+	ctxMock, idMock = profileRepoMock.GetProfileByUserIDArgsForCall(0)
+	assert.Equal(t, 1, profileRepoMock.GetProfileByUserIDCallCount())
 	assert.Equal(t, context.Background(), ctxMock)
-	assert.Equal(t, profileMockData.UserId, idMock)
+	assert.Equal(t, profileMockData.UserID, idMock)
 
-	profile, err := profileUsecase.GetProfileById(context.Background(), profileMockData.UserId)
+	profile, err := profileUsecase.GetProfileByID(context.Background(), profileMockData.UserID)
 	t.Log(profile)
 	assert.NotNil(t, profile)
 	assert.NoError(t, err)
 }
 
-func TestProfileUsecaseGetByIdWithStore(t *testing.T) {
-	// log.Logger = log.Output(zerolog.Nop())
+func TestProfileGetByIDWithStoreUSECASE(t *testing.T) {
 	profileRepoMock := &domainmock.FakeProfileRepo{}
-	sqlMock := &domainmock.FakeSqlTransactionRepo{}
-	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, sqlMock, 5*time.Second)
+	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, 5*time.Second)
 
 	profileMockData := model.Profile{}
-	profileMockData.UserId = "userid1"
+	profileMockData.UserID = "userid1"
 	profileMockData = profileMockData.DefaultValue()
 
-	profileRepoMock.GetProfileById(context.Background(), "userid2")
-	profileRepoMock.GetProfileByIdReturns(nil, sql.ErrNoRows)
-	ctxMock, idMock := profileRepoMock.GetProfileByIdArgsForCall(0)
+	profileRepoMock.GetProfileByID(context.Background(), "userid2")
+	profileRepoMock.GetProfileByIDReturns(nil, sql.ErrNoRows)
+	ctxMock, idMock := profileRepoMock.GetProfileByIDArgsForCall(0)
 	assert.Equal(t, context.Background(), ctxMock)
 	assert.Equal(t, "userid2", idMock)
 
-	profileRepoMock.GetProfileByUserId(context.Background(), "userid2")
-	profileRepoMock.GetProfileByUserIdReturnsOnCall(1, &profileMockData, nil)
-	profileMockData.UserId = "userid2"
+	profileRepoMock.GetProfileByUserID(context.Background(), "userid2")
+	profileRepoMock.GetProfileByUserIDReturnsOnCall(1, &profileMockData, nil)
+	profileMockData.UserID = "userid2"
 	profileMockData = profileMockData.DefaultValue()
-	ctxMock, idMock = profileRepoMock.GetProfileByUserIdArgsForCall(0)
+	ctxMock, idMock = profileRepoMock.GetProfileByUserIDArgsForCall(0)
 	assert.Equal(t, context.Background(), ctxMock)
 	assert.Equal(t, "userid2", idMock)
 
-	profileRepoMock.StoreProfile(context.Background(), &sql.Tx{}, profileMockData)
+	profileRepoMock.StoreProfile(context.Background(), profileMockData)
 	profileRepoMock.StoreProfileReturnsOnCall(1, profileMockData, nil)
-	ctxMock, txMock, profileMock := profileRepoMock.StoreProfileArgsForCall(0)
+	ctxMock, profileMock := profileRepoMock.StoreProfileArgsForCall(0)
 	assert.Equal(t, context.Background(), ctxMock)
-	assert.Equal(t, &sql.Tx{}, txMock)
 	assert.Equal(t, profileMockData, profileMock)
 
-	profile, err := profileUsecase.GetProfileById(context.Background(), "userid2")
+	profile, err := profileUsecase.GetProfileByID(context.Background(), "userid2")
 	t.Log(profile)
 	assert.NoError(t, err)
 	assert.NotNil(t, profile)

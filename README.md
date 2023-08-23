@@ -23,6 +23,7 @@ Referensi : https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architectur
 ```
 |-- delivery
 |   |-- rest-api
+|   |   |-- middleware
 |-- deploy
 |   |-- Dockerfile
 |   |-- docker-compose.yml
@@ -30,17 +31,18 @@ Referensi : https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architectur
 |-- docs
 |   |-- arsitektur
 |-- domain
-|   |-- domain-name
+|   |-- dto
+|   |-- exception
+|   |-- model
+|   |-- repository
+|   |-- usecase
 |   |-- mocks
 |-- infrastructures
 |   |-- config
-|   |-- db
 |   |-- logs
-|   |-- redis
-|   |-- init.go
+|   |-- repository
 |-- internal
 |   |-- helpers
-|   |-- repositories
 |   |-- usecase
 |   |-- utils
 |-- migrations

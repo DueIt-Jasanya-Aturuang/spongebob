@@ -9,8 +9,8 @@ import (
 )
 
 type Profile struct {
-	ProfileId string
-	UserId    string
+	ProfileID string
+	UserID    string
 	Quote     sql.NullString
 	CreatedAt int64
 	CreatedBy string
@@ -23,8 +23,8 @@ type Profile struct {
 func (p *Profile) DefaultValue() Profile {
 	id := uuid.NewV4().String()
 	return Profile{
-		ProfileId: id,
-		UserId:    p.UserId,
+		ProfileID: id,
+		UserID:    p.UserID,
 		Quote:     sql.NullString{},
 		CreatedAt: time.Now().Unix(),
 		CreatedBy: id,
@@ -37,7 +37,7 @@ func (p *Profile) DefaultValue() Profile {
 
 func (p *Profile) ToResp() dto.ProfileResp {
 	return dto.ProfileResp{
-		ProfileID: p.ProfileId,
+		ProfileID: p.ProfileID,
 		Quote:     p.Quote,
 	}
 }

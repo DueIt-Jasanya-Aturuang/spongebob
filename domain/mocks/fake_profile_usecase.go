@@ -10,17 +10,17 @@ import (
 )
 
 type FakeProfileUsecase struct {
-	GetProfileByIdStub        func(context.Context, string) (*dto.ProfileResp, error)
-	getProfileByIdMutex       sync.RWMutex
-	getProfileByIdArgsForCall []struct {
+	GetProfileByIDStub        func(context.Context, string) (*dto.ProfileResp, error)
+	getProfileByIDMutex       sync.RWMutex
+	getProfileByIDArgsForCall []struct {
 		arg1 context.Context
 		arg2 string
 	}
-	getProfileByIdReturns struct {
+	getProfileByIDReturns struct {
 		result1 *dto.ProfileResp
 		result2 error
 	}
-	getProfileByIdReturnsOnCall map[int]struct {
+	getProfileByIDReturnsOnCall map[int]struct {
 		result1 *dto.ProfileResp
 		result2 error
 	}
@@ -28,17 +28,17 @@ type FakeProfileUsecase struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeProfileUsecase) GetProfileById(arg1 context.Context, arg2 string) (*dto.ProfileResp, error) {
-	fake.getProfileByIdMutex.Lock()
-	ret, specificReturn := fake.getProfileByIdReturnsOnCall[len(fake.getProfileByIdArgsForCall)]
-	fake.getProfileByIdArgsForCall = append(fake.getProfileByIdArgsForCall, struct {
+func (fake *FakeProfileUsecase) GetProfileByID(arg1 context.Context, arg2 string) (*dto.ProfileResp, error) {
+	fake.getProfileByIDMutex.Lock()
+	ret, specificReturn := fake.getProfileByIDReturnsOnCall[len(fake.getProfileByIDArgsForCall)]
+	fake.getProfileByIDArgsForCall = append(fake.getProfileByIDArgsForCall, struct {
 		arg1 context.Context
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.GetProfileByIdStub
-	fakeReturns := fake.getProfileByIdReturns
-	fake.recordInvocation("GetProfileById", []interface{}{arg1, arg2})
-	fake.getProfileByIdMutex.Unlock()
+	stub := fake.GetProfileByIDStub
+	fakeReturns := fake.getProfileByIDReturns
+	fake.recordInvocation("GetProfileByID", []interface{}{arg1, arg2})
+	fake.getProfileByIDMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)
 	}
@@ -48,46 +48,46 @@ func (fake *FakeProfileUsecase) GetProfileById(arg1 context.Context, arg2 string
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeProfileUsecase) GetProfileByIdCallCount() int {
-	fake.getProfileByIdMutex.RLock()
-	defer fake.getProfileByIdMutex.RUnlock()
-	return len(fake.getProfileByIdArgsForCall)
+func (fake *FakeProfileUsecase) GetProfileByIDCallCount() int {
+	fake.getProfileByIDMutex.RLock()
+	defer fake.getProfileByIDMutex.RUnlock()
+	return len(fake.getProfileByIDArgsForCall)
 }
 
-func (fake *FakeProfileUsecase) GetProfileByIdCalls(stub func(context.Context, string) (*dto.ProfileResp, error)) {
-	fake.getProfileByIdMutex.Lock()
-	defer fake.getProfileByIdMutex.Unlock()
-	fake.GetProfileByIdStub = stub
+func (fake *FakeProfileUsecase) GetProfileByIDCalls(stub func(context.Context, string) (*dto.ProfileResp, error)) {
+	fake.getProfileByIDMutex.Lock()
+	defer fake.getProfileByIDMutex.Unlock()
+	fake.GetProfileByIDStub = stub
 }
 
-func (fake *FakeProfileUsecase) GetProfileByIdArgsForCall(i int) (context.Context, string) {
-	fake.getProfileByIdMutex.RLock()
-	defer fake.getProfileByIdMutex.RUnlock()
-	argsForCall := fake.getProfileByIdArgsForCall[i]
+func (fake *FakeProfileUsecase) GetProfileByIDArgsForCall(i int) (context.Context, string) {
+	fake.getProfileByIDMutex.RLock()
+	defer fake.getProfileByIDMutex.RUnlock()
+	argsForCall := fake.getProfileByIDArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeProfileUsecase) GetProfileByIdReturns(result1 *dto.ProfileResp, result2 error) {
-	fake.getProfileByIdMutex.Lock()
-	defer fake.getProfileByIdMutex.Unlock()
-	fake.GetProfileByIdStub = nil
-	fake.getProfileByIdReturns = struct {
+func (fake *FakeProfileUsecase) GetProfileByIDReturns(result1 *dto.ProfileResp, result2 error) {
+	fake.getProfileByIDMutex.Lock()
+	defer fake.getProfileByIDMutex.Unlock()
+	fake.GetProfileByIDStub = nil
+	fake.getProfileByIDReturns = struct {
 		result1 *dto.ProfileResp
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileUsecase) GetProfileByIdReturnsOnCall(i int, result1 *dto.ProfileResp, result2 error) {
-	fake.getProfileByIdMutex.Lock()
-	defer fake.getProfileByIdMutex.Unlock()
-	fake.GetProfileByIdStub = nil
-	if fake.getProfileByIdReturnsOnCall == nil {
-		fake.getProfileByIdReturnsOnCall = make(map[int]struct {
+func (fake *FakeProfileUsecase) GetProfileByIDReturnsOnCall(i int, result1 *dto.ProfileResp, result2 error) {
+	fake.getProfileByIDMutex.Lock()
+	defer fake.getProfileByIDMutex.Unlock()
+	fake.GetProfileByIDStub = nil
+	if fake.getProfileByIDReturnsOnCall == nil {
+		fake.getProfileByIDReturnsOnCall = make(map[int]struct {
 			result1 *dto.ProfileResp
 			result2 error
 		})
 	}
-	fake.getProfileByIdReturnsOnCall[i] = struct {
+	fake.getProfileByIDReturnsOnCall[i] = struct {
 		result1 *dto.ProfileResp
 		result2 error
 	}{result1, result2}
@@ -96,8 +96,8 @@ func (fake *FakeProfileUsecase) GetProfileByIdReturnsOnCall(i int, result1 *dto.
 func (fake *FakeProfileUsecase) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getProfileByIdMutex.RLock()
-	defer fake.getProfileByIdMutex.RUnlock()
+	fake.getProfileByIDMutex.RLock()
+	defer fake.getProfileByIDMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -12,6 +12,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/mocks"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/dtoconv"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/usecase"
 	"github.com/stretchr/testify/assert"
 )
@@ -43,130 +44,169 @@ func multipartFileHeader() *multipart.FileHeader {
 	return fileHeader
 }
 
-func TestAccountUsecase(t *testing.T) {
+func TestAccounUpdateUsecase(t *testing.T) {
 	profileRepoMock := &mocks.FakeProfileRepo{}
 	userRepoMock := &mocks.FakeUserRepo{}
-	tsxSqlRepoMock := &mocks.FakeSqlTransactionRepo{}
 	minioRepoMock := &mocks.FakeMinioRepo{}
 	timeOutCtx := 3 * time.Second
 	ctx := context.Background()
 
-	accountUsecase := usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, tsxSqlRepoMock, minioRepoMock, timeOutCtx)
+	accountUsecase := usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
 
-	// t.Run("SUCCESS_AccountUpdate", func(t *testing.T) {
-	// 	profile := model.Profile{
-	// 		ProfileId: "profileid_1",
-	// 		UserId:    "userid_1",
-	// 		Quote:     sql.NullString{String: ""},
-	// 		CreatedAt: time.Now().Unix(),
-	// 		CreatedBy: "profileid_1",
-	// 		UpdatedAt: time.Now().Unix(),
-	// 		UpdatedBy: sql.NullString{},
-	// 		DeletedAt: sql.NullInt64{},
-	// 		DeletedBy: sql.NullString{},
-	// 	}
+	profile := model.Profile{
+		ProfileID: "profileid_1",
+		UserID:    "userid_1",
+		Quote:     sql.NullString{String: ""},
+		CreatedAt: time.Now().Unix(),
+		CreatedBy: "profileid_1",
+		UpdatedAt: time.Now().Unix(),
+		UpdatedBy: sql.NullString{},
+		DeletedAt: sql.NullInt64{},
+		DeletedBy: sql.NullString{},
+	}
 
-	// 	user := model.User{
-	// 		ID:              "userid_1",
-	// 		FullName:        "rama_1",
-	// 		Gender:          "undefinied",
-	// 		Image:           "default-male.png",
-	// 		Username:        "ibanrmaa_1",
-	// 		Email:           "1_ibanrama29@gmail.com",
-	// 		Password:        "123456",
-	// 		PhoneNumber:     sql.NullString{},
-	// 		EmailVerifiedAt: true,
-	// 		CreatedAt:       time.Now().Unix(),
-	// 		CreatedBy:       "userid_1",
-	// 		UpdatedAt:       time.Now().Unix(),
-	// 		UpdatedBy:       sql.NullString{},
-	// 		DeletedAt:       sql.NullInt64{},
-	// 		DeletedBy:       sql.NullString{},
-	// 	}
+	user := model.User{
+		ID:              "userid_1",
+		FullName:        "rama_1",
+		Gender:          "undefinied",
+		Image:           "default-male.png",
+		Username:        "ibanrmaa_1",
+		Email:           "1_ibanrama29@gmail.com",
+		Password:        "123456",
+		PhoneNumber:     sql.NullString{},
+		EmailVerifiedAt: true,
+		CreatedAt:       time.Now().Unix(),
+		CreatedBy:       "userid_1",
+		UpdatedAt:       time.Now().Unix(),
+		UpdatedBy:       sql.NullString{},
+		DeletedAt:       sql.NullInt64{},
+		DeletedBy:       sql.NullString{},
+	}
 
-	// 	req := domaindto.UpdateAccountReq{
-	// 		UserID:      "userid_1",
-	// 		FullName:    "rama_update_1",
-	// 		Gender:      "male",
-	// 		Image:       multipartFileHeader(),
-	// 		PhoneNumber: "1234567890",
-	// 		Quote:       "semangat_update_1",
-	// 	}
+	req := dto.UpdateAccountReq{
+		UserID:      "userid_1",
+		FullName:    "rama_update_1",
+		Gender:      "male",
+		Image:       multipartFileHeader(),
+		PhoneNumber: "1234567890",
+		Quote:       "semangat_update_1",
+	}
 
-	// 	profileRepoMock.GetProfileByUserId(ctx, "userid_1")
-	// 	profileRepoMock.GetProfileByUserIdReturns(&profile, nil)
+	profileRepoMock.GetProfileByUserID(ctx, "userid_1")
+	profileRepoMock.GetProfileByUserIDReturns(&profile, nil)
 
-	// 	userRepoMock.GetUserById(ctx, "userid_1")
-	// 	userRepoMock.GetUserByIdReturns(&user, nil)
+	userRepoMock.GetUserByID(ctx, "userid_1")
+	userRepoMock.GetUserByIDReturns(&user, nil)
 
-	// 	minioReturnMock := minioRepoMock.GenerateFileName(multipartFileHeader(), "user-images/public/", "")
-	// 	minioRepoMock.GenerateFileNameReturns(minioReturnMock)
+	profileRepoMock.BeginTx(context.Background(), &sql.TxOptions{})
+	profileRepoMock.BeginTxReturns(nil)
 
-	// 	minioRepoMock.UploadFile(ctx, multipartFileHeader(), minioReturnMock, "files")
-	// 	minioRepoMock.UploadFileReturns(nil)
+	profileConv, userConv := dtoconv.UpdateAccountToModel(req, profile.ProfileID, user.Image)
+	profileRepoMock.UpdateProfile(ctx, profileConv)
+	profileRepoMock.UpdateProfileReturns(&profile, nil)
 
-	// 	profileRes, userRes, err := accountUsecase.AccountUpdate(ctx, req)
-	// 	assert.NoError(t, err)
-	// 	assert.NotNil(t, profileRes)
-	// 	assert.NotNil(t, userRes)
-	// })
+	profileRepoMock.GetTx()
+	profileRepoMock.GetTxReturns(&sql.Tx{})
 
-	t.Run("SUCCESS_AccountUpdate_WithDeleteFile", func(t *testing.T) {
-		profile := model.Profile{
-			ProfileId: "profileid_1",
-			UserId:    "userid_1",
-			Quote:     sql.NullString{String: ""},
-			CreatedAt: time.Now().Unix(),
-			CreatedBy: "profileid_1",
-			UpdatedAt: time.Now().Unix(),
-			UpdatedBy: sql.NullString{},
-			DeletedAt: sql.NullInt64{},
-			DeletedBy: sql.NullString{},
-		}
+	profileRepoMock.CallTx(&sql.Tx{})
+	profileRepoMock.CallTxReturns(nil)
 
-		user := model.User{
-			ID:              "userid_1",
-			FullName:        "rama_1",
-			Gender:          "undefinied",
-			Image:           "rama.png",
-			Username:        "ibanrmaa_1",
-			Email:           "1_ibanrama29@gmail.com",
-			Password:        "123456",
-			PhoneNumber:     sql.NullString{},
-			EmailVerifiedAt: true,
-			CreatedAt:       time.Now().Unix(),
-			CreatedBy:       "userid_1",
-			UpdatedAt:       time.Now().Unix(),
-			UpdatedBy:       sql.NullString{},
-			DeletedAt:       sql.NullInt64{},
-			DeletedBy:       sql.NullString{},
-		}
+	userRepoMock.UpdateUser(ctx, userConv)
+	userRepoMock.UpdateUserReturns(&user, nil)
 
-		req := dto.UpdateAccountReq{
-			UserID:      "userid_1",
-			FullName:    "rama_update_1",
-			Gender:      "male",
-			Image:       multipartFileHeader(),
-			PhoneNumber: "1234567890",
-			Quote:       "semangat_update_1",
-		}
+	minioRepoMock.GenerateFileName(multipartFileHeader(), "user-images/public/", "")
+	minioRepoMock.GenerateFileNameReturns("user-images/public/asd.png")
 
-		profileRepoMock.GetProfileByUserId(ctx, "userid_1")
-		profileRepoMock.GetProfileByUserIdReturns(&profile, nil)
+	minioRepoMock.UploadFile(ctx, multipartFileHeader(), "user-images/public/asd.png", "files")
+	minioRepoMock.UploadFileReturns(nil)
 
-		userRepoMock.GetUserById(ctx, "userid_1")
-		userRepoMock.GetUserByIdReturns(&user, nil)
+	profileRes, userRes, err := accountUsecase.AccountUpdate(ctx, req)
+	assert.NoError(t, err)
+	assert.NotNil(t, profileRes)
+	assert.NotNil(t, userRes)
+}
 
-		tsxSqlRepoMock.Transaction(ctx, &sql.TxOptions{ReadOnly: false}, func(tx *sql.Tx) error { return nil })
-		// minioReturnMock := minioRepoMock.GenerateFileName(multipartFileHeader(), "user-images/public/", "")
-		// minioRepoMock.GenerateFileNameReturns(minioReturnMock)
+func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
+	profileRepoMock := &mocks.FakeProfileRepo{}
+	userRepoMock := &mocks.FakeUserRepo{}
+	minioRepoMock := &mocks.FakeMinioRepo{}
+	timeOutCtx := 3 * time.Second
+	ctx := context.Background()
 
-		// minioRepoMock.UploadFile(ctx, multipartFileHeader(), minioReturnMock, "files")
-		// minioRepoMock.UploadFileReturns(nil)
+	accountUsecase := usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
 
-		profileRes, userRes, err := accountUsecase.AccountUpdate(ctx, req)
-		assert.NoError(t, err)
-		assert.NotNil(t, profileRes)
-		assert.NotNil(t, userRes)
-	})
+	profile := model.Profile{
+		ProfileID: "profileid_1",
+		UserID:    "userid_1",
+		Quote:     sql.NullString{String: ""},
+		CreatedAt: time.Now().Unix(),
+		CreatedBy: "profileid_1",
+		UpdatedAt: time.Now().Unix(),
+		UpdatedBy: sql.NullString{},
+		DeletedAt: sql.NullInt64{},
+		DeletedBy: sql.NullString{},
+	}
+
+	user := model.User{
+		ID:              "userid_1",
+		FullName:        "rama_1",
+		Gender:          "undefinied",
+		Image:           "/files/user-images/public/asd.png",
+		Username:        "ibanrmaa_1",
+		Email:           "1_ibanrama29@gmail.com",
+		Password:        "123456",
+		PhoneNumber:     sql.NullString{},
+		EmailVerifiedAt: true,
+		CreatedAt:       time.Now().Unix(),
+		CreatedBy:       "userid_1",
+		UpdatedAt:       time.Now().Unix(),
+		UpdatedBy:       sql.NullString{},
+		DeletedAt:       sql.NullInt64{},
+		DeletedBy:       sql.NullString{},
+	}
+
+	req := dto.UpdateAccountReq{
+		UserID:      "userid_1",
+		FullName:    "rama_update_1",
+		Gender:      "male",
+		Image:       multipartFileHeader(),
+		PhoneNumber: "1234567890",
+		Quote:       "semangat_update_1",
+	}
+
+	profileRepoMock.GetProfileByUserID(ctx, "userid_1")
+	profileRepoMock.GetProfileByUserIDReturns(&profile, nil)
+
+	userRepoMock.GetUserByID(ctx, "userid_1")
+	userRepoMock.GetUserByIDReturns(&user, nil)
+
+	profileRepoMock.BeginTx(context.Background(), &sql.TxOptions{})
+	profileRepoMock.BeginTxReturns(nil)
+
+	profileConv, userConv := dtoconv.UpdateAccountToModel(req, profile.ProfileID, user.Image)
+	profileRepoMock.UpdateProfile(ctx, profileConv)
+	profileRepoMock.UpdateProfileReturns(&profile, nil)
+
+	profileRepoMock.GetTx()
+	profileRepoMock.GetTxReturns(&sql.Tx{})
+
+	profileRepoMock.CallTx(&sql.Tx{})
+	profileRepoMock.CallTxReturns(nil)
+
+	userRepoMock.UpdateUser(ctx, userConv)
+	userRepoMock.UpdateUserReturns(&user, nil)
+
+	minioRepoMock.GenerateFileName(multipartFileHeader(), "user-images/public/", "")
+	minioRepoMock.GenerateFileNameReturns("user-images/public/asd.png")
+
+	minioRepoMock.UploadFile(ctx, multipartFileHeader(), "/files/user-images/public/asd.png", "files")
+	minioRepoMock.UploadFileReturns(nil)
+
+	minioRepoMock.DeleteFile(ctx, "/files/user-images/public/asd.png", "files")
+	minioRepoMock.DeleteFileReturns(nil)
+
+	profileRes, userRes, err := accountUsecase.AccountUpdate(ctx, req)
+	assert.NoError(t, err)
+	assert.NotNil(t, profileRes)
+	assert.NotNil(t, userRes)
 }

@@ -4,7 +4,7 @@ import "database/sql"
 
 type ProfileCfg struct {
 	ID          string
-	ProfileId   string
+	ProfileID   string
 	ConfigName  string
 	ConfigValue string
 	Status      string

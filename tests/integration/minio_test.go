@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repositories"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repository"
 	"github.com/minio/minio-go/v7"
 	"github.com/stretchr/testify/assert"
 )
@@ -36,7 +36,7 @@ func TestMinioImpl(t *testing.T) {
 	err = minioClient.MakeBucket(context.Background(), "files", minio.MakeBucketOptions{})
 	assert.NoError(t, err)
 
-	minioIMPL := repositories.NewMinioImpl(minioClient)
+	minioIMPL := repository.NewMinioImpl(minioClient)
 
 	filename := minioIMPL.GenerateFileName(fileHeader, "user-images/public/", "")
 	t.Run("SUCCESS_Upload", func(t *testing.T) {

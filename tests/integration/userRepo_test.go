@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exceptions"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exception"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repositories"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repository"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -78,8 +78,8 @@ func createUserFunc() {
 	}
 }
 
-func TestUserRepo(t *testing.T) {
-	userRepo := repositories.NewUserRepoImpl(db)
+func TestUserREPO(t *testing.T) {
+	userRepo := repository.NewUserRepoImpl(db)
 	fmt.Println("RUNNING TEST USER REPOSITORY")
 	updateUser := model.User{
 		ID:              "userId1",
@@ -116,67 +116,63 @@ func TestUserRepo(t *testing.T) {
 		DeletedBy:       sql.NullString{},
 	}
 	createUserFunc()
-	t.Run("SUCCESS_Get-By-Id", func(t *testing.T) {
-		user, err := userRepo.GetUserById(context.Background(), createUser.ID)
+	t.Run("SUCCESS_GetUserByID", func(t *testing.T) {
+		user, err := userRepo.GetUserByID(context.Background(), createUser.ID)
 		assert.NoError(t, err)
 		assert.NotNil(t, user)
 		assert.Equal(t, &createUser, user)
 	})
 
-	t.Run("FAILED_Get-By-Id", func(t *testing.T) {
-		user, err := userRepo.GetUserById(context.Background(), "createUser.ID")
+	t.Run("ERROR_GetUserByID_NOWROW", func(t *testing.T) {
+		user, err := userRepo.GetUserByID(context.Background(), "createUser.ID")
 		assert.Error(t, err)
 		assert.Nil(t, user)
 		assert.Equal(t, err, sql.ErrNoRows)
 	})
 
-	t.Run("SUCCESS_Update-By-Id", func(t *testing.T) {
-		tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
-		if err != nil {
-			t.Fatal(err)
-		}
-		user, err := userRepo.UpdateUser(context.TODO(), tx, updateUser1)
+	t.Run("SUCCESS_UpdateUser", func(t *testing.T) {
+		err := userRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+		assert.NoError(t, err)
+		user, err := userRepo.UpdateUser(context.TODO(), updateUser1)
 		assert.NoError(t, err)
 		assert.NotNil(t, user)
 		assert.Equal(t, &updateUser1, user)
 		assert.NotEqual(t, &createUser, user)
-		tx.Commit()
+		err = userRepo.Commit()
+		assert.NoError(t, err)
 	})
 
-	t.Run("ERROR_Update-By-Id", func(t *testing.T) {
-		tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
-		if err != nil {
-			t.Fatal(err)
-		}
-		user, err := userRepo.UpdateUser(context.TODO(), tx, updateUser)
+	t.Run("ERROR_UpdateUser_PHONEEXISTS", func(t *testing.T) {
+		err := userRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+		assert.NoError(t, err)
+		user, err := userRepo.UpdateUser(context.TODO(), updateUser)
 		assert.Error(t, err)
 		assert.Nil(t, user)
-		assert.Equal(t, err, exceptions.ErrPhoneAlvailable)
-		tx.Commit()
+		assert.Equal(t, err, exception.Err400PhoneAlvailable)
+		err = userRepo.Rollback()
+		assert.NoError(t, err)
 	})
 
-	t.Run("ERROR_Update-Username", func(t *testing.T) {
-		tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
-		if err != nil {
-			t.Fatal(err)
-		}
+	t.Run("ERROR_UpdateUsername_USERNAMEEXISTS", func(t *testing.T) {
+		err := userRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+		assert.NoError(t, err)
 		updateUser.Username = "rama2"
-		user, err := userRepo.UpdateUsername(context.TODO(), tx, updateUser)
+		user, err := userRepo.UpdateUsername(context.TODO(), updateUser)
 		assert.Error(t, err)
 		assert.Nil(t, user)
-		assert.Equal(t, err, exceptions.ErrUsernameAlvailable)
-		tx.Commit()
+		assert.Equal(t, err, exception.Err400UsernameAlvailable)
+		err = userRepo.Rollback()
+		assert.NoError(t, err)
 	})
 
-	t.Run("SUCCESS_Update-Username", func(t *testing.T) {
-		tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
-		if err != nil {
-			t.Fatal(err)
-		}
-		user, err := userRepo.UpdateUsername(context.TODO(), tx, updateUser)
+	t.Run("SUCCESS_UpdateUsername", func(t *testing.T) {
+		err := userRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+		assert.NoError(t, err)
+		user, err := userRepo.UpdateUsername(context.TODO(), updateUser)
 		assert.Error(t, err)
 		assert.Nil(t, user)
-		assert.Equal(t, err, exceptions.ErrUsernameAlvailable)
-		tx.Commit()
+		assert.Equal(t, err, exception.Err400UsernameAlvailable)
+		err = userRepo.Commit()
+		assert.NoError(t, err)
 	})
 }

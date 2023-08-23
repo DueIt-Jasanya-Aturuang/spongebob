@@ -32,14 +32,14 @@ func EnvInit() {
 	}
 	RedisHost = os.Getenv("REDIS_HOST")
 	RedisPort = os.Getenv("REDIS_PORT")
-	RedisDb = dbInt
+	RedisDB = dbInt
 	RedisPass = os.Getenv("REDIS_PASS")
 
 	miniosslBool, err := strconv.ParseBool(os.Getenv("MINIO_SSL"))
 	if err != nil {
 		panic(err)
 	}
-	MinIoId = os.Getenv("MINIO_ID")
+	MinIoID = os.Getenv("MINIO_ID")
 	MinIoSecretKey = os.Getenv("MINIO_SECRETKEY")
 	MinIoEndpoint = os.Getenv("MINIO_ENDPOINT")
 	MinIoPort = os.Getenv("MINIO_PORT")
@@ -68,10 +68,10 @@ var (
 
 	RedisHost string
 	RedisPort string
-	RedisDb   int
+	RedisDB   int
 	RedisPass string
 
-	MinIoId        string
+	MinIoID        string
 	MinIoSecretKey string
 	MinIoEndpoint  string
 	MinIoPort      string

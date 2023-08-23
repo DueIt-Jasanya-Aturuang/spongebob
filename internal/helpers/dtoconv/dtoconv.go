@@ -10,15 +10,15 @@ import (
 
 func UpdateAccountToModel(
 	req dto.UpdateAccountReq,
-	profileId, image string,
+	profileID, image string,
 ) (model.Profile, model.User) {
 	timeUnix := time.Now().Unix()
 	profile := model.Profile{
-		ProfileId: profileId,
-		UserId:    req.UserID,
+		ProfileID: profileID,
+		UserID:    req.UserID,
 		Quote:     sql.NullString{String: req.Quote},
 		UpdatedAt: timeUnix,
-		UpdatedBy: sql.NullString{String: profileId},
+		UpdatedBy: sql.NullString{String: profileID},
 	}
 
 	user := model.User{

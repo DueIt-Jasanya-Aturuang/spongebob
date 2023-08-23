@@ -7,19 +7,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exceptions"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exception"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repositories"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repository"
 	"github.com/stretchr/testify/assert"
 )
 
-func ProfileRepo(t *testing.T) {
-	profileRepo := repositories.NewProfileRepoImpl(db)
+func ProfileREPO(t *testing.T) {
+	profileRepo := repository.NewProfileRepoImpl(db)
 	fmt.Println("RUNNING TEST PROFILE REPOSITORY")
 	unix := time.Now().Unix()
 	dataProfile := model.Profile{
-		ProfileId: "profileid1",
-		UserId:    "userId1",
+		ProfileID: "profileid1",
+		UserID:    "userId1",
 		Quote:     sql.NullString{String: "semagat", Valid: true},
 		CreatedAt: unix,
 		CreatedBy: "profileid1",
@@ -29,61 +29,63 @@ func ProfileRepo(t *testing.T) {
 		DeletedBy: sql.NullString{},
 	}
 
-	t.Run("SUCCESS_Store", func(t *testing.T) {
-		tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
-		if err != nil {
-			t.Fatal(err)
-		}
-		profile, err := profileRepo.StoreProfile(context.Background(), tx, dataProfile)
+	t.Run("SUCCESS_StoreProfile", func(t *testing.T) {
+		err := profileRepo.BeginTx(context.Background(), &sql.TxOptions{
+			ReadOnly: false,
+		})
+		assert.NoError(t, err)
+		profile, err := profileRepo.StoreProfile(context.Background(), dataProfile)
 		assert.NoError(t, err)
 		assert.Equal(t, dataProfile, profile)
-		tx.Commit()
+		err = profileRepo.Commit()
+		assert.NoError(t, err)
 	})
 
-	t.Run("ERROR_Store", func(t *testing.T) {
-		tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
-		if err != nil {
-			t.Fatal(err)
-		}
-		profile, err := profileRepo.StoreProfile(context.Background(), tx, dataProfile)
+	t.Run("ERROR_StoreProfile_PROFILEEXISTS", func(t *testing.T) {
+		err := profileRepo.BeginTx(context.Background(), &sql.TxOptions{
+			Isolation: sql.LevelSerializable,
+		})
+		assert.NoError(t, err)
+		profile, err := profileRepo.StoreProfile(context.Background(), dataProfile)
 		assert.Error(t, err)
 		assert.NotEqual(t, dataProfile, profile)
-		assert.Equal(t, exceptions.ErrProfileAlvailable, err)
-		tx.Rollback()
+		assert.Equal(t, exception.Err400ProfileAlvailable, err)
+		err = profileRepo.Rollback()
+		assert.NoError(t, err)
 	})
 
-	t.Run("SUCCESS_Get-By-Id", func(t *testing.T) {
-		profile, err := profileRepo.GetProfileById(context.TODO(), dataProfile.ProfileId)
+	t.Run("SUCCESS_GetProfileByID", func(t *testing.T) {
+		profile, err := profileRepo.GetProfileByID(context.TODO(), dataProfile.ProfileID)
 		t.Log(err)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.Equal(t, &dataProfile, profile)
 	})
 
-	t.Run("ERROR_Get-By-Id", func(t *testing.T) {
-		profile, err := profileRepo.GetProfileById(context.TODO(), "nil")
+	t.Run("ERROR_GetProfileByID_NOROW", func(t *testing.T) {
+		profile, err := profileRepo.GetProfileByID(context.TODO(), "nil")
 		assert.Error(t, err)
 		assert.Nil(t, profile)
 		assert.Equal(t, err, sql.ErrNoRows)
 	})
-	t.Run("SUCCESS_Get-By-User-Id", func(t *testing.T) {
-		profile, err := profileRepo.GetProfileByUserId(context.TODO(), dataProfile.UserId)
+	t.Run("SUCCESS_GetProfileByUserID", func(t *testing.T) {
+		profile, err := profileRepo.GetProfileByUserID(context.TODO(), dataProfile.UserID)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.Equal(t, &dataProfile, profile)
 	})
 
-	t.Run("ERROR_Get-By-User-Id", func(t *testing.T) {
-		profile, err := profileRepo.GetProfileByUserId(context.TODO(), "nil")
+	t.Run("ERROR_GetProfileByUserID_NOROW", func(t *testing.T) {
+		profile, err := profileRepo.GetProfileByUserID(context.TODO(), "nil")
 		assert.Error(t, err)
 		assert.Nil(t, profile)
 		assert.Equal(t, err, sql.ErrNoRows)
 	})
 
-	t.Run("SUCCESS_Update", func(t *testing.T) {
+	t.Run("SUCCESS_UpdateProfile", func(t *testing.T) {
 		updateProfile := model.Profile{
-			ProfileId: "id1",
-			UserId:    "userId1",
+			ProfileID: "id1",
+			UserID:    "userId1",
 			Quote:     sql.NullString{String: "semagat", Valid: true},
 			CreatedAt: unix,
 			CreatedBy: "id1",
@@ -92,15 +94,17 @@ func ProfileRepo(t *testing.T) {
 			DeletedAt: sql.NullInt64{},
 			DeletedBy: sql.NullString{},
 		}
-		tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
-		if err != nil {
-			t.Fatal(err)
-		}
-		profile, err := profileRepo.UpdateProfile(context.TODO(), tx, updateProfile)
+		err := profileRepo.BeginTx(context.Background(), &sql.TxOptions{
+			ReadOnly:  false,
+			Isolation: sql.LevelSerializable,
+		})
+		assert.NoError(t, err)
+		profile, err := profileRepo.UpdateProfile(context.TODO(), updateProfile)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.NotEqual(t, &dataProfile, profile)
 		assert.Equal(t, &updateProfile, profile)
-		tx.Commit()
+		err = profileRepo.Commit()
+		assert.NoError(t, err)
 	})
 }

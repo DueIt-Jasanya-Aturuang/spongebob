@@ -2,15 +2,15 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o ./../mocks . ProfileRepo
+//counterfeiter:generate -o ./../mocks . ProfileRepo
 type ProfileRepo interface {
-	GetProfileById(context.Context, string) (*model.Profile, error)
-	GetProfileByUserId(context.Context, string) (*model.Profile, error)
-	StoreProfile(context.Context, *sql.Tx, model.Profile) (model.Profile, error)
-	UpdateProfile(context.Context, *sql.Tx, model.Profile) (*model.Profile, error)
+	GetProfileByID(context.Context, string) (*model.Profile, error)
+	GetProfileByUserID(context.Context, string) (*model.Profile, error)
+	StoreProfile(context.Context, model.Profile) (model.Profile, error)
+	UpdateProfile(context.Context, model.Profile) (*model.Profile, error)
+	UnitOfWork
 }

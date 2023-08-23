@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exceptions"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exception"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repositories"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repository"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 )
@@ -42,7 +42,7 @@ var (
 	}
 	profileConfig1 = model.ProfileCfg{
 		ID:          "profileCfgid1",
-		ProfileId:   "profileid1",
+		ProfileID:   "profileid1",
 		ConfigName:  "USER PERIOD",
 		ConfigValue: marshal(profileCfgPeriod1),
 		Status:      "on",
@@ -55,7 +55,7 @@ var (
 	}
 	profileConfigUpdate1 = model.ProfileCfg{
 		ID:          "profileCfgid1",
-		ProfileId:   "profileid1",
+		ProfileID:   "profileid1",
 		ConfigName:  "USER PERIOD",
 		ConfigValue: marshal(profileCfgPeriod1),
 		Status:      "off",
@@ -68,7 +68,7 @@ var (
 	}
 	profileConfig2 = model.ProfileCfg{
 		ID:          "profileCfgid2",
-		ProfileId:   "profileid1",
+		ProfileID:   "profileid1",
 		ConfigName:  "DAILY NOTIF",
 		ConfigValue: marshal(profileCfgDay1),
 		Status:      "on",
@@ -81,49 +81,53 @@ var (
 	}
 )
 
-func TestProfileConfigRepo(t *testing.T) {
-	profileCfgRepo := repositories.NewProfileCfgRepoImpl(db)
-	t.Run("TestProfileRepo", ProfileRepo)
+func TestProfileConfigREPO(t *testing.T) {
+	profileCfgRepo := repository.NewProfileCfgRepoImpl(db)
+	t.Run("TestProfileRepo", ProfileREPO)
 	fmt.Println("RUNNING TEST PROFILE CONFIG REPOSITORY")
 
-	t.Run("SUCCESS_Store", func(t *testing.T) {
-		tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
-		if err != nil {
-			t.Fatal(err)
-		}
-		err = profileCfgRepo.StoreProfileCfg(context.Background(), tx, profileConfig1)
+	t.Run("SUCCESS_StoreProfileCfg", func(t *testing.T) {
+		err := profileCfgRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
-		err = profileCfgRepo.StoreProfileCfg(context.Background(), tx, profileConfig2)
+		err = profileCfgRepo.StoreProfileCfg(context.Background(), profileConfig1)
 		assert.NoError(t, err)
-		tx.Commit()
+		err = profileCfgRepo.Commit()
+		assert.NoError(t, err)
+
+		err = profileCfgRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+		assert.NoError(t, err)
+		err = profileCfgRepo.StoreProfileCfg(context.Background(), profileConfig2)
+		assert.NoError(t, err)
+		err = profileCfgRepo.Commit()
+		assert.NoError(t, err)
 	})
 
-	t.Run("ERROR_Store", func(t *testing.T) {
-		tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
-		if err != nil {
-			t.Fatal(err)
-		}
-		err = profileCfgRepo.StoreProfileCfg(context.Background(), tx, profileConfig1)
+	t.Run("ERROR_StoreProfileCfg_PROFILECFGEXISTS", func(t *testing.T) {
+		err := profileCfgRepo.BeginTx(context.TODO(), &sql.TxOptions{})
+		assert.NoError(t, err)
+		err = profileCfgRepo.StoreProfileCfg(context.Background(), profileConfig1)
 		assert.Error(t, err)
-		assert.Equal(t, exceptions.ErrProfileConfigAlvailable, err)
-		tx.Rollback()
+		assert.Equal(t, exception.Err400ProfileConfigAlvailable, err)
+
+		err = profileCfgRepo.Rollback()
+		assert.NoError(t, err)
 	})
 
-	t.Run("SUCCESS_Get-By-Id-Or-UserId", func(t *testing.T) {
-		profileCfg, err := profileCfgRepo.GetProfileCfgById(context.Background(), profileConfig1.ID)
+	t.Run("SUCCESS_GetProfileCfgByID", func(t *testing.T) {
+		profileCfg, err := profileCfgRepo.GetProfileCfgByID(context.Background(), profileConfig1.ID)
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfg)
 		assert.Equal(t, profileConfig1.ID, profileCfg.ID)
 	})
 
-	t.Run("ERROR_Get-By-Id-Or-UserId", func(t *testing.T) {
-		profileCfg, err := profileCfgRepo.GetProfileCfgById(context.Background(), profileConfig1.ConfigName)
+	t.Run("ERROR_GetProfileCfgByID_NOROW", func(t *testing.T) {
+		profileCfg, err := profileCfgRepo.GetProfileCfgByID(context.Background(), profileConfig1.ConfigName)
 		assert.Error(t, err)
 		assert.Nil(t, profileCfg)
 		assert.Equal(t, sql.ErrNoRows, err)
 	})
 
-	t.Run("SUCCESS_Get-Scheduler", func(t *testing.T) {
+	t.Run("SUCCESS_GetProfileCfgByScheduler", func(t *testing.T) {
 		scheduler := dto.ProfileCfgScheduler{
 			Day:  "monday",
 			Time: "02:00",
@@ -138,7 +142,7 @@ func TestProfileConfigRepo(t *testing.T) {
 		}
 	})
 
-	t.Run("ERROR_Get-Scheduler", func(t *testing.T) {
+	t.Run("ERROR_GetProfileCfgByScheduler_NOROWS", func(t *testing.T) {
 		scheduler := dto.ProfileCfgScheduler{
 			Day:  "saturday",
 			Time: "02:00",
@@ -152,13 +156,21 @@ func TestProfileConfigRepo(t *testing.T) {
 		}
 	})
 
-	t.Run("SUCCESS_Update", func(t *testing.T) {
-		tx, err := db.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
-		if err != nil {
-			t.Fatal(err)
-		}
-		err = profileCfgRepo.UpdateProfileCfg(context.Background(), tx, profileConfigUpdate1)
+	t.Run("SUCCESS_UpdateProfileCfg", func(t *testing.T) {
+		err := profileCfgRepo.BeginTx(context.TODO(), &sql.TxOptions{})
 		assert.NoError(t, err)
-		tx.Commit()
+
+		err = profileCfgRepo.UpdateProfileCfg(context.Background(), profileConfigUpdate1)
+		assert.NoError(t, err)
+
+		err = profileCfgRepo.Commit()
+		assert.NoError(t, err)
+	})
+
+	t.Run("SUCCESS_GetProfileCfgByID_AFTERUPDATE", func(t *testing.T) {
+		profileCfg, err := profileCfgRepo.GetProfileCfgByID(context.Background(), profileConfigUpdate1.ID)
+		assert.NoError(t, err)
+		assert.NotNil(t, profileCfg)
+		t.Log(profileCfg)
 	})
 }

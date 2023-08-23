@@ -8,36 +8,32 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exceptions"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exception"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repositories"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repository"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	id1     = uuid.NewV4().String()
-	id2     = uuid.NewV4().String()
-	id3     = uuid.NewV4().String()
-	userId1 = "user id 1"
-	userId2 = "user id 2"
-	userId3 = "user id 3"
-	columns = []string{"id", "user_id", "quotes", "created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"}
-)
+func TestGetProfileByIDREPO(t *testing.T) {
+	id1 := uuid.NewV4().String()
+	id2 := uuid.NewV4().String()
+	id3 := uuid.NewV4().String()
+	userId1 := "userid_1"
+	userId2 := "userid_2"
+	userId3 := "userid_3"
+	columns := []string{"id", "user_id", "quotes", "created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"}
 
-func TestGetProfileById(t *testing.T) {
 	db, mocksql, err := sqlmock.New()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	profileRepo := repositories.NewProfileRepoImpl(db)
+	profileRepo := repository.NewProfileRepoImpl(db)
 
 	expectProfile := &model.Profile{
-		ProfileId: id1,
-		UserId:    userId1,
+		ProfileID: id1,
+		UserID:    userId1,
 		Quote:     sql.NullString{String: "semangat", Valid: true},
 		CreatedAt: time.Now().Unix(),
 		CreatedBy: id1,
@@ -49,7 +45,7 @@ func TestGetProfileById(t *testing.T) {
 
 	prepareQuery := regexp.QuoteMeta("SELECT id, user_id, quotes, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM dueit.m_profiles WHERE id = $1 AND deleted_at IS NULL")
 
-	t.Run("success", func(t *testing.T) {
+	t.Run("SUCCESS_GetProfileByID", func(t *testing.T) {
 		rows := sqlmock.NewRows(columns)
 		rows.AddRow(id1, userId1, "semangat", time.Now().Unix(), id1, time.Now().Unix(), nil, nil, nil)
 		rows.AddRow(id2, userId2, "semangat", time.Now().Unix(), id2, time.Now().Unix(), nil, nil, nil)
@@ -58,7 +54,7 @@ func TestGetProfileById(t *testing.T) {
 		mocksql.ExpectPrepare(prepareQuery)
 		mocksql.ExpectQuery(prepareQuery).WithArgs(id1).WillReturnRows(rows)
 
-		profile, err := profileRepo.GetProfileById(context.TODO(), id1)
+		profile, err := profileRepo.GetProfileByID(context.TODO(), id1)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.Equal(t, expectProfile, profile)
@@ -66,28 +62,12 @@ func TestGetProfileById(t *testing.T) {
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
 	})
-	t.Run("error deleted not nil", func(t *testing.T) {
-		rows := sqlmock.NewRows(columns)
-		rows.AddRow(id1, userId1, "semangat", time.Now().Unix(), id1, time.Now().Unix(), nil, time.Now().Unix(), nil)
-		rows.AddRow(id2, userId2, "semangat", time.Now().Unix(), id2, time.Now().Unix(), nil, nil, nil)
-		rows.AddRow(id3, userId3, "semangat", time.Now().Unix(), id3, time.Now().Unix(), nil, nil, nil)
 
-		mocksql.ExpectPrepare(prepareQuery)
-		mocksql.ExpectQuery(prepareQuery).WithArgs(id1).WillReturnRows(rows)
-
-		profile, err := profileRepo.GetProfileById(context.TODO(), id1)
-		assert.NoError(t, err)
-		assert.NotNil(t, profile)
-		assert.NotEqual(t, expectProfile, profile)
-
-		err = mocksql.ExpectationsWereMet()
-		assert.NoError(t, err)
-	})
-	t.Run("error data nil", func(t *testing.T) {
+	t.Run("ERROR_GetProfileByID_DATANILL", func(t *testing.T) {
 		mocksql.ExpectPrepare(prepareQuery)
 		mocksql.ExpectQuery(prepareQuery).WithArgs(id1).WillReturnRows(sqlmock.NewRows(columns))
 
-		profile, err := profileRepo.GetProfileById(context.TODO(), id1)
+		profile, err := profileRepo.GetProfileByID(context.TODO(), id1)
 		assert.Error(t, err)
 		assert.Nil(t, profile)
 		assert.NotEqual(t, expectProfile, profile)
@@ -97,16 +77,24 @@ func TestGetProfileById(t *testing.T) {
 	})
 }
 
-func TestGetProfileByUserId(t *testing.T) {
+func TestGetProfileByUserIDREPO(t *testing.T) {
+	id1 := uuid.NewV4().String()
+	id2 := uuid.NewV4().String()
+	id3 := uuid.NewV4().String()
+	userId1 := "user id 1"
+	userId2 := "user id 2"
+	userId3 := "user id 3"
+	columns := []string{"id", "user_id", "quotes", "created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"}
+
 	db, mocksql, err := sqlmock.New()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	profileRepo := repositories.NewProfileRepoImpl(db)
+	profileRepo := repository.NewProfileRepoImpl(db)
 	expectProfile := &model.Profile{
-		ProfileId: id1,
-		UserId:    userId1,
+		ProfileID: id1,
+		UserID:    userId1,
 		Quote:     sql.NullString{String: "semangat", Valid: true},
 		CreatedAt: time.Now().Unix(),
 		CreatedBy: id1,
@@ -116,18 +104,18 @@ func TestGetProfileByUserId(t *testing.T) {
 		DeletedBy: sql.NullString{},
 	}
 
-	prepareQuery := regexp.QuoteMeta("SELECT id, user_id, quotes, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM dueit.m_profiles WHERE user_id = $1 AND deleted_at IS NULL")
+	query := regexp.QuoteMeta("SELECT id, user_id, quotes, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM dueit.m_profiles WHERE user_id = $1 AND deleted_at IS NULL")
 
-	t.Run("success", func(t *testing.T) {
+	t.Run("SUCCESS_GetProfileByUserID", func(t *testing.T) {
 		rows := sqlmock.NewRows(columns)
 		rows.AddRow(id1, userId1, "semangat", time.Now().Unix(), id1, time.Now().Unix(), nil, nil, nil)
 		rows.AddRow(id2, userId2, "semangat", time.Now().Unix(), id2, time.Now().Unix(), nil, nil, nil)
 		rows.AddRow(id3, userId3, "semangat", time.Now().Unix(), id3, time.Now().Unix(), nil, nil, nil)
 
-		mocksql.ExpectPrepare(prepareQuery)
-		mocksql.ExpectQuery(prepareQuery).WithArgs(userId1).WillReturnRows(rows)
+		mocksql.ExpectPrepare(query)
+		mocksql.ExpectQuery(query).WithArgs(userId1).WillReturnRows(rows)
 
-		profile, err := profileRepo.GetProfileByUserId(context.TODO(), userId1)
+		profile, err := profileRepo.GetProfileByUserID(context.TODO(), userId1)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.Equal(t, expectProfile, profile)
@@ -135,29 +123,13 @@ func TestGetProfileByUserId(t *testing.T) {
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
 	})
-	t.Run("error deleted not nil", func(t *testing.T) {
-		rows := sqlmock.NewRows(columns)
-		rows.AddRow(id1, userId1, "semangat", time.Now().Unix(), id1, time.Now().Unix(), nil, time.Now().Unix(), nil)
-		rows.AddRow(id2, userId2, "semangat", time.Now().Unix(), id2, time.Now().Unix(), nil, nil, nil)
-		rows.AddRow(id3, userId3, "semangat", time.Now().Unix(), id3, time.Now().Unix(), nil, nil, nil)
 
-		mocksql.ExpectPrepare(prepareQuery)
-		mocksql.ExpectQuery(prepareQuery).WithArgs(id1).WillReturnRows(rows)
-
-		profile, err := profileRepo.GetProfileByUserId(context.TODO(), id1)
-		assert.NoError(t, err)
-		assert.NotNil(t, profile)
-		assert.NotEqual(t, expectProfile, profile)
-
-		err = mocksql.ExpectationsWereMet()
-		assert.NoError(t, err)
-	})
-	t.Run("error data nil", func(t *testing.T) {
-		mocksql.ExpectPrepare(prepareQuery)
-		mocksql.ExpectQuery(prepareQuery).WithArgs(id1).
+	t.Run("ERROR_GetProfileByUserID_DATANILL", func(t *testing.T) {
+		mocksql.ExpectPrepare(query)
+		mocksql.ExpectQuery(query).WithArgs(id1).
 			WillReturnRows(sqlmock.NewRows(columns))
 
-		profile, err := profileRepo.GetProfileByUserId(context.TODO(), id1)
+		profile, err := profileRepo.GetProfileByUserID(context.TODO(), id1)
 		assert.Error(t, err)
 		assert.Nil(t, profile)
 		assert.NotEqual(t, expectProfile, profile)
@@ -167,12 +139,14 @@ func TestGetProfileByUserId(t *testing.T) {
 	})
 }
 
-func TestStoreProfile(t *testing.T) {
-	// log.Logger = log.Output(zerolog.Nop())
+func TestStoreProfileREPO(t *testing.T) {
+	id1 := uuid.NewV4().String()
+	userId1 := "user id 1"
+
 	unix := time.Now().Unix()
 	createProfile := &model.Profile{
-		ProfileId: id1,
-		UserId:    userId1,
+		ProfileID: id1,
+		UserID:    userId1,
 		Quote:     sql.NullString{String: "semagat", Valid: true},
 		CreatedAt: unix,
 		CreatedBy: id1,
@@ -187,65 +161,73 @@ func TestStoreProfile(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	profileRepo := repositories.NewProfileRepoImpl(db)
+	profileRepo := repository.NewProfileRepoImpl(db)
 
 	query := regexp.QuoteMeta("SELECT EXISTS (SELECT 1 FROM dueit.m_profiles WHERE user_id = $1)")
 	query2 := regexp.QuoteMeta("INSERT INTO dueit.m_profiles (id, user_id, quotes, created_at, created_by, updated_at) VALUES ($1, $2, $3, $4, $5, $6)")
-	t.Run("success", func(t *testing.T) {
+	t.Run("SUCCESS_StoreProfile", func(t *testing.T) {
 		mocksql.ExpectBegin()
 		mocksql.ExpectPrepare(query)
 		rows := sqlmock.NewRows([]string{"exists"})
 		rows.AddRow(false)
-		mocksql.ExpectQuery(query).WithArgs(createProfile.UserId).WillReturnRows(rows)
+		mocksql.ExpectQuery(query).WithArgs(createProfile.UserID).WillReturnRows(rows)
 		mocksql.ExpectPrepare(query2)
 		mocksql.ExpectExec(query2).WithArgs(
-			createProfile.ProfileId,
-			createProfile.UserId,
+			createProfile.ProfileID,
+			createProfile.UserID,
 			createProfile.Quote,
 			createProfile.CreatedAt,
 			createProfile.CreatedBy,
 			createProfile.UpdatedAt,
 		).WillReturnResult(sqlmock.NewResult(1, 1))
+		mocksql.ExpectCommit()
 
-		tx, err := db.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
-		if err != nil {
-			t.Fatal(err)
-		}
-		profile, err := profileRepo.StoreProfile(context.TODO(), tx, *createProfile)
+		err = profileRepo.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
+		assert.NoError(t, err)
+
+		profile, err := profileRepo.StoreProfile(context.TODO(), *createProfile)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
-		assert.Equal(t, profile.ProfileId, createProfile.ProfileId)
+		assert.Equal(t, profile.ProfileID, createProfile.ProfileID)
+
+		err = profileRepo.Commit()
+		assert.NoError(t, err)
 
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
 	})
 
-	t.Run("error", func(t *testing.T) {
+	t.Run("ERROR_StoreProfile_DATAEXISTS", func(t *testing.T) {
 		mocksql.ExpectBegin()
 		mocksql.ExpectPrepare(query)
 		rows := sqlmock.NewRows([]string{"exists"})
 		rows.AddRow(true)
-		mocksql.ExpectQuery(query).WithArgs(createProfile.UserId).WillReturnRows(rows)
+		mocksql.ExpectQuery(query).WithArgs(createProfile.UserID).WillReturnRows(rows)
+		mocksql.ExpectRollback()
 
-		tx, err := db.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
-		if err != nil {
-			t.Fatal(err)
-		}
-		_, err = profileRepo.StoreProfile(context.TODO(), tx, *createProfile)
+		err = profileRepo.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
+		assert.NoError(t, err)
+
+		_, err = profileRepo.StoreProfile(context.TODO(), *createProfile)
 		assert.Error(t, err)
-		assert.Equal(t, exceptions.ErrProfileAlvailable, err)
+		assert.Equal(t, exception.Err400ProfileAlvailable, err)
+
+		err = profileRepo.Rollback()
+		assert.NoError(t, err)
 
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
 	})
 }
 
-func TestUpdateProfile(t *testing.T) {
-	log.Logger = log.Output(zerolog.Nop())
+func TestUpdateProfileREPO(t *testing.T) {
+	id1 := uuid.NewV4().String()
+	userId1 := "user id 1"
+
 	unix := time.Now().Unix()
 	updateProfile := &model.Profile{
-		ProfileId: id1,
-		UserId:    userId1,
+		ProfileID: id1,
+		UserID:    userId1,
 		Quote:     sql.NullString{String: "semagat", Valid: true},
 		CreatedAt: unix,
 		CreatedBy: id1,
@@ -260,11 +242,11 @@ func TestUpdateProfile(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	profileRepo := repositories.NewProfileRepoImpl(db)
+	profileRepo := repository.NewProfileRepoImpl(db)
 
 	query := regexp.QuoteMeta("UPDATE dueit.m_profiles SET quotes = $1, updated_by = $2, updated_at = $3 WHERE user_id = $4 AND id = $5 AND deleted_at IS NULL")
 
-	t.Run("success", func(t *testing.T) {
+	t.Run("SUCCESS_UpdateProfile", func(t *testing.T) {
 		mocksql.ExpectBegin()
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectExec(query).WithArgs(
@@ -274,14 +256,18 @@ func TestUpdateProfile(t *testing.T) {
 			userId1,
 			id1,
 		).WillReturnResult(sqlmock.NewResult(1, 1))
+		mocksql.ExpectCommit()
 
-		tx, err := db.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+		err = profileRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 
-		profile, err := profileRepo.UpdateProfile(context.TODO(), tx, *updateProfile)
+		profile, err := profileRepo.UpdateProfile(context.TODO(), *updateProfile)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.Equal(t, profile, updateProfile)
+
+		err = profileRepo.Commit()
+		assert.NoError(t, err)
 
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)

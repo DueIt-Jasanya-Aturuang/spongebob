@@ -18,7 +18,7 @@ func NewRedisConn() *RedisImpl {
 	rDB := redis.NewClient(&redis.Options{
 		Addr:     host,
 		Password: RedisPass,
-		DB:       RedisDb,
+		DB:       RedisDB,
 	})
 
 	ctx := context.TODO()

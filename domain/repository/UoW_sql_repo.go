@@ -5,9 +5,11 @@ import (
 	"database/sql"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o ./../mocks . UnitOfWork
+//counterfeiter:generate -o ./../mocks . UnitOfWork
 type UnitOfWork interface {
-	BeginTx(context.Context, *sql.TxOptions) (*sql.Tx, error)
+	BeginTx(context.Context, *sql.TxOptions) error
 	Commit() error
 	Rollback() error
+	GetTx() *sql.Tx
+	CallTx(*sql.Tx) error
 }

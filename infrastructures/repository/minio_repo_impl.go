@@ -1,4 +1,4 @@
-package repositories
+package repository
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exceptions"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exception"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
 	"github.com/minio/minio-go/v7"
 	"github.com/rs/zerolog/log"
@@ -40,7 +40,7 @@ func (m *MinioImpl) UploadFile(ctx context.Context, file *multipart.FileHeader, 
 		ContentType: contentType,
 	})
 	if err != nil {
-		log.Err(err).Msg(exceptions.LogErrMinioPut)
+		log.Err(err).Msg(exception.LogErrMinioPut)
 		return err
 	}
 
@@ -50,7 +50,7 @@ func (m *MinioImpl) UploadFile(ctx context.Context, file *multipart.FileHeader, 
 
 func (m *MinioImpl) DeleteFile(ctx context.Context, objectName, bucket string) error {
 	if err := m.c.RemoveObject(ctx, bucket, objectName, minio.RemoveObjectOptions{}); err != nil {
-		log.Err(err).Msg(exceptions.LogErrMinioDel)
+		log.Err(err).Msg(exception.LogErrMinioDel)
 		return err
 	}
 

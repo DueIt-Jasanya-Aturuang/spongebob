@@ -13,5 +13,5 @@ type ProfileCfgRepo interface {
 	UpdateProfileCfg(context.Context, model.ProfileCfg) error
 	GetProfileCfgByID(context.Context, string) (*model.ProfileCfg, error)
 	GetProfileCfgByScheduler(context.Context, dto.ProfileCfgScheduler) (*[]model.ProfileCfg, error)
-	UnitOfWork
+	UoW() UnitOfWork
 }

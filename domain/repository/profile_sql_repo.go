@@ -12,5 +12,5 @@ type ProfileRepo interface {
 	GetProfileByUserID(context.Context, string) (*model.Profile, error)
 	StoreProfile(context.Context, model.Profile) (model.Profile, error)
 	UpdateProfile(context.Context, model.Profile) (*model.Profile, error)
-	UnitOfWork
+	UoW() UnitOfWork
 }

@@ -3,6 +3,7 @@ package unit
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"regexp"
 	"testing"
 	"time"
@@ -29,7 +30,8 @@ func TestGetProfileByIDREPO(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	profileRepo := repository.NewProfileRepoImpl(db)
+	uow := repository.NewUnitOfWorkImpl(db)
+	profileRepo := repository.NewProfileRepoImpl(uow)
 
 	expectProfile := &model.Profile{
 		ProfileID: id1,
@@ -91,7 +93,8 @@ func TestGetProfileByUserIDREPO(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	profileRepo := repository.NewProfileRepoImpl(db)
+	uow := repository.NewUnitOfWorkImpl(db)
+	profileRepo := repository.NewProfileRepoImpl(uow)
 	expectProfile := &model.Profile{
 		ProfileID: id1,
 		UserID:    userId1,
@@ -161,7 +164,8 @@ func TestStoreProfileREPO(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	profileRepo := repository.NewProfileRepoImpl(db)
+	uow := repository.NewUnitOfWorkImpl(db)
+	profileRepo := repository.NewProfileRepoImpl(uow)
 
 	query := regexp.QuoteMeta("SELECT EXISTS (SELECT 1 FROM dueit.m_profiles WHERE user_id = $1)")
 	query2 := regexp.QuoteMeta("INSERT INTO dueit.m_profiles (id, user_id, quotes, created_at, created_by, updated_at) VALUES ($1, $2, $3, $4, $5, $6)")
@@ -182,17 +186,14 @@ func TestStoreProfileREPO(t *testing.T) {
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 		mocksql.ExpectCommit()
 
-		err = profileRepo.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
+		err := profileRepo.UoW().StartTx(context.Background(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 
 		profile, err := profileRepo.StoreProfile(context.TODO(), *createProfile)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.Equal(t, profile.ProfileID, createProfile.ProfileID)
-
-		err = profileRepo.Commit()
-		assert.NoError(t, err)
-
+		profileRepo.UoW().EndTx(nil)
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
 	})
@@ -205,16 +206,14 @@ func TestStoreProfileREPO(t *testing.T) {
 		mocksql.ExpectQuery(query).WithArgs(createProfile.UserID).WillReturnRows(rows)
 		mocksql.ExpectRollback()
 
-		err = profileRepo.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: false})
+		err := profileRepo.UoW().StartTx(context.Background(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 
 		_, err = profileRepo.StoreProfile(context.TODO(), *createProfile)
 		assert.Error(t, err)
 		assert.Equal(t, exception.Err400ProfileAlvailable, err)
 
-		err = profileRepo.Rollback()
-		assert.NoError(t, err)
-
+		profileRepo.UoW().EndTx(errors.New("DATA EXISTS"))
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
 	})
@@ -242,7 +241,8 @@ func TestUpdateProfileREPO(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	profileRepo := repository.NewProfileRepoImpl(db)
+	uow := repository.NewUnitOfWorkImpl(db)
+	profileRepo := repository.NewProfileRepoImpl(uow)
 
 	query := regexp.QuoteMeta("UPDATE dueit.m_profiles SET quotes = $1, updated_by = $2, updated_at = $3 WHERE user_id = $4 AND id = $5 AND deleted_at IS NULL")
 
@@ -258,7 +258,7 @@ func TestUpdateProfileREPO(t *testing.T) {
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 		mocksql.ExpectCommit()
 
-		err = profileRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+		err := profileRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 
 		profile, err := profileRepo.UpdateProfile(context.TODO(), *updateProfile)
@@ -266,7 +266,7 @@ func TestUpdateProfileREPO(t *testing.T) {
 		assert.NotNil(t, profile)
 		assert.Equal(t, profile, updateProfile)
 
-		err = profileRepo.Commit()
+		profileRepo.UoW().EndTx(nil)
 		assert.NoError(t, err)
 
 		err = mocksql.ExpectationsWereMet()

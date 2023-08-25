@@ -3,6 +3,7 @@ package integration
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 	"testing"
@@ -79,7 +80,8 @@ func createUserFunc() {
 }
 
 func TestUserREPO(t *testing.T) {
-	userRepo := repository.NewUserRepoImpl(db)
+	uow := repository.NewUnitOfWorkImpl(db)
+	userRepo := repository.NewUserRepoImpl(uow)
 	fmt.Println("RUNNING TEST USER REPOSITORY")
 	updateUser := model.User{
 		ID:              "userId1",
@@ -131,48 +133,44 @@ func TestUserREPO(t *testing.T) {
 	})
 
 	t.Run("SUCCESS_UpdateUser", func(t *testing.T) {
-		err := userRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+		err := userRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 		user, err := userRepo.UpdateUser(context.TODO(), updateUser1)
 		assert.NoError(t, err)
 		assert.NotNil(t, user)
 		assert.Equal(t, &updateUser1, user)
 		assert.NotEqual(t, &createUser, user)
-		err = userRepo.Commit()
-		assert.NoError(t, err)
+		userRepo.UoW().EndTx(nil)
 	})
 
 	t.Run("ERROR_UpdateUser_PHONEEXISTS", func(t *testing.T) {
-		err := userRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+		err := userRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 		user, err := userRepo.UpdateUser(context.TODO(), updateUser)
 		assert.Error(t, err)
 		assert.Nil(t, user)
 		assert.Equal(t, err, exception.Err400PhoneAlvailable)
-		err = userRepo.Rollback()
-		assert.NoError(t, err)
+		userRepo.UoW().EndTx(errors.New("PHONEEXISTS"))
 	})
 
 	t.Run("ERROR_UpdateUsername_USERNAMEEXISTS", func(t *testing.T) {
-		err := userRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+		err := userRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 		updateUser.Username = "rama2"
 		user, err := userRepo.UpdateUsername(context.TODO(), updateUser)
 		assert.Error(t, err)
 		assert.Nil(t, user)
 		assert.Equal(t, err, exception.Err400UsernameAlvailable)
-		err = userRepo.Rollback()
-		assert.NoError(t, err)
+		userRepo.UoW().EndTx(errors.New("USERNAMEEXISTS"))
 	})
 
 	t.Run("SUCCESS_UpdateUsername", func(t *testing.T) {
-		err := userRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+		err := userRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 		user, err := userRepo.UpdateUsername(context.TODO(), updateUser)
 		assert.Error(t, err)
 		assert.Nil(t, user)
 		assert.Equal(t, err, exception.Err400UsernameAlvailable)
-		err = userRepo.Commit()
-		assert.NoError(t, err)
+		userRepo.UoW().EndTx(nil)
 	})
 }

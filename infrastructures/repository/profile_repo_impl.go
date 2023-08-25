@@ -11,14 +11,17 @@ import (
 )
 
 type ProfileRepoImpl struct {
-	db *sql.DB
-	tx *sql.Tx
+	uow repository.UnitOfWork
 }
 
-func NewProfileRepoImpl(db *sql.DB) repository.ProfileRepo {
+func NewProfileRepoImpl(uow repository.UnitOfWork) repository.ProfileRepo {
 	return &ProfileRepoImpl{
-		db: db,
+		uow: uow,
 	}
+}
+
+func (repo *ProfileRepoImpl) UoW() repository.UnitOfWork {
+	return repo.uow
 }
 
 func (repo *ProfileRepoImpl) scanRow(row *sql.Row) (*model.Profile, error) {
@@ -45,11 +48,26 @@ func (repo *ProfileRepoImpl) GetProfileByID(ctx context.Context, id string) (*mo
 	query := "SELECT id, user_id, quotes, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by " +
 		"FROM dueit.m_profiles WHERE id = $1 AND deleted_at IS NULL"
 
-	stmt, err := repo.db.PrepareContext(ctx, query)
+	conn, err := repo.uow.OpenConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if errConn := conn.Close(); errConn != nil {
+			log.Err(errConn).Msg(exception.LogErrCloseConn)
+		}
+	}()
+
+	stmt, err := conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Err(err).Msg(exception.LogErrSTMT)
 		return nil, err
 	}
+	defer func() {
+		if errStmt := stmt.Close(); errStmt != nil {
+			log.Err(errStmt).Msg(exception.LogErrCloseStmt)
+		}
+	}()
 
 	row := stmt.QueryRowContext(ctx, id)
 
@@ -63,11 +81,27 @@ func (repo *ProfileRepoImpl) GetProfileByID(ctx context.Context, id string) (*mo
 func (repo *ProfileRepoImpl) GetProfileByUserID(ctx context.Context, userID string) (*model.Profile, error) {
 	query := "SELECT id, user_id, quotes, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by " +
 		"FROM dueit.m_profiles WHERE user_id = $1 AND deleted_at IS NULL"
-	stmt, err := repo.db.PrepareContext(ctx, query)
+
+	conn, err := repo.uow.OpenConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if errConn := conn.Close(); errConn != nil {
+			log.Err(errConn).Msg(exception.LogErrCloseConn)
+		}
+	}()
+
+	stmt, err := conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Err(err).Msg(exception.LogErrSTMT)
 		return nil, err
 	}
+	defer func() {
+		if errStmt := stmt.Close(); errStmt != nil {
+			log.Err(errStmt).Msg(exception.LogErrCloseStmt)
+		}
+	}()
 
 	row := stmt.QueryRowContext(ctx, userID)
 
@@ -82,12 +116,22 @@ func (repo *ProfileRepoImpl) GetProfileByUserID(ctx context.Context, userID stri
 func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, entity model.Profile) (model.Profile, error) {
 	query := "SELECT EXISTS (SELECT 1 FROM dueit.m_profiles WHERE user_id = $1)"
 	var exists bool
+	tx, err := repo.uow.GetTx()
+	if err != nil {
+		return model.Profile{}, err
+	}
 
-	querySTMT, err := repo.tx.PrepareContext(ctx, query)
+	querySTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
 		log.Err(err).Msg(exception.LogErrSTMT)
 		return model.Profile{}, err
 	}
+	defer func() {
+		if errQueryStmt := querySTMT.Close(); errQueryStmt != nil {
+			log.Err(errQueryStmt).Msg(exception.LogErrCloseStmt)
+		}
+	}()
+
 	if err = querySTMT.QueryRowContext(ctx, entity.UserID).Scan(&exists); err != nil {
 		log.Err(err).Msg(exception.LogErrQuery)
 		return model.Profile{}, err
@@ -99,11 +143,16 @@ func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, entity model.Prof
 
 	// insert proses
 	query = "INSERT INTO dueit.m_profiles (id, user_id, quotes, created_at, created_by, updated_at) VALUES ($1, $2, $3, $4, $5, $6)"
-	execSTMT, err := repo.tx.PrepareContext(ctx, query)
+	execSTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
 		log.Err(err).Msg(exception.LogErrSTMT)
 		return model.Profile{}, err
 	}
+	defer func() {
+		if errExecStmt := execSTMT.Close(); errExecStmt != nil {
+			log.Err(errExecStmt).Msg(exception.LogErrCloseStmt)
+		}
+	}()
 
 	if _, err := execSTMT.ExecContext(
 		ctx,
@@ -123,12 +172,21 @@ func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, entity model.Prof
 
 func (repo *ProfileRepoImpl) UpdateProfile(ctx context.Context, entity model.Profile) (*model.Profile, error) {
 	query := "UPDATE dueit.m_profiles SET quotes = $1, updated_by = $2, updated_at = $3 WHERE user_id = $4 AND id = $5 AND deleted_at IS NULL"
+	tx, err := repo.uow.GetTx()
+	if err != nil {
+		return nil, err
+	}
 
-	stmt, err := repo.tx.PrepareContext(ctx, query)
+	stmt, err := tx.PrepareContext(ctx, query)
 	if err != nil {
 		log.Err(err).Msg(exception.LogErrSTMT)
 		return nil, err
 	}
+	defer func() {
+		if errStmt := stmt.Close(); errStmt != nil {
+			log.Err(errStmt).Msg(exception.LogErrCloseStmt)
+		}
+	}()
 
 	if _, err = stmt.ExecContext(
 		ctx,
@@ -143,51 +201,4 @@ func (repo *ProfileRepoImpl) UpdateProfile(ctx context.Context, entity model.Pro
 	}
 
 	return &entity, nil
-}
-
-func (repo *ProfileRepoImpl) BeginTx(ctx context.Context, opts *sql.TxOptions) error {
-	tx, err := repo.db.BeginTx(ctx, opts)
-	if err != nil {
-		log.Err(err).Msg(exception.LogErrTxStart)
-		return err
-	}
-
-	repo.tx = tx
-	return nil
-}
-
-func (repo *ProfileRepoImpl) GetTx() *sql.Tx {
-	if repo.tx != nil {
-		return repo.tx
-	}
-	return nil
-}
-
-func (repo *ProfileRepoImpl) Commit() error {
-	if repo.tx != nil {
-		err := repo.tx.Commit()
-		if err != nil {
-			log.Err(err).Msg(exception.LogErrTxCommit)
-			return err
-		}
-		return nil
-	}
-	return exception.Err500TxNil
-}
-
-func (repo *ProfileRepoImpl) Rollback() error {
-	err := repo.tx.Rollback()
-	if err != nil {
-		log.Err(err).Msg(exception.LogErrTxRollback)
-		return err
-	}
-
-	return nil
-}
-
-func (repo *ProfileRepoImpl) CallTx(tx *sql.Tx) error {
-	if tx != nil {
-		repo.tx = tx
-	}
-	return exception.Err500TxNil
 }

@@ -3,6 +3,7 @@ package integration
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -14,7 +15,8 @@ import (
 )
 
 func ProfileREPO(t *testing.T) {
-	profileRepo := repository.NewProfileRepoImpl(db)
+	uow := repository.NewUnitOfWorkImpl(db)
+	profileRepo := repository.NewProfileRepoImpl(uow)
 	fmt.Println("RUNNING TEST PROFILE REPOSITORY")
 	unix := time.Now().Unix()
 	dataProfile := model.Profile{
@@ -30,33 +32,26 @@ func ProfileREPO(t *testing.T) {
 	}
 
 	t.Run("SUCCESS_StoreProfile", func(t *testing.T) {
-		err := profileRepo.BeginTx(context.Background(), &sql.TxOptions{
-			ReadOnly: false,
-		})
+		err := profileRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 		profile, err := profileRepo.StoreProfile(context.Background(), dataProfile)
 		assert.NoError(t, err)
 		assert.Equal(t, dataProfile, profile)
-		err = profileRepo.Commit()
-		assert.NoError(t, err)
+		profileRepo.UoW().EndTx(nil)
 	})
 
 	t.Run("ERROR_StoreProfile_PROFILEEXISTS", func(t *testing.T) {
-		err := profileRepo.BeginTx(context.Background(), &sql.TxOptions{
-			Isolation: sql.LevelSerializable,
-		})
+		err := profileRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 		profile, err := profileRepo.StoreProfile(context.Background(), dataProfile)
 		assert.Error(t, err)
 		assert.NotEqual(t, dataProfile, profile)
 		assert.Equal(t, exception.Err400ProfileAlvailable, err)
-		err = profileRepo.Rollback()
-		assert.NoError(t, err)
+		profileRepo.UoW().EndTx(errors.New("PROFILEEXISTS"))
 	})
 
 	t.Run("SUCCESS_GetProfileByID", func(t *testing.T) {
 		profile, err := profileRepo.GetProfileByID(context.TODO(), dataProfile.ProfileID)
-		t.Log(err)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.Equal(t, &dataProfile, profile)
@@ -68,6 +63,7 @@ func ProfileREPO(t *testing.T) {
 		assert.Nil(t, profile)
 		assert.Equal(t, err, sql.ErrNoRows)
 	})
+
 	t.Run("SUCCESS_GetProfileByUserID", func(t *testing.T) {
 		profile, err := profileRepo.GetProfileByUserID(context.TODO(), dataProfile.UserID)
 		assert.NoError(t, err)
@@ -94,17 +90,13 @@ func ProfileREPO(t *testing.T) {
 			DeletedAt: sql.NullInt64{},
 			DeletedBy: sql.NullString{},
 		}
-		err := profileRepo.BeginTx(context.Background(), &sql.TxOptions{
-			ReadOnly:  false,
-			Isolation: sql.LevelSerializable,
-		})
+		err := profileRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 		profile, err := profileRepo.UpdateProfile(context.TODO(), updateProfile)
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 		assert.NotEqual(t, &dataProfile, profile)
 		assert.Equal(t, &updateProfile, profile)
-		err = profileRepo.Commit()
-		assert.NoError(t, err)
+		profileRepo.UoW().EndTx(nil)
 	})
 }

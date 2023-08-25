@@ -11,5 +11,5 @@ type UserRepo interface {
 	GetUserByID(context.Context, string) (*model.User, error)
 	UpdateUser(context.Context, model.User) (*model.User, error)
 	UpdateUsername(context.Context, model.User) (*model.User, error)
-	UnitOfWork
+	UoW() UnitOfWork
 }

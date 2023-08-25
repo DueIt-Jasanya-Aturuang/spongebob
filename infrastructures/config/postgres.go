@@ -29,7 +29,7 @@ func NewPgConn() *sql.DB {
 
 	db.SetMaxIdleConns(setMaxIdleConnsDB)
 	db.SetMaxOpenConns(setMaxOpenConnsDB)
-	db.SetConnMaxIdleTime(setMaxIdleConnsDB)
+	db.SetConnMaxIdleTime(SetConnMaxIdleTimeDB)
 	db.SetConnMaxLifetime(setConnMaxLifetimeDB)
 
 	log.Info().Msgf("connection postgres successfully : %s", PgName)

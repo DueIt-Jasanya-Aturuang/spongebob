@@ -11,7 +11,7 @@ import (
 func EnvInit() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Err(err).Msg("cannot load env")
+		log.Err(err).Msg("CANNOT LOAD ENV FILE")
 		os.Exit(1)
 	}
 

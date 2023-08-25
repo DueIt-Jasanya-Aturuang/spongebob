@@ -3,7 +3,6 @@ package mocks
 
 import (
 	"context"
-	"database/sql"
 	"sync"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
@@ -11,39 +10,6 @@ import (
 )
 
 type FakeProfileRepo struct {
-	BeginTxStub        func(context.Context, *sql.TxOptions) error
-	beginTxMutex       sync.RWMutex
-	beginTxArgsForCall []struct {
-		arg1 context.Context
-		arg2 *sql.TxOptions
-	}
-	beginTxReturns struct {
-		result1 error
-	}
-	beginTxReturnsOnCall map[int]struct {
-		result1 error
-	}
-	CallTxStub        func(*sql.Tx) error
-	callTxMutex       sync.RWMutex
-	callTxArgsForCall []struct {
-		arg1 *sql.Tx
-	}
-	callTxReturns struct {
-		result1 error
-	}
-	callTxReturnsOnCall map[int]struct {
-		result1 error
-	}
-	CommitStub        func() error
-	commitMutex       sync.RWMutex
-	commitArgsForCall []struct {
-	}
-	commitReturns struct {
-		result1 error
-	}
-	commitReturnsOnCall map[int]struct {
-		result1 error
-	}
 	GetProfileByIDStub        func(context.Context, string) (*model.Profile, error)
 	getProfileByIDMutex       sync.RWMutex
 	getProfileByIDArgsForCall []struct {
@@ -72,26 +38,6 @@ type FakeProfileRepo struct {
 		result1 *model.Profile
 		result2 error
 	}
-	GetTxStub        func() *sql.Tx
-	getTxMutex       sync.RWMutex
-	getTxArgsForCall []struct {
-	}
-	getTxReturns struct {
-		result1 *sql.Tx
-	}
-	getTxReturnsOnCall map[int]struct {
-		result1 *sql.Tx
-	}
-	RollbackStub        func() error
-	rollbackMutex       sync.RWMutex
-	rollbackArgsForCall []struct {
-	}
-	rollbackReturns struct {
-		result1 error
-	}
-	rollbackReturnsOnCall map[int]struct {
-		result1 error
-	}
 	StoreProfileStub        func(context.Context, model.Profile) (model.Profile, error)
 	storeProfileMutex       sync.RWMutex
 	storeProfileArgsForCall []struct {
@@ -105,6 +51,16 @@ type FakeProfileRepo struct {
 	storeProfileReturnsOnCall map[int]struct {
 		result1 model.Profile
 		result2 error
+	}
+	UoWStub        func() repository.UnitOfWork
+	uoWMutex       sync.RWMutex
+	uoWArgsForCall []struct {
+	}
+	uoWReturns struct {
+		result1 repository.UnitOfWork
+	}
+	uoWReturnsOnCall map[int]struct {
+		result1 repository.UnitOfWork
 	}
 	UpdateProfileStub        func(context.Context, model.Profile) (*model.Profile, error)
 	updateProfileMutex       sync.RWMutex
@@ -122,182 +78,6 @@ type FakeProfileRepo struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
-}
-
-func (fake *FakeProfileRepo) BeginTx(arg1 context.Context, arg2 *sql.TxOptions) error {
-	fake.beginTxMutex.Lock()
-	ret, specificReturn := fake.beginTxReturnsOnCall[len(fake.beginTxArgsForCall)]
-	fake.beginTxArgsForCall = append(fake.beginTxArgsForCall, struct {
-		arg1 context.Context
-		arg2 *sql.TxOptions
-	}{arg1, arg2})
-	stub := fake.BeginTxStub
-	fakeReturns := fake.beginTxReturns
-	fake.recordInvocation("BeginTx", []interface{}{arg1, arg2})
-	fake.beginTxMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *FakeProfileRepo) BeginTxCallCount() int {
-	fake.beginTxMutex.RLock()
-	defer fake.beginTxMutex.RUnlock()
-	return len(fake.beginTxArgsForCall)
-}
-
-func (fake *FakeProfileRepo) BeginTxCalls(stub func(context.Context, *sql.TxOptions) error) {
-	fake.beginTxMutex.Lock()
-	defer fake.beginTxMutex.Unlock()
-	fake.BeginTxStub = stub
-}
-
-func (fake *FakeProfileRepo) BeginTxArgsForCall(i int) (context.Context, *sql.TxOptions) {
-	fake.beginTxMutex.RLock()
-	defer fake.beginTxMutex.RUnlock()
-	argsForCall := fake.beginTxArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeProfileRepo) BeginTxReturns(result1 error) {
-	fake.beginTxMutex.Lock()
-	defer fake.beginTxMutex.Unlock()
-	fake.BeginTxStub = nil
-	fake.beginTxReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeProfileRepo) BeginTxReturnsOnCall(i int, result1 error) {
-	fake.beginTxMutex.Lock()
-	defer fake.beginTxMutex.Unlock()
-	fake.BeginTxStub = nil
-	if fake.beginTxReturnsOnCall == nil {
-		fake.beginTxReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.beginTxReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeProfileRepo) CallTx(arg1 *sql.Tx) error {
-	fake.callTxMutex.Lock()
-	ret, specificReturn := fake.callTxReturnsOnCall[len(fake.callTxArgsForCall)]
-	fake.callTxArgsForCall = append(fake.callTxArgsForCall, struct {
-		arg1 *sql.Tx
-	}{arg1})
-	stub := fake.CallTxStub
-	fakeReturns := fake.callTxReturns
-	fake.recordInvocation("CallTx", []interface{}{arg1})
-	fake.callTxMutex.Unlock()
-	if stub != nil {
-		return stub(arg1)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *FakeProfileRepo) CallTxCallCount() int {
-	fake.callTxMutex.RLock()
-	defer fake.callTxMutex.RUnlock()
-	return len(fake.callTxArgsForCall)
-}
-
-func (fake *FakeProfileRepo) CallTxCalls(stub func(*sql.Tx) error) {
-	fake.callTxMutex.Lock()
-	defer fake.callTxMutex.Unlock()
-	fake.CallTxStub = stub
-}
-
-func (fake *FakeProfileRepo) CallTxArgsForCall(i int) *sql.Tx {
-	fake.callTxMutex.RLock()
-	defer fake.callTxMutex.RUnlock()
-	argsForCall := fake.callTxArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeProfileRepo) CallTxReturns(result1 error) {
-	fake.callTxMutex.Lock()
-	defer fake.callTxMutex.Unlock()
-	fake.CallTxStub = nil
-	fake.callTxReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeProfileRepo) CallTxReturnsOnCall(i int, result1 error) {
-	fake.callTxMutex.Lock()
-	defer fake.callTxMutex.Unlock()
-	fake.CallTxStub = nil
-	if fake.callTxReturnsOnCall == nil {
-		fake.callTxReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.callTxReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeProfileRepo) Commit() error {
-	fake.commitMutex.Lock()
-	ret, specificReturn := fake.commitReturnsOnCall[len(fake.commitArgsForCall)]
-	fake.commitArgsForCall = append(fake.commitArgsForCall, struct {
-	}{})
-	stub := fake.CommitStub
-	fakeReturns := fake.commitReturns
-	fake.recordInvocation("Commit", []interface{}{})
-	fake.commitMutex.Unlock()
-	if stub != nil {
-		return stub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *FakeProfileRepo) CommitCallCount() int {
-	fake.commitMutex.RLock()
-	defer fake.commitMutex.RUnlock()
-	return len(fake.commitArgsForCall)
-}
-
-func (fake *FakeProfileRepo) CommitCalls(stub func() error) {
-	fake.commitMutex.Lock()
-	defer fake.commitMutex.Unlock()
-	fake.CommitStub = stub
-}
-
-func (fake *FakeProfileRepo) CommitReturns(result1 error) {
-	fake.commitMutex.Lock()
-	defer fake.commitMutex.Unlock()
-	fake.CommitStub = nil
-	fake.commitReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeProfileRepo) CommitReturnsOnCall(i int, result1 error) {
-	fake.commitMutex.Lock()
-	defer fake.commitMutex.Unlock()
-	fake.CommitStub = nil
-	if fake.commitReturnsOnCall == nil {
-		fake.commitReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.commitReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
 }
 
 func (fake *FakeProfileRepo) GetProfileByID(arg1 context.Context, arg2 string) (*model.Profile, error) {
@@ -430,112 +210,6 @@ func (fake *FakeProfileRepo) GetProfileByUserIDReturnsOnCall(i int, result1 *mod
 	}{result1, result2}
 }
 
-func (fake *FakeProfileRepo) GetTx() *sql.Tx {
-	fake.getTxMutex.Lock()
-	ret, specificReturn := fake.getTxReturnsOnCall[len(fake.getTxArgsForCall)]
-	fake.getTxArgsForCall = append(fake.getTxArgsForCall, struct {
-	}{})
-	stub := fake.GetTxStub
-	fakeReturns := fake.getTxReturns
-	fake.recordInvocation("GetTx", []interface{}{})
-	fake.getTxMutex.Unlock()
-	if stub != nil {
-		return stub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *FakeProfileRepo) GetTxCallCount() int {
-	fake.getTxMutex.RLock()
-	defer fake.getTxMutex.RUnlock()
-	return len(fake.getTxArgsForCall)
-}
-
-func (fake *FakeProfileRepo) GetTxCalls(stub func() *sql.Tx) {
-	fake.getTxMutex.Lock()
-	defer fake.getTxMutex.Unlock()
-	fake.GetTxStub = stub
-}
-
-func (fake *FakeProfileRepo) GetTxReturns(result1 *sql.Tx) {
-	fake.getTxMutex.Lock()
-	defer fake.getTxMutex.Unlock()
-	fake.GetTxStub = nil
-	fake.getTxReturns = struct {
-		result1 *sql.Tx
-	}{result1}
-}
-
-func (fake *FakeProfileRepo) GetTxReturnsOnCall(i int, result1 *sql.Tx) {
-	fake.getTxMutex.Lock()
-	defer fake.getTxMutex.Unlock()
-	fake.GetTxStub = nil
-	if fake.getTxReturnsOnCall == nil {
-		fake.getTxReturnsOnCall = make(map[int]struct {
-			result1 *sql.Tx
-		})
-	}
-	fake.getTxReturnsOnCall[i] = struct {
-		result1 *sql.Tx
-	}{result1}
-}
-
-func (fake *FakeProfileRepo) Rollback() error {
-	fake.rollbackMutex.Lock()
-	ret, specificReturn := fake.rollbackReturnsOnCall[len(fake.rollbackArgsForCall)]
-	fake.rollbackArgsForCall = append(fake.rollbackArgsForCall, struct {
-	}{})
-	stub := fake.RollbackStub
-	fakeReturns := fake.rollbackReturns
-	fake.recordInvocation("Rollback", []interface{}{})
-	fake.rollbackMutex.Unlock()
-	if stub != nil {
-		return stub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
-}
-
-func (fake *FakeProfileRepo) RollbackCallCount() int {
-	fake.rollbackMutex.RLock()
-	defer fake.rollbackMutex.RUnlock()
-	return len(fake.rollbackArgsForCall)
-}
-
-func (fake *FakeProfileRepo) RollbackCalls(stub func() error) {
-	fake.rollbackMutex.Lock()
-	defer fake.rollbackMutex.Unlock()
-	fake.RollbackStub = stub
-}
-
-func (fake *FakeProfileRepo) RollbackReturns(result1 error) {
-	fake.rollbackMutex.Lock()
-	defer fake.rollbackMutex.Unlock()
-	fake.RollbackStub = nil
-	fake.rollbackReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeProfileRepo) RollbackReturnsOnCall(i int, result1 error) {
-	fake.rollbackMutex.Lock()
-	defer fake.rollbackMutex.Unlock()
-	fake.RollbackStub = nil
-	if fake.rollbackReturnsOnCall == nil {
-		fake.rollbackReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.rollbackReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
 func (fake *FakeProfileRepo) StoreProfile(arg1 context.Context, arg2 model.Profile) (model.Profile, error) {
 	fake.storeProfileMutex.Lock()
 	ret, specificReturn := fake.storeProfileReturnsOnCall[len(fake.storeProfileArgsForCall)]
@@ -599,6 +273,59 @@ func (fake *FakeProfileRepo) StoreProfileReturnsOnCall(i int, result1 model.Prof
 		result1 model.Profile
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeProfileRepo) UoW() repository.UnitOfWork {
+	fake.uoWMutex.Lock()
+	ret, specificReturn := fake.uoWReturnsOnCall[len(fake.uoWArgsForCall)]
+	fake.uoWArgsForCall = append(fake.uoWArgsForCall, struct {
+	}{})
+	stub := fake.UoWStub
+	fakeReturns := fake.uoWReturns
+	fake.recordInvocation("UoW", []interface{}{})
+	fake.uoWMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeProfileRepo) UoWCallCount() int {
+	fake.uoWMutex.RLock()
+	defer fake.uoWMutex.RUnlock()
+	return len(fake.uoWArgsForCall)
+}
+
+func (fake *FakeProfileRepo) UoWCalls(stub func() repository.UnitOfWork) {
+	fake.uoWMutex.Lock()
+	defer fake.uoWMutex.Unlock()
+	fake.UoWStub = stub
+}
+
+func (fake *FakeProfileRepo) UoWReturns(result1 repository.UnitOfWork) {
+	fake.uoWMutex.Lock()
+	defer fake.uoWMutex.Unlock()
+	fake.UoWStub = nil
+	fake.uoWReturns = struct {
+		result1 repository.UnitOfWork
+	}{result1}
+}
+
+func (fake *FakeProfileRepo) UoWReturnsOnCall(i int, result1 repository.UnitOfWork) {
+	fake.uoWMutex.Lock()
+	defer fake.uoWMutex.Unlock()
+	fake.UoWStub = nil
+	if fake.uoWReturnsOnCall == nil {
+		fake.uoWReturnsOnCall = make(map[int]struct {
+			result1 repository.UnitOfWork
+		})
+	}
+	fake.uoWReturnsOnCall[i] = struct {
+		result1 repository.UnitOfWork
+	}{result1}
 }
 
 func (fake *FakeProfileRepo) UpdateProfile(arg1 context.Context, arg2 model.Profile) (*model.Profile, error) {
@@ -669,22 +396,14 @@ func (fake *FakeProfileRepo) UpdateProfileReturnsOnCall(i int, result1 *model.Pr
 func (fake *FakeProfileRepo) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.beginTxMutex.RLock()
-	defer fake.beginTxMutex.RUnlock()
-	fake.callTxMutex.RLock()
-	defer fake.callTxMutex.RUnlock()
-	fake.commitMutex.RLock()
-	defer fake.commitMutex.RUnlock()
 	fake.getProfileByIDMutex.RLock()
 	defer fake.getProfileByIDMutex.RUnlock()
 	fake.getProfileByUserIDMutex.RLock()
 	defer fake.getProfileByUserIDMutex.RUnlock()
-	fake.getTxMutex.RLock()
-	defer fake.getTxMutex.RUnlock()
-	fake.rollbackMutex.RLock()
-	defer fake.rollbackMutex.RUnlock()
 	fake.storeProfileMutex.RLock()
 	defer fake.storeProfileMutex.RUnlock()
+	fake.uoWMutex.RLock()
+	defer fake.uoWMutex.RUnlock()
 	fake.updateProfileMutex.RLock()
 	defer fake.updateProfileMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

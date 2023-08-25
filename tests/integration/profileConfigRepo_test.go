@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"testing"
@@ -82,35 +83,33 @@ var (
 )
 
 func TestProfileConfigREPO(t *testing.T) {
-	profileCfgRepo := repository.NewProfileCfgRepoImpl(db)
+	uow := repository.NewUnitOfWorkImpl(db)
+	profileCfgRepo := repository.NewProfileCfgRepoImpl(uow)
 	t.Run("TestProfileRepo", ProfileREPO)
 	fmt.Println("RUNNING TEST PROFILE CONFIG REPOSITORY")
 
 	t.Run("SUCCESS_StoreProfileCfg", func(t *testing.T) {
-		err := profileCfgRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+		err := profileCfgRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 		err = profileCfgRepo.StoreProfileCfg(context.Background(), profileConfig1)
 		assert.NoError(t, err)
-		err = profileCfgRepo.Commit()
-		assert.NoError(t, err)
+		profileCfgRepo.UoW().EndTx(nil)
 
-		err = profileCfgRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
+		err = profileCfgRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 		err = profileCfgRepo.StoreProfileCfg(context.Background(), profileConfig2)
 		assert.NoError(t, err)
-		err = profileCfgRepo.Commit()
-		assert.NoError(t, err)
+		profileCfgRepo.UoW().EndTx(nil)
 	})
 
 	t.Run("ERROR_StoreProfileCfg_PROFILECFGEXISTS", func(t *testing.T) {
-		err := profileCfgRepo.BeginTx(context.TODO(), &sql.TxOptions{})
+		err := profileCfgRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 		err = profileCfgRepo.StoreProfileCfg(context.Background(), profileConfig1)
 		assert.Error(t, err)
 		assert.Equal(t, exception.Err400ProfileConfigAlvailable, err)
 
-		err = profileCfgRepo.Rollback()
-		assert.NoError(t, err)
+		profileCfgRepo.UoW().EndTx(errors.New("PROFILECFGEXISTS"))
 	})
 
 	t.Run("SUCCESS_GetProfileCfgByID", func(t *testing.T) {
@@ -157,14 +156,13 @@ func TestProfileConfigREPO(t *testing.T) {
 	})
 
 	t.Run("SUCCESS_UpdateProfileCfg", func(t *testing.T) {
-		err := profileCfgRepo.BeginTx(context.TODO(), &sql.TxOptions{})
+		err := profileCfgRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 
 		err = profileCfgRepo.UpdateProfileCfg(context.Background(), profileConfigUpdate1)
 		assert.NoError(t, err)
 
-		err = profileCfgRepo.Commit()
-		assert.NoError(t, err)
+		profileCfgRepo.UoW().EndTx(nil)
 	})
 
 	t.Run("SUCCESS_GetProfileCfgByID_AFTERUPDATE", func(t *testing.T) {

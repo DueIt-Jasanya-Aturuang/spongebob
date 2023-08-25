@@ -13,6 +13,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/config"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/dtoconv"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/format"
+	"github.com/rs/zerolog/log"
 )
 
 type AccountUsecaseImpl struct {
@@ -36,7 +37,7 @@ func NewAccountUsecaseImpl(
 	}
 }
 
-func (u *AccountUsecaseImpl) AccountUpdate(c context.Context, req dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error) {
+func (u *AccountUsecaseImpl) AccountUpdate(c context.Context, req dto.UpdateAccountReq) (userResp *dto.UserResp, profileResp *dto.ProfileResp, err error) {
 	// set timeout process
 	ctx, cancel := context.WithTimeout(c, u.ctxTimeout)
 	defer cancel()
@@ -53,20 +54,32 @@ func (u *AccountUsecaseImpl) AccountUpdate(c context.Context, req dto.UpdateAcco
 		return nil, nil, err
 	}
 
-	oldImage := user.Image
 	// condition req image and oldimage
+	oldImage := user.Image
 	reqImageBool := req.Image != nil && req.Image.Size > 0
 	delImageBool := !strings.Contains(oldImage, "default-male") && !strings.Contains(oldImage, "google")
+
 	// convert dto to model
 	profileConv, userConv := dtoconv.UpdateAccountToModel(req, profile.ProfileID, user.Image)
+
+	// declar profile repo unit of work
+	profileRepoUOW := u.profileRepo.UoW()
+
 	// start tx from profile repo
-	err = u.profileRepo.BeginTx(ctx, &sql.TxOptions{
+	err = profileRepoUOW.StartTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,
 		ReadOnly:  false,
 	})
 	if err != nil {
 		return nil, nil, err
 	}
+	defer func() {
+		err = profileRepoUOW.EndTx(err)
+		if err != nil {
+			profileResp = nil
+			userResp = nil
+		}
+	}()
 
 	// update profile repo process
 	profile, err = u.profileRepo.UpdateProfile(ctx, profileConv)
@@ -75,7 +88,12 @@ func (u *AccountUsecaseImpl) AccountUpdate(c context.Context, req dto.UpdateAcco
 	}
 
 	// call tx from profile repo to user repo
-	err = u.userRepo.CallTx(u.profileRepo.GetTx())
+	userRepoUOW := u.userRepo.UoW()
+	txProfileRepoUOW, err := profileRepoUOW.GetTx()
+	if err != nil {
+		return nil, nil, err
+	}
+	err = userRepoUOW.CallTx(txProfileRepoUOW)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -105,8 +123,8 @@ func (u *AccountUsecaseImpl) AccountUpdate(c context.Context, req dto.UpdateAcco
 			}
 		}
 	}
-
-	userResp := user.ToResp(format.EmailFormat(user.Email))
-	profileResp := profile.ToResp()
-	return &userResp, &profileResp, nil
+	userResp = user.ToResp(format.EmailFormat(user.Email))
+	log.Debug().Msgf("%v", userResp)
+	profileResp = profile.ToResp()
+	return userResp, profileResp, nil
 }

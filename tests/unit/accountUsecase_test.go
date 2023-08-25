@@ -45,6 +45,7 @@ func multipartFileHeader() *multipart.FileHeader {
 }
 
 func TestAccounUpdateUsecase(t *testing.T) {
+	uow := &mocks.FakeUnitOfWork{}
 	profileRepoMock := &mocks.FakeProfileRepo{}
 	userRepoMock := &mocks.FakeUserRepo{}
 	minioRepoMock := &mocks.FakeMinioRepo{}
@@ -98,18 +99,20 @@ func TestAccounUpdateUsecase(t *testing.T) {
 	userRepoMock.GetUserByID(ctx, "userid_1")
 	userRepoMock.GetUserByIDReturns(&user, nil)
 
-	profileRepoMock.BeginTx(context.Background(), &sql.TxOptions{})
-	profileRepoMock.BeginTxReturns(nil)
+	profileRepoMock.UoW()
+	profileRepoMock.UoWReturns(uow)
 
 	profileConv, userConv := dtoconv.UpdateAccountToModel(req, profile.ProfileID, user.Image)
 	profileRepoMock.UpdateProfile(ctx, profileConv)
 	profileRepoMock.UpdateProfileReturns(&profile, nil)
 
-	profileRepoMock.GetTx()
-	profileRepoMock.GetTxReturns(&sql.Tx{})
+	userRepoMock.UoW()
+	userRepoMock.UoWReturns(uow)
 
-	profileRepoMock.CallTx(&sql.Tx{})
-	profileRepoMock.CallTxReturns(nil)
+	uow.GetTx()
+	uow.GetTxReturns(&sql.Tx{}, nil)
+	uow.CallTx(nil)
+	uow.CallTxReturns(nil)
 
 	userRepoMock.UpdateUser(ctx, userConv)
 	userRepoMock.UpdateUserReturns(&user, nil)
@@ -120,6 +123,9 @@ func TestAccounUpdateUsecase(t *testing.T) {
 	minioRepoMock.UploadFile(ctx, multipartFileHeader(), "user-images/public/asd.png", "files")
 	minioRepoMock.UploadFileReturns(nil)
 
+	uow.EndTx(nil)
+	uow.EndTxReturns(nil)
+
 	profileRes, userRes, err := accountUsecase.AccountUpdate(ctx, req)
 	assert.NoError(t, err)
 	assert.NotNil(t, profileRes)
@@ -128,6 +134,7 @@ func TestAccounUpdateUsecase(t *testing.T) {
 
 func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 	profileRepoMock := &mocks.FakeProfileRepo{}
+	uow := &mocks.FakeUnitOfWork{}
 	userRepoMock := &mocks.FakeUserRepo{}
 	minioRepoMock := &mocks.FakeMinioRepo{}
 	timeOutCtx := 3 * time.Second
@@ -180,18 +187,15 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 	userRepoMock.GetUserByID(ctx, "userid_1")
 	userRepoMock.GetUserByIDReturns(&user, nil)
 
-	profileRepoMock.BeginTx(context.Background(), &sql.TxOptions{})
-	profileRepoMock.BeginTxReturns(nil)
+	profileRepoMock.UoW()
+	profileRepoMock.UoWReturns(uow)
 
 	profileConv, userConv := dtoconv.UpdateAccountToModel(req, profile.ProfileID, user.Image)
 	profileRepoMock.UpdateProfile(ctx, profileConv)
 	profileRepoMock.UpdateProfileReturns(&profile, nil)
 
-	profileRepoMock.GetTx()
-	profileRepoMock.GetTxReturns(&sql.Tx{})
-
-	profileRepoMock.CallTx(&sql.Tx{})
-	profileRepoMock.CallTxReturns(nil)
+	userRepoMock.UoW()
+	userRepoMock.UoWReturns(uow)
 
 	userRepoMock.UpdateUser(ctx, userConv)
 	userRepoMock.UpdateUserReturns(&user, nil)

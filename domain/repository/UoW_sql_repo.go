@@ -7,9 +7,9 @@ import (
 
 //counterfeiter:generate -o ./../mocks . UnitOfWork
 type UnitOfWork interface {
-	StartTx(context.Context, *sql.TxOptions) error
-	EndTx(error) error
+	StartTx(c context.Context, opts *sql.TxOptions) error
+	EndTx(err error) error
 	GetTx() (*sql.Tx, error)
-	CallTx(*sql.Tx) error
-	OpenConn(context.Context) (*sql.Conn, error)
+	CallTx(tx *sql.Tx) error
+	OpenConn(c context.Context) (*sql.Conn, error)
 }

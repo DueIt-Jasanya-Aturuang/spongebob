@@ -73,9 +73,9 @@ func (repo *ProfileCfgRepoImpl) scanRows(rows *sql.Rows) (*[]model.ProfileCfg, e
 	return &profileCfgs, nil
 }
 
-func (repo *ProfileCfgRepoImpl) GetProfileCfgByID(ctx context.Context, id string) (*model.ProfileCfg, error) {
+func (repo *ProfileCfgRepoImpl) GetProfileCfgByNameAndID(ctx context.Context, id, profileID, configName string) (*model.ProfileCfg, error) {
 	query := `SELECT id, profile_id, config_name, config_value, status, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
-              FROM dueit.m_user_config WHERE profile_id = $1 OR id = $2`
+				  FROM dueit.m_user_config WHERE id = $1 AND profile_id = $2 AND config_name = $3`
 
 	conn, err := repo.uow.OpenConn(ctx)
 	if err != nil {
@@ -98,7 +98,7 @@ func (repo *ProfileCfgRepoImpl) GetProfileCfgByID(ctx context.Context, id string
 		}
 	}()
 
-	row := stmt.QueryRowContext(ctx, id, id)
+	row := stmt.QueryRowContext(ctx, id, profileID, configName)
 
 	profileCfg, err := repo.scanRow(row)
 	if err != nil {
@@ -208,7 +208,8 @@ func (repo *ProfileCfgRepoImpl) StoreProfileCfg(ctx context.Context, profileCfg 
 }
 
 func (repo *ProfileCfgRepoImpl) UpdateProfileCfg(ctx context.Context, profileCfg model.ProfileCfg) error {
-	query := `UPDATE dueit.m_user_config SET config_value = $1, status = $2, updated_at = $3, updated_by = $4 WHERE id = $5`
+	query := `UPDATE dueit.m_user_config SET config_value = $1, status = $2, updated_at = $3, updated_by = $4
+		WHERE id = $5 and profile_id = $6`
 	tx, err := repo.uow.GetTx()
 	if err != nil {
 		return err
@@ -232,6 +233,7 @@ func (repo *ProfileCfgRepoImpl) UpdateProfileCfg(ctx context.Context, profileCfg
 		profileCfg.UpdatedAt,
 		profileCfg.UpdatedBy,
 		profileCfg.ID,
+		profileCfg.ProfileID,
 	)
 	return err
 }

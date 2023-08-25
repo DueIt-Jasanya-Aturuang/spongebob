@@ -33,4 +33,5 @@ func ProfileUsecase(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 	})
+	t.Run("CreateProfileCfgUSECASE", ProfileCfgUSECASE)
 }

@@ -53,7 +53,7 @@ func AccountUpdateUSECASE(t *testing.T) {
 	}
 
 	t.Run("SUCCESS_AccountUpdate", func(t *testing.T) {
-		userResp, profileResp, err := account.AccountUpdate(context.Background(), accountUpdate)
+		userResp, profileResp, err := account.UpdateAccount(context.Background(), accountUpdate)
 		assert.NoError(t, err)
 		assert.NotNil(t, userResp)
 		assert.NotNil(t, profileResp)

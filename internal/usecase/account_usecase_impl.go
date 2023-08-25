@@ -36,36 +36,28 @@ func NewAccountUsecaseImpl(
 	}
 }
 
-func (u *AccountUsecaseImpl) AccountUpdate(c context.Context, req dto.UpdateAccountReq) (userResp *dto.UserResp, profileResp *dto.ProfileResp, err error) {
-	// set timeout process
+func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAccountReq) (userResp *dto.UserResp, profileResp *dto.ProfileResp, err error) {
 	ctx, cancel := context.WithTimeout(c, u.ctxTimeout)
 	defer cancel()
 
-	// get profile by user id request
 	profile, err := u.profileRepo.GetProfileByUserID(ctx, req.UserID)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// get user by id request
 	user, err := u.userRepo.GetUserByID(ctx, req.UserID)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// condition req image and oldimage
 	oldImage := user.Image
 	email := user.Email
 	reqImageBool := req.Image != nil && req.Image.Size > 0
 	delImageBool := !strings.Contains(oldImage, "default-male") && !strings.Contains(oldImage, "google")
 
-	// convert dto to model
 	profileConv, userConv := dtoconv.UpdateAccountToModel(req, profile.ProfileID, user.Image)
 
-	// declar profile repo unit of work
 	profileRepoUOW := u.profileRepo.UoW()
-
-	// start tx from profile repo
 	err = profileRepoUOW.StartTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,
 		ReadOnly:  false,
@@ -82,13 +74,11 @@ func (u *AccountUsecaseImpl) AccountUpdate(c context.Context, req dto.UpdateAcco
 		}
 	}()
 
-	// update profile repo process
 	profile, err = u.profileRepo.UpdateProfile(ctx, profileConv)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// call tx from profile repo to user repo
 	userRepoUOW := u.userRepo.UoW()
 	txProfileRepoUOW, err := profileRepoUOW.GetTx()
 	if err != nil {

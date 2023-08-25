@@ -64,10 +64,8 @@ func (u *ProfileUsecaseImpl) storeProfile(c context.Context, userID string) (pro
 
 	profile = profile.DefaultValue(userID)
 
-	// declar profile repo unit of work
 	profileRepoUOW := u.profileRepo.UoW()
 
-	// start tx from profile repo
 	err = profileRepoUOW.StartTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,
 		ReadOnly:  false,

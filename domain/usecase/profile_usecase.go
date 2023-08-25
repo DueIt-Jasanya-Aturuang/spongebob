@@ -8,6 +8,6 @@ import (
 
 //counterfeiter:generate -o ./../mocks . ProfileUsecase
 type ProfileUsecase interface {
-	GetProfileByID(context.Context, string) (*dto.ProfileResp, error)
+	GetProfileByID(c context.Context, id string) (*dto.ProfileResp, error)
 	// StoreProfile(context.Context, string) (*Profile, error)
 }

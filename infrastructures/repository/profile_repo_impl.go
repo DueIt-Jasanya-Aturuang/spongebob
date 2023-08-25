@@ -38,7 +38,7 @@ func (repo *ProfileRepoImpl) scanRow(row *sql.Row) (*model.Profile, error) {
 		&profile.DeletedAt,
 		&profile.DeletedBy,
 	); err != nil {
-		log.Err(err).Msg(exception.LogErrScanning)
+		log.Err(err).Msg(exception.LogErrDBScanning)
 		return nil, err
 	}
 	return &profile, nil
@@ -54,18 +54,18 @@ func (repo *ProfileRepoImpl) GetProfileByID(ctx context.Context, id string) (*mo
 	}
 	defer func() {
 		if errConn := conn.Close(); errConn != nil {
-			log.Err(errConn).Msg(exception.LogErrCloseConn)
+			log.Err(errConn).Msg(exception.LogErrDBCloseConn)
 		}
 	}()
 
 	stmt, err := conn.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return nil, err
 	}
 	defer func() {
 		if errStmt := stmt.Close(); errStmt != nil {
-			log.Err(errStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
@@ -88,18 +88,18 @@ func (repo *ProfileRepoImpl) GetProfileByUserID(ctx context.Context, userID stri
 	}
 	defer func() {
 		if errConn := conn.Close(); errConn != nil {
-			log.Err(errConn).Msg(exception.LogErrCloseConn)
+			log.Err(errConn).Msg(exception.LogErrDBCloseConn)
 		}
 	}()
 
 	stmt, err := conn.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return nil, err
 	}
 	defer func() {
 		if errStmt := stmt.Close(); errStmt != nil {
-			log.Err(errStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
@@ -123,17 +123,17 @@ func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, entity model.Prof
 
 	querySTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return model.Profile{}, err
 	}
 	defer func() {
 		if errQueryStmt := querySTMT.Close(); errQueryStmt != nil {
-			log.Err(errQueryStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errQueryStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
 	if err = querySTMT.QueryRowContext(ctx, entity.UserID).Scan(&exists); err != nil {
-		log.Err(err).Msg(exception.LogErrQuery)
+		log.Err(err).Msg(exception.LogErrDBQuery)
 		return model.Profile{}, err
 	}
 
@@ -145,12 +145,12 @@ func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, entity model.Prof
 	query = "INSERT INTO dueit.m_profiles (id, user_id, quotes, created_at, created_by, updated_at) VALUES ($1, $2, $3, $4, $5, $6)"
 	execSTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return model.Profile{}, err
 	}
 	defer func() {
 		if errExecStmt := execSTMT.Close(); errExecStmt != nil {
-			log.Err(errExecStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errExecStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
@@ -163,7 +163,7 @@ func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, entity model.Prof
 		entity.CreatedBy,
 		entity.UpdatedAt,
 	); err != nil {
-		log.Err(err).Msg(exception.LogErrExec)
+		log.Err(err).Msg(exception.LogErrDBExec)
 		return model.Profile{}, err
 	}
 
@@ -179,12 +179,12 @@ func (repo *ProfileRepoImpl) UpdateProfile(ctx context.Context, entity model.Pro
 
 	stmt, err := tx.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return nil, err
 	}
 	defer func() {
 		if errStmt := stmt.Close(); errStmt != nil {
-			log.Err(errStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
@@ -196,7 +196,7 @@ func (repo *ProfileRepoImpl) UpdateProfile(ctx context.Context, entity model.Pro
 		entity.UserID,
 		entity.ProfileID,
 	); err != nil {
-		log.Err(err).Msg(exception.LogErrExec)
+		log.Err(err).Msg(exception.LogErrDBExec)
 		return nil, err
 	}
 

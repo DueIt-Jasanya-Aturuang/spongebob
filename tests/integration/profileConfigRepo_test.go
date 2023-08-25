@@ -93,13 +93,13 @@ func TestProfileConfigREPO(t *testing.T) {
 		assert.NoError(t, err)
 		err = profileCfgRepo.StoreProfileCfg(context.Background(), profileConfig1)
 		assert.NoError(t, err)
-		profileCfgRepo.UoW().EndTx(nil)
+		profileCfgRepo.UoW().EndTx(err)
 
 		err = profileCfgRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 		err = profileCfgRepo.StoreProfileCfg(context.Background(), profileConfig2)
 		assert.NoError(t, err)
-		profileCfgRepo.UoW().EndTx(nil)
+		profileCfgRepo.UoW().EndTx(err)
 	})
 
 	t.Run("ERROR_StoreProfileCfg_PROFILECFGEXISTS", func(t *testing.T) {
@@ -162,13 +162,12 @@ func TestProfileConfigREPO(t *testing.T) {
 		err = profileCfgRepo.UpdateProfileCfg(context.Background(), profileConfigUpdate1)
 		assert.NoError(t, err)
 
-		profileCfgRepo.UoW().EndTx(nil)
+		profileCfgRepo.UoW().EndTx(err)
 	})
 
 	t.Run("SUCCESS_GetProfileCfgByID_AFTERUPDATE", func(t *testing.T) {
 		profileCfg, err := profileCfgRepo.GetProfileCfgByID(context.Background(), profileConfigUpdate1.ID)
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfg)
-		t.Log(profileCfg)
 	})
 }

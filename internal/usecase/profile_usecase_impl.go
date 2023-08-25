@@ -10,6 +10,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
+	"github.com/rs/zerolog/log"
 )
 
 type ProfileUsecaseImpl struct {
@@ -61,8 +62,7 @@ func (u *ProfileUsecaseImpl) storeProfile(c context.Context, userID string) (pro
 	ctx, cancel := context.WithTimeout(c, u.ctxTimeout)
 	defer cancel()
 
-	profile.UserID = userID
-	profile = profile.DefaultValue()
+	profile = profile.DefaultValue(userID)
 
 	// declar profile repo unit of work
 	profileRepoUOW := u.profileRepo.UoW()
@@ -76,13 +76,17 @@ func (u *ProfileUsecaseImpl) storeProfile(c context.Context, userID string) (pro
 		return nil, err
 	}
 	defer func() {
-		err = profileRepoUOW.EndTx(err)
-		profile = nil
+		errEndTx := profileRepoUOW.EndTx(err)
+		if errEndTx != nil {
+			err = errEndTx
+			profile = nil
+		}
 	}()
 	profileRes, err := u.profileRepo.StoreProfile(ctx, *profile)
 	if err != nil {
 		return nil, err
 	}
 	profile = &profileRes
+	log.Info().Msgf("%v", profile)
 	return profile, err
 }

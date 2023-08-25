@@ -41,7 +41,7 @@ func (repo *ProfileCfgRepoImpl) scanRow(row *sql.Row) (*model.ProfileCfg, error)
 		&profileCfg.DeletedAt,
 		&profileCfg.DeletedBy,
 	); err != nil {
-		log.Err(err).Msg(exception.LogErrScanning)
+		log.Err(err).Msg(exception.LogErrDBScanning)
 		return nil, err
 	}
 	return &profileCfg, nil
@@ -65,7 +65,7 @@ func (repo *ProfileCfgRepoImpl) scanRows(rows *sql.Rows) (*[]model.ProfileCfg, e
 			&profileCfg.DeletedAt,
 			&profileCfg.DeletedBy,
 		); err != nil {
-			log.Err(err).Msg(exception.LogErrScanning)
+			log.Err(err).Msg(exception.LogErrDBScanning)
 			return nil, err
 		}
 		profileCfgs = append(profileCfgs, profileCfg)
@@ -83,18 +83,18 @@ func (repo *ProfileCfgRepoImpl) GetProfileCfgByID(ctx context.Context, id string
 	}
 	defer func() {
 		if errConn := conn.Close(); errConn != nil {
-			log.Err(errConn).Msg(exception.LogErrCloseConn)
+			log.Err(errConn).Msg(exception.LogErrDBCloseConn)
 		}
 	}()
 
 	stmt, err := conn.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return nil, err
 	}
 	defer func() {
 		if errStmt := stmt.Close(); errStmt != nil {
-			log.Err(errStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
@@ -102,6 +102,7 @@ func (repo *ProfileCfgRepoImpl) GetProfileCfgByID(ctx context.Context, id string
 
 	profileCfg, err := repo.scanRow(row)
 	if err != nil {
+		log.Err(err).Msg(exception.LogErrDBScanning)
 		return nil, err
 	}
 
@@ -118,28 +119,28 @@ func (repo *ProfileCfgRepoImpl) GetProfileCfgByScheduler(ctx context.Context, pr
 	}
 	defer func() {
 		if errConn := conn.Close(); errConn != nil {
-			log.Err(errConn).Msg(exception.LogErrCloseConn)
+			log.Err(errConn).Msg(exception.LogErrDBCloseConn)
 		}
 	}()
 
 	stmt, err := conn.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return nil, err
 	}
 	defer func() {
 		if errStmt := stmt.Close(); errStmt != nil {
-			log.Err(errStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
 	rows, err := stmt.QueryContext(ctx, profileCfgScheduler.Time, profileCfgScheduler.Day)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrQuery)
+		log.Err(err).Msg(exception.LogErrDBQuery)
 	}
 	defer func() {
 		if errRows := rows.Close(); errRows != nil {
-			log.Err(errRows).Msg(exception.LogErrCloseRows)
+			log.Err(errRows).Msg(exception.LogErrDBCloseRows)
 		}
 	}()
 
@@ -161,17 +162,17 @@ func (repo *ProfileCfgRepoImpl) StoreProfileCfg(ctx context.Context, profileCfg 
 
 	querySTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return err
 	}
 	defer func() {
 		if errQueryStmt := querySTMT.Close(); errQueryStmt != nil {
-			log.Err(errQueryStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errQueryStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
 	if err = querySTMT.QueryRowContext(ctx, profileCfg.ProfileID, profileCfg.ConfigName).Scan(&exists); err != nil {
-		log.Err(err).Msg(exception.LogErrQuery)
+		log.Err(err).Msg(exception.LogErrDBQuery)
 		return err
 	}
 	if exists {
@@ -183,12 +184,12 @@ func (repo *ProfileCfgRepoImpl) StoreProfileCfg(ctx context.Context, profileCfg 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 	execSTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return err
 	}
 	defer func() {
 		if errExecStmt := execSTMT.Close(); errExecStmt != nil {
-			log.Err(errExecStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errExecStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
@@ -215,12 +216,12 @@ func (repo *ProfileCfgRepoImpl) UpdateProfileCfg(ctx context.Context, profileCfg
 
 	stmt, err := tx.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return err
 	}
 	defer func() {
 		if errStmt := stmt.Close(); errStmt != nil {
-			log.Err(errStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 

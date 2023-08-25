@@ -13,7 +13,6 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/config"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/dtoconv"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/format"
-	"github.com/rs/zerolog/log"
 )
 
 type AccountUsecaseImpl struct {
@@ -56,6 +55,7 @@ func (u *AccountUsecaseImpl) AccountUpdate(c context.Context, req dto.UpdateAcco
 
 	// condition req image and oldimage
 	oldImage := user.Image
+	email := user.Email
 	reqImageBool := req.Image != nil && req.Image.Size > 0
 	delImageBool := !strings.Contains(oldImage, "default-male") && !strings.Contains(oldImage, "google")
 
@@ -74,8 +74,9 @@ func (u *AccountUsecaseImpl) AccountUpdate(c context.Context, req dto.UpdateAcco
 		return nil, nil, err
 	}
 	defer func() {
-		err = profileRepoUOW.EndTx(err)
-		if err != nil {
+		errEndTx := profileRepoUOW.EndTx(err)
+		if errEndTx != nil {
+			err = errEndTx
 			profileResp = nil
 			userResp = nil
 		}
@@ -93,11 +94,11 @@ func (u *AccountUsecaseImpl) AccountUpdate(c context.Context, req dto.UpdateAcco
 	if err != nil {
 		return nil, nil, err
 	}
+
 	err = userRepoUOW.CallTx(txProfileRepoUOW)
 	if err != nil {
 		return nil, nil, err
 	}
-
 	user, err = u.userRepo.UpdateUser(ctx, userConv)
 	if err != nil {
 		return nil, nil, err
@@ -123,8 +124,12 @@ func (u *AccountUsecaseImpl) AccountUpdate(c context.Context, req dto.UpdateAcco
 			}
 		}
 	}
-	userResp = user.ToResp(format.EmailFormat(user.Email))
-	log.Debug().Msgf("%v", userResp)
+
+	emailFormat, err := format.EmailFormat(email)
+	if err != nil {
+		return nil, nil, err
+	}
+	userResp = user.ToResp(emailFormat)
 	profileResp = profile.ToResp()
 	return userResp, profileResp, nil
 }

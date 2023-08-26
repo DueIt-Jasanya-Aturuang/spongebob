@@ -129,25 +129,25 @@ func TestGetProfileCfgByNameAndIDUSECASE(t *testing.T) {
 	}
 
 	t.Run("SUCCESS_GetProfileCfgByNameAndID", func(t *testing.T) {
-		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, "cfgid_1", "profileid_1", "DAILY_NOTIF")
+		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, "profileid_1", "DAILY_NOTIF")
 		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(&profileCfg, nil)
 
 		profileCfgRepoMock.UoW()
 		profileCfgRepoMock.UoWReturns(uow)
 
-		profileCfgResp, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, "cfgid_1", "profileid_1", "DAILY_NOTIF")
+		profileCfgResp, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, "profileid_1", "DAILY_NOTIF")
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfgResp)
 	})
 
 	t.Run("ERROR_GetProfileCfgByNameAndID_DATANIL", func(t *testing.T) {
-		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, "cfgid_1", "profileid_1", "DAILY_NOTIF")
+		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, "profileid_1", "DAILY_NOTIF")
 		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(nil, sql.ErrNoRows)
 
 		profileCfgRepoMock.UoW()
 		profileCfgRepoMock.UoWReturns(uow)
 
-		profileCfgResp, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, "cfgid_1", "profileid_1", "DAILY_NOTIF")
+		profileCfgResp, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, "profileid_1", "DAILY_NOTIF")
 		assert.Error(t, err)
 		assert.Nil(t, profileCfgResp)
 		assert.Equal(t, sql.ErrNoRows, err)
@@ -196,7 +196,7 @@ func TestUpdateProfileCfgUSECASE(t *testing.T) {
 		DeletedBy:   sql.NullString{},
 	}
 	t.Run("SUCCESS_UpdateProfileCfg", func(t *testing.T) {
-		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, request.ProfileID, "nil", "nil")
+		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, "nil", "nil")
 		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(profileCfg, nil)
 		assert.Equal(t, 1, profileCfgRepoMock.GetProfileCfgByNameAndIDCallCount())
 
@@ -222,7 +222,7 @@ func TestUpdateProfileCfgUSECASE(t *testing.T) {
 	})
 
 	t.Run("ERROR_UpdateProfileCfg_DATANIL", func(t *testing.T) {
-		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, request.ProfileID, "nil", "nil")
+		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, "nil", "nil")
 		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(nil, sql.ErrNoRows)
 
 		uow.StartTx(ctx, &sql.TxOptions{})

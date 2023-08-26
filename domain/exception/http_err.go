@@ -23,7 +23,7 @@ func Err500(msg string, err error) error {
 	}
 }
 
-func Err422(msg map[string][]string, err error) error {
+func Err422(msg map[string]string, err error) error {
 	return &ErrResp{
 		Code:    http.StatusUnprocessableEntity,
 		Message: msg,

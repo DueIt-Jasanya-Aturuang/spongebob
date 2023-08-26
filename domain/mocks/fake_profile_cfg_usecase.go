@@ -24,13 +24,12 @@ type FakeProfileCfgUsecase struct {
 		result1 *dto.ProfileCfgResp
 		result2 error
 	}
-	GetProfileCfgByNameAndIDStub        func(context.Context, string, string, string) (*dto.ProfileCfgResp, error)
+	GetProfileCfgByNameAndIDStub        func(context.Context, string, string) (*dto.ProfileCfgResp, error)
 	getProfileCfgByNameAndIDMutex       sync.RWMutex
 	getProfileCfgByNameAndIDArgsForCall []struct {
 		arg1 context.Context
 		arg2 string
 		arg3 string
-		arg4 string
 	}
 	getProfileCfgByNameAndIDReturns struct {
 		result1 *dto.ProfileCfgResp
@@ -125,21 +124,20 @@ func (fake *FakeProfileCfgUsecase) CreateProfileCfgReturnsOnCall(i int, result1 
 	}{result1, result2}
 }
 
-func (fake *FakeProfileCfgUsecase) GetProfileCfgByNameAndID(arg1 context.Context, arg2 string, arg3 string, arg4 string) (*dto.ProfileCfgResp, error) {
+func (fake *FakeProfileCfgUsecase) GetProfileCfgByNameAndID(arg1 context.Context, arg2 string, arg3 string) (*dto.ProfileCfgResp, error) {
 	fake.getProfileCfgByNameAndIDMutex.Lock()
 	ret, specificReturn := fake.getProfileCfgByNameAndIDReturnsOnCall[len(fake.getProfileCfgByNameAndIDArgsForCall)]
 	fake.getProfileCfgByNameAndIDArgsForCall = append(fake.getProfileCfgByNameAndIDArgsForCall, struct {
 		arg1 context.Context
 		arg2 string
 		arg3 string
-		arg4 string
-	}{arg1, arg2, arg3, arg4})
+	}{arg1, arg2, arg3})
 	stub := fake.GetProfileCfgByNameAndIDStub
 	fakeReturns := fake.getProfileCfgByNameAndIDReturns
-	fake.recordInvocation("GetProfileCfgByNameAndID", []interface{}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("GetProfileCfgByNameAndID", []interface{}{arg1, arg2, arg3})
 	fake.getProfileCfgByNameAndIDMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -153,17 +151,17 @@ func (fake *FakeProfileCfgUsecase) GetProfileCfgByNameAndIDCallCount() int {
 	return len(fake.getProfileCfgByNameAndIDArgsForCall)
 }
 
-func (fake *FakeProfileCfgUsecase) GetProfileCfgByNameAndIDCalls(stub func(context.Context, string, string, string) (*dto.ProfileCfgResp, error)) {
+func (fake *FakeProfileCfgUsecase) GetProfileCfgByNameAndIDCalls(stub func(context.Context, string, string) (*dto.ProfileCfgResp, error)) {
 	fake.getProfileCfgByNameAndIDMutex.Lock()
 	defer fake.getProfileCfgByNameAndIDMutex.Unlock()
 	fake.GetProfileCfgByNameAndIDStub = stub
 }
 
-func (fake *FakeProfileCfgUsecase) GetProfileCfgByNameAndIDArgsForCall(i int) (context.Context, string, string, string) {
+func (fake *FakeProfileCfgUsecase) GetProfileCfgByNameAndIDArgsForCall(i int) (context.Context, string, string) {
 	fake.getProfileCfgByNameAndIDMutex.RLock()
 	defer fake.getProfileCfgByNameAndIDMutex.RUnlock()
 	argsForCall := fake.getProfileCfgByNameAndIDArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakeProfileCfgUsecase) GetProfileCfgByNameAndIDReturns(result1 *dto.ProfileCfgResp, result2 error) {

@@ -113,14 +113,14 @@ func TestProfileConfigREPO(t *testing.T) {
 	})
 
 	t.Run("SUCCESS_GetProfileCfgByID", func(t *testing.T) {
-		profileCfg, err := profileCfgRepo.GetProfileCfgByNameAndID(context.Background(), profileConfig1.ID, profileConfig1.ProfileID, profileConfig1.ConfigName)
+		profileCfg, err := profileCfgRepo.GetProfileCfgByNameAndID(context.Background(), profileConfig1.ProfileID, profileConfig1.ConfigName)
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfg)
 		assert.Equal(t, profileConfig1.ID, profileCfg.ID)
 	})
 
 	t.Run("ERROR_GetProfileCfgByID_NOROW", func(t *testing.T) {
-		profileCfg, err := profileCfgRepo.GetProfileCfgByNameAndID(context.Background(), "nil", "nil", "nil")
+		profileCfg, err := profileCfgRepo.GetProfileCfgByNameAndID(context.Background(), "nil", "nil")
 		assert.Error(t, err)
 		assert.Nil(t, profileCfg)
 		assert.Equal(t, sql.ErrNoRows, err)
@@ -166,7 +166,7 @@ func TestProfileConfigREPO(t *testing.T) {
 	})
 
 	t.Run("SUCCESS_GetProfileCfgByID_AFTERUPDATE", func(t *testing.T) {
-		profileCfg, err := profileCfgRepo.GetProfileCfgByNameAndID(context.Background(), profileConfigUpdate1.ID, profileConfigUpdate1.ProfileID, profileConfigUpdate1.ConfigName)
+		profileCfg, err := profileCfgRepo.GetProfileCfgByNameAndID(context.Background(), profileConfigUpdate1.ProfileID, profileConfigUpdate1.ConfigName)
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfg)
 	})

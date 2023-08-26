@@ -12,5 +12,5 @@ type UserResp struct {
 	Email           string         `json:"email"`
 	EmailFormat     string         `json:"email_format"`
 	PhoneNumber     sql.NullString `json:"phone_number"`
-	EmailVerifiedAt bool           `json:"activited"`
+	EmailVerifiedAt bool           `json:"activated"`
 }

@@ -52,7 +52,7 @@ func ProfileCfgUSECASE(t *testing.T) {
 	})
 
 	t.Run("SUCCESS_GetProfileCfgByNameAndIDUSECASE", func(t *testing.T) {
-		profileCfg, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, profileCfgResp.ID, "profileid1", "DAILY_NOTIFY")
+		profileCfg, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, "profileid1", "DAILY_NOTIFY")
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfg)
 		assert.Equal(t, profileCfgResp, profileCfg)

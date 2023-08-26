@@ -83,11 +83,11 @@ func (u *ProfileCfgUsecaseImpl) CreateProfileCfg(c context.Context, req dto.Crea
 	return profileCfgResp, nil
 }
 
-func (u *ProfileCfgUsecaseImpl) GetProfileCfgByNameAndID(c context.Context, id, profileID, configName string) (profileCfgResp *dto.ProfileCfgResp, err error) {
+func (u *ProfileCfgUsecaseImpl) GetProfileCfgByNameAndID(c context.Context, profileID, configName string) (profileCfgResp *dto.ProfileCfgResp, err error) {
 	ctx, cancel := context.WithTimeout(c, u.ctxTimeout)
 	defer cancel()
 
-	profileCfg, err := u.profileCfgRepo.GetProfileCfgByNameAndID(ctx, id, profileID, configName)
+	profileCfg, err := u.profileCfgRepo.GetProfileCfgByNameAndID(ctx, profileID, configName)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (u *ProfileCfgUsecaseImpl) UpdateProfileCfg(c context.Context, req dto.Upda
 	ctx, cancel := context.WithTimeout(c, u.ctxTimeout)
 	defer cancel()
 
-	_, err = u.profileCfgRepo.GetProfileCfgByNameAndID(ctx, id, req.ProfileID, configName)
+	_, err = u.profileCfgRepo.GetProfileCfgByNameAndID(ctx, req.ProfileID, configName)
 	if err != nil {
 		return nil, err
 	}

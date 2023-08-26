@@ -73,9 +73,9 @@ func (repo *ProfileCfgRepoImpl) scanRows(rows *sql.Rows) (*[]model.ProfileCfg, e
 	return &profileCfgs, nil
 }
 
-func (repo *ProfileCfgRepoImpl) GetProfileCfgByNameAndID(ctx context.Context, id, profileID, configName string) (*model.ProfileCfg, error) {
+func (repo *ProfileCfgRepoImpl) GetProfileCfgByNameAndID(ctx context.Context, profileID, configName string) (*model.ProfileCfg, error) {
 	query := `SELECT id, profile_id, config_name, config_value, status, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
-				  FROM dueit.m_user_config WHERE id = $1 AND profile_id = $2 AND config_name = $3`
+				  FROM dueit.m_user_config WHERE profile_id = $1 AND config_name = $2`
 
 	conn, err := repo.uow.OpenConn(ctx)
 	if err != nil {
@@ -98,7 +98,7 @@ func (repo *ProfileCfgRepoImpl) GetProfileCfgByNameAndID(ctx context.Context, id
 		}
 	}()
 
-	row := stmt.QueryRowContext(ctx, id, profileID, configName)
+	row := stmt.QueryRowContext(ctx, profileID, configName)
 
 	profileCfg, err := repo.scanRow(row)
 	if err != nil {

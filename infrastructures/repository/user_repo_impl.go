@@ -43,7 +43,7 @@ func (repo *UserRepoImpl) scanRow(row *sql.Row) (*model.User, error) {
 		&user.DeletedAt,
 		&user.DeletedBy,
 	); err != nil {
-		log.Err(err).Msg(exception.LogErrScanning)
+		log.Err(err).Msg(exception.LogErrDBScanning)
 		return nil, err
 	}
 	return &user, nil
@@ -60,18 +60,18 @@ func (repo *UserRepoImpl) GetUserByID(ctx context.Context, id string) (*model.Us
 	}
 	defer func() {
 		if errConn := conn.Close(); errConn != nil {
-			log.Err(errConn).Msg(exception.LogErrCloseConn)
+			log.Err(errConn).Msg(exception.LogErrDBCloseConn)
 		}
 	}()
 
 	stmt, err := conn.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return nil, err
 	}
 	defer func() {
 		if errStmt := stmt.Close(); errStmt != nil {
-			log.Err(errStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
@@ -94,23 +94,23 @@ func (repo *UserRepoImpl) UpdateUser(ctx context.Context, entity model.User) (*m
 
 	querySTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return nil, err
 	}
 	defer func() {
 		if errQueryStmt := querySTMT.Close(); errQueryStmt != nil {
-			log.Err(errQueryStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errQueryStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
 	rows, err := querySTMT.QueryContext(ctx, entity.PhoneNumber, entity.ID)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrQuery)
+		log.Err(err).Msg(exception.LogErrDBQuery)
 		return nil, err
 	}
 	defer func() {
 		if errRows := rows.Close(); errRows != nil {
-			log.Err(errRows).Msg(exception.LogErrCloseRows)
+			log.Err(errRows).Msg(exception.LogErrDBCloseRows)
 		}
 	}()
 
@@ -123,12 +123,12 @@ func (repo *UserRepoImpl) UpdateUser(ctx context.Context, entity model.User) (*m
 		"WHERE id = $7 AND deleted_at IS NULL"
 	execSTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return nil, err
 	}
 	defer func() {
 		if errExecStmt := execSTMT.Close(); errExecStmt != nil {
-			log.Err(errExecStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errExecStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
@@ -142,7 +142,7 @@ func (repo *UserRepoImpl) UpdateUser(ctx context.Context, entity model.User) (*m
 		entity.UpdatedBy,
 		entity.ID,
 	); err != nil {
-		log.Err(err).Msg(exception.LogErrExec)
+		log.Err(err).Msg(exception.LogErrDBExec)
 		return nil, err
 	}
 
@@ -158,23 +158,23 @@ func (repo *UserRepoImpl) UpdateUsername(ctx context.Context, entity model.User)
 
 	querySTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return nil, err
 	}
 	defer func() {
 		if errQueryStmt := querySTMT.Close(); errQueryStmt != nil {
-			log.Err(errQueryStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errQueryStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
 	rows, err := querySTMT.QueryContext(ctx, entity.Username, entity.ID)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrQuery)
+		log.Err(err).Msg(exception.LogErrDBQuery)
 		return nil, err
 	}
 	defer func() {
 		if errRows := rows.Close(); errRows != nil {
-			log.Err(errRows).Msg(exception.LogErrCloseRows)
+			log.Err(errRows).Msg(exception.LogErrDBCloseRows)
 		}
 	}()
 
@@ -187,12 +187,12 @@ func (repo *UserRepoImpl) UpdateUsername(ctx context.Context, entity model.User)
 
 	execSTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrSTMT)
+		log.Err(err).Msg(exception.LogErrDBStmt)
 		return nil, err
 	}
 	defer func() {
 		if errExecStmt := execSTMT.Close(); errExecStmt != nil {
-			log.Err(errExecStmt).Msg(exception.LogErrCloseStmt)
+			log.Err(errExecStmt).Msg(exception.LogErrDBCloseStmt)
 		}
 	}()
 
@@ -203,7 +203,7 @@ func (repo *UserRepoImpl) UpdateUsername(ctx context.Context, entity model.User)
 		entity.UpdatedBy,
 		entity.ID,
 	); err != nil {
-		log.Err(err).Msg(exception.LogErrExec)
+		log.Err(err).Msg(exception.LogErrDBExec)
 		return nil, err
 	}
 

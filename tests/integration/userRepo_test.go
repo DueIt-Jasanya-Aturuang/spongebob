@@ -3,7 +3,6 @@ package integration
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"os"
 	"testing"
@@ -88,7 +87,7 @@ func TestUserREPO(t *testing.T) {
 		FullName:        "rama",
 		Gender:          "male",
 		Image:           image,
-		Username:        "ibanrmaa",
+		Username:        "ibanrmaaasd9",
 		Email:           "ibanrama29@gmail.com",
 		Password:        "123456",
 		PhoneNumber:     sql.NullString{String: "12345678", Valid: true},
@@ -140,7 +139,7 @@ func TestUserREPO(t *testing.T) {
 		assert.NotNil(t, user)
 		assert.Equal(t, &updateUser1, user)
 		assert.NotEqual(t, &createUser, user)
-		userRepo.UoW().EndTx(nil)
+		userRepo.UoW().EndTx(err)
 	})
 
 	t.Run("ERROR_UpdateUser_PHONEEXISTS", func(t *testing.T) {
@@ -150,7 +149,7 @@ func TestUserREPO(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, user)
 		assert.Equal(t, err, exception.Err400PhoneAlvailable)
-		userRepo.UoW().EndTx(errors.New("PHONEEXISTS"))
+		userRepo.UoW().EndTx(err)
 	})
 
 	t.Run("ERROR_UpdateUsername_USERNAMEEXISTS", func(t *testing.T) {
@@ -161,16 +160,17 @@ func TestUserREPO(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, user)
 		assert.Equal(t, err, exception.Err400UsernameAlvailable)
-		userRepo.UoW().EndTx(errors.New("USERNAMEEXISTS"))
+		userRepo.UoW().EndTx(err)
 	})
 
 	t.Run("SUCCESS_UpdateUsername", func(t *testing.T) {
 		err := userRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
+		updateUser.Username = "updateusernamerama"
 		user, err := userRepo.UpdateUsername(context.TODO(), updateUser)
-		assert.Error(t, err)
-		assert.Nil(t, user)
-		assert.Equal(t, err, exception.Err400UsernameAlvailable)
-		userRepo.UoW().EndTx(nil)
+		assert.NoError(t, err)
+		assert.NotNil(t, user)
+		userRepo.UoW().EndTx(err)
 	})
+	t.Run("AccountUpdateUSECASE", AccountUpdateUSECASE)
 }

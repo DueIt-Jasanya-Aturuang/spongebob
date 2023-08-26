@@ -3,7 +3,6 @@ package integration
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -37,7 +36,7 @@ func ProfileREPO(t *testing.T) {
 		profile, err := profileRepo.StoreProfile(context.Background(), dataProfile)
 		assert.NoError(t, err)
 		assert.Equal(t, dataProfile, profile)
-		profileRepo.UoW().EndTx(nil)
+		profileRepo.UoW().EndTx(err)
 	})
 
 	t.Run("ERROR_StoreProfile_PROFILEEXISTS", func(t *testing.T) {
@@ -47,7 +46,7 @@ func ProfileREPO(t *testing.T) {
 		assert.Error(t, err)
 		assert.NotEqual(t, dataProfile, profile)
 		assert.Equal(t, exception.Err400ProfileAlvailable, err)
-		profileRepo.UoW().EndTx(errors.New("PROFILEEXISTS"))
+		profileRepo.UoW().EndTx(err)
 	})
 
 	t.Run("SUCCESS_GetProfileByID", func(t *testing.T) {
@@ -97,6 +96,8 @@ func ProfileREPO(t *testing.T) {
 		assert.NotNil(t, profile)
 		assert.NotEqual(t, &dataProfile, profile)
 		assert.Equal(t, &updateProfile, profile)
-		profileRepo.UoW().EndTx(nil)
+		profileRepo.UoW().EndTx(err)
 	})
+
+	t.Run("ProfileUSECASE", ProfileUsecase)
 }

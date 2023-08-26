@@ -51,7 +51,7 @@ func TestAccounUpdateUsecase(t *testing.T) {
 	minioRepoMock := &mocks.FakeMinioRepo{}
 	timeOutCtx := 3 * time.Second
 	ctx := context.Background()
-
+	image := "user-images/public/asd.png"
 	accountUsecase := usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
 
 	profile := model.Profile{
@@ -118,15 +118,15 @@ func TestAccounUpdateUsecase(t *testing.T) {
 	userRepoMock.UpdateUserReturns(&user, nil)
 
 	minioRepoMock.GenerateFileName(multipartFileHeader(), "user-images/public/", "")
-	minioRepoMock.GenerateFileNameReturns("user-images/public/asd.png")
+	minioRepoMock.GenerateFileNameReturns(image)
 
-	minioRepoMock.UploadFile(ctx, multipartFileHeader(), "user-images/public/asd.png", "files")
+	minioRepoMock.UploadFile(ctx, multipartFileHeader(), image, "files")
 	minioRepoMock.UploadFileReturns(nil)
 
 	uow.EndTx(nil)
 	uow.EndTxReturns(nil)
 
-	profileRes, userRes, err := accountUsecase.AccountUpdate(ctx, req)
+	profileRes, userRes, err := accountUsecase.UpdateAccount(ctx, req)
 	assert.NoError(t, err)
 	assert.NotNil(t, profileRes)
 	assert.NotNil(t, userRes)
@@ -139,6 +139,7 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 	minioRepoMock := &mocks.FakeMinioRepo{}
 	timeOutCtx := 3 * time.Second
 	ctx := context.Background()
+	image := "/files/user-images/public/asd.png"
 
 	accountUsecase := usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
 
@@ -158,7 +159,7 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 		ID:              "userid_1",
 		FullName:        "rama_1",
 		Gender:          "undefinied",
-		Image:           "/files/user-images/public/asd.png",
+		Image:           image,
 		Username:        "ibanrmaa_1",
 		Email:           "1_ibanrama29@gmail.com",
 		Password:        "123456",
@@ -203,13 +204,13 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 	minioRepoMock.GenerateFileName(multipartFileHeader(), "user-images/public/", "")
 	minioRepoMock.GenerateFileNameReturns("user-images/public/asd.png")
 
-	minioRepoMock.UploadFile(ctx, multipartFileHeader(), "/files/user-images/public/asd.png", "files")
+	minioRepoMock.UploadFile(ctx, multipartFileHeader(), image, "files")
 	minioRepoMock.UploadFileReturns(nil)
 
-	minioRepoMock.DeleteFile(ctx, "/files/user-images/public/asd.png", "files")
+	minioRepoMock.DeleteFile(ctx, image, "files")
 	minioRepoMock.DeleteFileReturns(nil)
 
-	profileRes, userRes, err := accountUsecase.AccountUpdate(ctx, req)
+	profileRes, userRes, err := accountUsecase.UpdateAccount(ctx, req)
 	assert.NoError(t, err)
 	assert.NotNil(t, profileRes)
 	assert.NotNil(t, userRes)

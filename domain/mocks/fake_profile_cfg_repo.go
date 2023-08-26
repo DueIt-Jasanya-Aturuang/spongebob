@@ -11,17 +11,19 @@ import (
 )
 
 type FakeProfileCfgRepo struct {
-	GetProfileCfgByIDStub        func(context.Context, string) (*model.ProfileCfg, error)
-	getProfileCfgByIDMutex       sync.RWMutex
-	getProfileCfgByIDArgsForCall []struct {
+	GetProfileCfgByNameAndIDStub        func(context.Context, string, string, string) (*model.ProfileCfg, error)
+	getProfileCfgByNameAndIDMutex       sync.RWMutex
+	getProfileCfgByNameAndIDArgsForCall []struct {
 		arg1 context.Context
 		arg2 string
+		arg3 string
+		arg4 string
 	}
-	getProfileCfgByIDReturns struct {
+	getProfileCfgByNameAndIDReturns struct {
 		result1 *model.ProfileCfg
 		result2 error
 	}
-	getProfileCfgByIDReturnsOnCall map[int]struct {
+	getProfileCfgByNameAndIDReturnsOnCall map[int]struct {
 		result1 *model.ProfileCfg
 		result2 error
 	}
@@ -77,19 +79,21 @@ type FakeProfileCfgRepo struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgByID(arg1 context.Context, arg2 string) (*model.ProfileCfg, error) {
-	fake.getProfileCfgByIDMutex.Lock()
-	ret, specificReturn := fake.getProfileCfgByIDReturnsOnCall[len(fake.getProfileCfgByIDArgsForCall)]
-	fake.getProfileCfgByIDArgsForCall = append(fake.getProfileCfgByIDArgsForCall, struct {
+func (fake *FakeProfileCfgRepo) GetProfileCfgByNameAndID(arg1 context.Context, arg2 string, arg3 string, arg4 string) (*model.ProfileCfg, error) {
+	fake.getProfileCfgByNameAndIDMutex.Lock()
+	ret, specificReturn := fake.getProfileCfgByNameAndIDReturnsOnCall[len(fake.getProfileCfgByNameAndIDArgsForCall)]
+	fake.getProfileCfgByNameAndIDArgsForCall = append(fake.getProfileCfgByNameAndIDArgsForCall, struct {
 		arg1 context.Context
 		arg2 string
-	}{arg1, arg2})
-	stub := fake.GetProfileCfgByIDStub
-	fakeReturns := fake.getProfileCfgByIDReturns
-	fake.recordInvocation("GetProfileCfgByID", []interface{}{arg1, arg2})
-	fake.getProfileCfgByIDMutex.Unlock()
+		arg3 string
+		arg4 string
+	}{arg1, arg2, arg3, arg4})
+	stub := fake.GetProfileCfgByNameAndIDStub
+	fakeReturns := fake.getProfileCfgByNameAndIDReturns
+	fake.recordInvocation("GetProfileCfgByNameAndID", []interface{}{arg1, arg2, arg3, arg4})
+	fake.getProfileCfgByNameAndIDMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2)
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -97,46 +101,46 @@ func (fake *FakeProfileCfgRepo) GetProfileCfgByID(arg1 context.Context, arg2 str
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgByIDCallCount() int {
-	fake.getProfileCfgByIDMutex.RLock()
-	defer fake.getProfileCfgByIDMutex.RUnlock()
-	return len(fake.getProfileCfgByIDArgsForCall)
+func (fake *FakeProfileCfgRepo) GetProfileCfgByNameAndIDCallCount() int {
+	fake.getProfileCfgByNameAndIDMutex.RLock()
+	defer fake.getProfileCfgByNameAndIDMutex.RUnlock()
+	return len(fake.getProfileCfgByNameAndIDArgsForCall)
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgByIDCalls(stub func(context.Context, string) (*model.ProfileCfg, error)) {
-	fake.getProfileCfgByIDMutex.Lock()
-	defer fake.getProfileCfgByIDMutex.Unlock()
-	fake.GetProfileCfgByIDStub = stub
+func (fake *FakeProfileCfgRepo) GetProfileCfgByNameAndIDCalls(stub func(context.Context, string, string, string) (*model.ProfileCfg, error)) {
+	fake.getProfileCfgByNameAndIDMutex.Lock()
+	defer fake.getProfileCfgByNameAndIDMutex.Unlock()
+	fake.GetProfileCfgByNameAndIDStub = stub
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgByIDArgsForCall(i int) (context.Context, string) {
-	fake.getProfileCfgByIDMutex.RLock()
-	defer fake.getProfileCfgByIDMutex.RUnlock()
-	argsForCall := fake.getProfileCfgByIDArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+func (fake *FakeProfileCfgRepo) GetProfileCfgByNameAndIDArgsForCall(i int) (context.Context, string, string, string) {
+	fake.getProfileCfgByNameAndIDMutex.RLock()
+	defer fake.getProfileCfgByNameAndIDMutex.RUnlock()
+	argsForCall := fake.getProfileCfgByNameAndIDArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgByIDReturns(result1 *model.ProfileCfg, result2 error) {
-	fake.getProfileCfgByIDMutex.Lock()
-	defer fake.getProfileCfgByIDMutex.Unlock()
-	fake.GetProfileCfgByIDStub = nil
-	fake.getProfileCfgByIDReturns = struct {
+func (fake *FakeProfileCfgRepo) GetProfileCfgByNameAndIDReturns(result1 *model.ProfileCfg, result2 error) {
+	fake.getProfileCfgByNameAndIDMutex.Lock()
+	defer fake.getProfileCfgByNameAndIDMutex.Unlock()
+	fake.GetProfileCfgByNameAndIDStub = nil
+	fake.getProfileCfgByNameAndIDReturns = struct {
 		result1 *model.ProfileCfg
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileCfgRepo) GetProfileCfgByIDReturnsOnCall(i int, result1 *model.ProfileCfg, result2 error) {
-	fake.getProfileCfgByIDMutex.Lock()
-	defer fake.getProfileCfgByIDMutex.Unlock()
-	fake.GetProfileCfgByIDStub = nil
-	if fake.getProfileCfgByIDReturnsOnCall == nil {
-		fake.getProfileCfgByIDReturnsOnCall = make(map[int]struct {
+func (fake *FakeProfileCfgRepo) GetProfileCfgByNameAndIDReturnsOnCall(i int, result1 *model.ProfileCfg, result2 error) {
+	fake.getProfileCfgByNameAndIDMutex.Lock()
+	defer fake.getProfileCfgByNameAndIDMutex.Unlock()
+	fake.GetProfileCfgByNameAndIDStub = nil
+	if fake.getProfileCfgByNameAndIDReturnsOnCall == nil {
+		fake.getProfileCfgByNameAndIDReturnsOnCall = make(map[int]struct {
 			result1 *model.ProfileCfg
 			result2 error
 		})
 	}
-	fake.getProfileCfgByIDReturnsOnCall[i] = struct {
+	fake.getProfileCfgByNameAndIDReturnsOnCall[i] = struct {
 		result1 *model.ProfileCfg
 		result2 error
 	}{result1, result2}
@@ -387,8 +391,8 @@ func (fake *FakeProfileCfgRepo) UpdateProfileCfgReturnsOnCall(i int, result1 err
 func (fake *FakeProfileCfgRepo) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getProfileCfgByIDMutex.RLock()
-	defer fake.getProfileCfgByIDMutex.RUnlock()
+	fake.getProfileCfgByNameAndIDMutex.RLock()
+	defer fake.getProfileCfgByNameAndIDMutex.RUnlock()
 	fake.getProfileCfgBySchedulerMutex.RLock()
 	defer fake.getProfileCfgBySchedulerMutex.RUnlock()
 	fake.storeProfileCfgMutex.RLock()

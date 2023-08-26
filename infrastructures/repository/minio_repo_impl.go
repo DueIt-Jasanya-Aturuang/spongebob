@@ -28,10 +28,15 @@ func NewMinioImpl(c *minio.Client) repository.MinioRepo {
 func (m *MinioImpl) UploadFile(ctx context.Context, file *multipart.FileHeader, objectName, bucket string) error {
 	fileReader, err := file.Open()
 	if err != nil {
-		log.Err(err).Msg("cannot open file header")
+		log.Err(err).Msg(exception.LogErrFileCannotOpen)
 		return err
 	}
-	defer fileReader.Close()
+	defer func() {
+		errCloseFile := fileReader.Close()
+		if errCloseFile != nil {
+			log.Err(err).Msg(exception.LogErrFileCannotClose)
+		}
+	}()
 
 	contentType := file.Header["Content-Type"][0]
 	fileSize := file.Size

@@ -17,8 +17,7 @@ func TestProfileGetByIDUSECASE(t *testing.T) {
 	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, 5*time.Second)
 
 	profileMockData := model.Profile{}
-	profileMockData.UserID = "userid1"
-	profileMockData = *profileMockData.DefaultValue()
+	profileMockData = *profileMockData.DefaultValue("userid1")
 
 	profileRepoMock.GetProfileByID(context.Background(), profileMockData.UserID)
 	profileRepoMock.GetProfileByIDReturns(&profileMockData, nil)
@@ -38,8 +37,7 @@ func TestProfileGetByUserIDUSECASE(t *testing.T) {
 	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, 5*time.Second)
 
 	profileMockData := model.Profile{}
-	profileMockData.UserID = "userid1"
-	profileMockData = *profileMockData.DefaultValue()
+	profileMockData = *profileMockData.DefaultValue("userid1")
 
 	profileRepoMock.GetProfileByID(context.Background(), profileMockData.UserID)
 	profileRepoMock.GetProfileByIDReturns(nil, sql.ErrNoRows)
@@ -66,8 +64,7 @@ func TestProfileGetByIDWithStoreUSECASE(t *testing.T) {
 	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, 5*time.Second)
 
 	profileMockData := model.Profile{}
-	profileMockData.UserID = "userid1"
-	profileMockData = *profileMockData.DefaultValue()
+	profileMockData = *profileMockData.DefaultValue("userid1")
 
 	profileRepoMock.GetProfileByID(context.Background(), "userid2")
 	profileRepoMock.GetProfileByIDReturns(nil, sql.ErrNoRows)
@@ -77,8 +74,7 @@ func TestProfileGetByIDWithStoreUSECASE(t *testing.T) {
 
 	profileRepoMock.GetProfileByUserID(context.Background(), "userid2")
 	profileRepoMock.GetProfileByUserIDReturnsOnCall(1, &profileMockData, nil)
-	profileMockData.UserID = "userid2"
-	profileMockData = *profileMockData.DefaultValue()
+	profileMockData = *profileMockData.DefaultValue("userid2")
 	ctxMock, idMock = profileRepoMock.GetProfileByUserIDArgsForCall(0)
 	assert.Equal(t, context.Background(), ctxMock)
 	assert.Equal(t, "userid2", idMock)

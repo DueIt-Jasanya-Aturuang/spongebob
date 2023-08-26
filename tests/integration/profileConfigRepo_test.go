@@ -93,13 +93,13 @@ func TestProfileConfigREPO(t *testing.T) {
 		assert.NoError(t, err)
 		err = profileCfgRepo.StoreProfileCfg(context.Background(), profileConfig1)
 		assert.NoError(t, err)
-		profileCfgRepo.UoW().EndTx(nil)
+		profileCfgRepo.UoW().EndTx(err)
 
 		err = profileCfgRepo.UoW().StartTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
 		assert.NoError(t, err)
 		err = profileCfgRepo.StoreProfileCfg(context.Background(), profileConfig2)
 		assert.NoError(t, err)
-		profileCfgRepo.UoW().EndTx(nil)
+		profileCfgRepo.UoW().EndTx(err)
 	})
 
 	t.Run("ERROR_StoreProfileCfg_PROFILECFGEXISTS", func(t *testing.T) {
@@ -113,14 +113,14 @@ func TestProfileConfigREPO(t *testing.T) {
 	})
 
 	t.Run("SUCCESS_GetProfileCfgByID", func(t *testing.T) {
-		profileCfg, err := profileCfgRepo.GetProfileCfgByID(context.Background(), profileConfig1.ID)
+		profileCfg, err := profileCfgRepo.GetProfileCfgByNameAndID(context.Background(), profileConfig1.ID, profileConfig1.ProfileID, profileConfig1.ConfigName)
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfg)
 		assert.Equal(t, profileConfig1.ID, profileCfg.ID)
 	})
 
 	t.Run("ERROR_GetProfileCfgByID_NOROW", func(t *testing.T) {
-		profileCfg, err := profileCfgRepo.GetProfileCfgByID(context.Background(), profileConfig1.ConfigName)
+		profileCfg, err := profileCfgRepo.GetProfileCfgByNameAndID(context.Background(), "nil", "nil", "nil")
 		assert.Error(t, err)
 		assert.Nil(t, profileCfg)
 		assert.Equal(t, sql.ErrNoRows, err)
@@ -162,13 +162,12 @@ func TestProfileConfigREPO(t *testing.T) {
 		err = profileCfgRepo.UpdateProfileCfg(context.Background(), profileConfigUpdate1)
 		assert.NoError(t, err)
 
-		profileCfgRepo.UoW().EndTx(nil)
+		profileCfgRepo.UoW().EndTx(err)
 	})
 
 	t.Run("SUCCESS_GetProfileCfgByID_AFTERUPDATE", func(t *testing.T) {
-		profileCfg, err := profileCfgRepo.GetProfileCfgByID(context.Background(), profileConfigUpdate1.ID)
+		profileCfg, err := profileCfgRepo.GetProfileCfgByNameAndID(context.Background(), profileConfigUpdate1.ID, profileConfigUpdate1.ProfileID, profileConfigUpdate1.ConfigName)
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfg)
-		t.Log(profileCfg)
 	})
 }

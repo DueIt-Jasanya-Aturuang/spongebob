@@ -17,15 +17,6 @@ func ProfileCfgUSECASE(t *testing.T) {
 	ctx := context.Background()
 
 	profileCfgUsecase := usecase.NewProfileCfgUsecaseImpl(profileRepo, profileCfgRepo, timeOut)
-	//configValue := map[string]any{
-	//	"config_time_user":       "19:00",
-	//	"config_timezone_user":   "Asia/Jakarta",
-	//	"config_time_notify":     fmt.Sprintf("%02d:%02d", 12, 0o0),
-	//	"config_timezone_notify": "UTC",
-	//	"days":                   []string{"monday", "sunday"},
-	//	"token":                  "1234",
-	//}
-	//configValueBytes, _ := json.Marshal(configValue)
 	req := dto.CreateProfileCfgReq{
 		ProfileID:   "profileid1",
 		ConfigValue: "19:00 Asia/Jakarta",

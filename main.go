@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
+	config.LogInit()
 	config.EnvInit()
-
 	pgConn := config.NewPgConn()
 	defer func() {
 		err := pgConn.Close()

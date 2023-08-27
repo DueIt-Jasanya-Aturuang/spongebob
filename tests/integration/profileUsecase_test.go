@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"testing"
 	"time"
 
@@ -16,22 +17,21 @@ func ProfileUsecase(t *testing.T) {
 	timeOut := 2 * time.Second
 	profile := usecase.NewProfileUsecaseImpl(profileRepo, timeOut)
 
+	t.Run("SUCCESS_StoreProfile", func(t *testing.T) {
+		profile, err := profile.StoreProfile(context.Background(), dto.StoreProfileReq{
+			UserID: "userId2",
+		})
+		assert.NoError(t, err)
+		assert.NotNil(t, profile)
+	})
+
 	t.Run("SUCCESS_GetProfileByID", func(t *testing.T) {
-		profile, err := profile.GetProfileByID(context.Background(), "profileid1")
+		profile, err := profile.GetProfileByID(context.Background(), dto.GetProfileReq{
+			UserID: "userId2",
+		})
 		assert.NoError(t, err)
 		assert.NotNil(t, profile)
 	})
 
-	t.Run("SUCCESS_GetProfileByUserID", func(t *testing.T) {
-		profile, err := profile.GetProfileByID(context.Background(), "userId1")
-		assert.NoError(t, err)
-		assert.NotNil(t, profile)
-	})
-
-	t.Run("SUCCESS_GetProfileByIDWithStore", func(t *testing.T) {
-		profile, err := profile.GetProfileByID(context.Background(), "profileidnottfound")
-		assert.NoError(t, err)
-		assert.NotNil(t, profile)
-	})
 	t.Run("CreateProfileCfgUSECASE", ProfileCfgUSECASE)
 }

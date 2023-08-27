@@ -26,6 +26,7 @@ func ProfileCfgUSECASE(t *testing.T) {
 		ConfigName:   "DAILY_NOTIFY",
 		Status:       "on",
 		Token:        "123",
+		UserID:       "userId1",
 		Value:        "19:00",
 		IanaTimezone: "Asia/Jakarta",
 	}
@@ -38,6 +39,8 @@ func ProfileCfgUSECASE(t *testing.T) {
 		},
 		Status:       "on",
 		Token:        "123",
+		UserID:       "userId1",
+		ConfigName:   "DAILY_NOTIFY",
 		Value:        "20:00",
 		IanaTimezone: "Asia/Jakarta",
 	}
@@ -52,14 +55,19 @@ func ProfileCfgUSECASE(t *testing.T) {
 	})
 
 	t.Run("SUCCESS_GetProfileCfgByNameAndIDUSECASE", func(t *testing.T) {
-		profileCfg, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, "profileid1", "DAILY_NOTIFY")
+		req := dto.GetProfileCfgReq{
+			UserID:     "userId1",
+			ConfigName: "DAILY_NOTIFY",
+			ProfileID:  "profileid1",
+		}
+		profileCfg, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, req)
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfg)
 		assert.Equal(t, profileCfgResp, profileCfg)
 	})
 
 	t.Run("SUCCESS_UpdateProfileCfgUSECASE", func(t *testing.T) {
-		profileCfg, err := profileCfgUsecase.UpdateProfileCfg(ctx, reqUpdate, profileCfgResp.ID, "DAILY_NOTIFY")
+		profileCfg, err := profileCfgUsecase.UpdateProfileCfg(ctx, reqUpdate)
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfg)
 		assert.NotEqual(t, profileCfgResp, profileCfg)

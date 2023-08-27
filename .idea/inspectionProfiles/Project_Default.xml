@@ -16,5 +16,10 @@
         <method importPath="github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository" receiver="UnitOfWork" name="EndTx" />
       </methods>
     </inspection_tool>
+    <inspection_tool class="SpellCheckingInspection" enabled="true" level="INFORMATION" enabled_by_default="true">
+      <option name="processCode" value="true" />
+      <option name="processLiterals" value="true" />
+      <option name="processComments" value="true" />
+    </inspection_tool>
   </profile>
 </component>

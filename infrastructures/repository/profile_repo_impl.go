@@ -79,8 +79,7 @@ func (repo *ProfileRepoImpl) GetProfileByID(ctx context.Context, id string) (*mo
 }
 
 func (repo *ProfileRepoImpl) GetProfileByUserID(ctx context.Context, userID string) (*model.Profile, error) {
-	query := "SELECT id, user_id, quotes, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by " +
-		"FROM dueit.m_profiles WHERE user_id = $1 AND deleted_at IS NULL"
+	query := "SELECT id, user_id, quotes, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM dueit.m_profiles WHERE user_id = $1 AND deleted_at IS NULL"
 
 	conn, err := repo.uow.OpenConn(ctx)
 	if err != nil {
@@ -138,7 +137,7 @@ func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, entity model.Prof
 	}
 
 	if exists {
-		return model.Profile{}, exception.Err400ProfileAlvailable
+		return model.Profile{}, exception.Err400ProfileAvailable
 	}
 
 	// insert proses

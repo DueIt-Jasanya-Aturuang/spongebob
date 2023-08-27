@@ -44,6 +44,7 @@ func AccountUpdateUSECASE(t *testing.T) {
 	defer file.Close()
 
 	accountUpdate := dto.UpdateAccountReq{
+		ProfileID:   "profileid1",
 		UserID:      "userId1",
 		FullName:    "rama_update_usecase",
 		Gender:      "male",

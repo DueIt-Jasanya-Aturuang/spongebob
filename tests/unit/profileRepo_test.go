@@ -211,7 +211,7 @@ func TestStoreProfileREPO(t *testing.T) {
 
 		_, err = profileRepo.StoreProfile(context.TODO(), *createProfile)
 		assert.Error(t, err)
-		assert.Equal(t, exception.Err400ProfileAlvailable, err)
+		assert.Equal(t, exception.Err400ProfileAvailable, err)
 
 		profileRepo.UoW().EndTx(errors.New("DATA EXISTS"))
 		err = mocksql.ExpectationsWereMet()

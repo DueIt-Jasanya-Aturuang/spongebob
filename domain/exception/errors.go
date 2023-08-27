@@ -5,12 +5,27 @@ import (
 )
 
 var (
-	Err400UsernameAlvailable      = errors.New("USERNAME ALVAILABLE")
-	Err400PhoneAlvailable         = errors.New("PHONE NUMBER ALVAILABLE")
-	Err400ProfileConfigAlvailable = errors.New("PROFILE CONFIG ALVAILABLE")
-	Err400ProfileAlvailable       = errors.New("PROFILE ALVAILABLE")
-	Err400InvalidTimeLayout       = errors.New("INVALID TIME LAYOUT 15:04")
-	Err400InvalidIanaTimezone     = errors.New("INVALID IANA TIMEZONE")
-	Err500TxNil                   = errors.New("TX PROPERTY IS NIL")
-	Err500InvalidFormatEmail      = errors.New("INVALID EMAIL USER FROM UPDATE ACCOUNT")
+	Err400UsernameAvailable      = errors.New("USERNAME AVAILABLE")
+	Err400PhoneAvailable         = errors.New("PHONE NUMBER AVAILABLE")
+	Err400ProfileConfigAvailable = errors.New("PROFILE CONFIG AVAILABLE")
+	Err400ProfileAvailable       = errors.New("PROFILE AVAILABLE")
+	Err400InvalidTimeLayout      = errors.New("INVALID TIME LAYOUT 15:04")
+	Err400InvalidIanaTimezone    = errors.New("INVALID IANA TIMEZONE")
+	Err500TxNil                  = errors.New("TX PROPERTY IS NIL")
+	Err500InvalidFormatEmail     = errors.New("INVALID EMAIL USER FROM UPDATE ACCOUNT")
+	Err401Unauthorization        = errors.New("UNAUTHORIZATION")
+)
+
+var (
+	Required     = "%s is required"
+	MaxString    = "maximum %s character must be %d"
+	MinString    = "minimum %s character must be %d"
+	Gender       = "%s gender must be male, female, or undefinied"
+	FileSize     = "max %s size should be %d kb or %d mb"
+	FileContent  = "%s must be %s"
+	InvalidField = "%s invalid %s, example %s"
+	Integer      = "%s must be number"
+	Enum         = "%s must be %s"
+	MinInteger   = "minimum %s number must be %d"
+	MaxInteger   = "maximum %s number must be %d"
 )

@@ -176,12 +176,11 @@ func (repo *ProfileCfgRepoImpl) StoreProfileCfg(ctx context.Context, profileCfg 
 		return err
 	}
 	if exists {
-		return exception.Err400ProfileConfigAlvailable
+		return exception.Err400ProfileConfigAvailable
 	}
 
 	// process insert
-	query = `INSERT INTO dueit.m_user_config (id, profile_id, config_name, config_value, status, created_at, created_by, updated_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+	query = "INSERT INTO dueit.m_user_config (id, profile_id, config_name, config_value, status, created_at, created_by, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
 	execSTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
 		log.Err(err).Msg(exception.LogErrDBStmt)

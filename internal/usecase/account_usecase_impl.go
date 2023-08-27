@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exception"
 	"strings"
 	"time"
 
@@ -40,7 +41,7 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAcco
 	ctx, cancel := context.WithTimeout(c, u.ctxTimeout)
 	defer cancel()
 
-	profile, err := u.profileRepo.GetProfileByUserID(ctx, req.UserID)
+	profile, err := u.profileRepo.GetProfileByID(ctx, req.ProfileID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -50,12 +51,22 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAcco
 		return nil, nil, err
 	}
 
+	if profile.UserID != user.ID {
+		return nil, nil, exception.Err401Unauthorization
+	}
+
 	oldImage := user.Image
 	email := user.Email
 	reqImageBool := req.Image != nil && req.Image.Size > 0
 	delImageBool := !strings.Contains(oldImage, "default-male") && !strings.Contains(oldImage, "google")
 
-	profileConv, userConv := dtoconv.UpdateAccountToModel(req, profile.ProfileID, user.Image)
+	var newImageName string
+	if reqImageBool {
+		newImageName = u.minioClient.GenerateFileName(req.Image, "user-images/public/", "")
+		user.Image = fmt.Sprintf("/%s/%s", config.MinIoBucket, newImageName)
+	}
+
+	profileConv, userConv := dtoconv.UpdateAccountToModel(req, user.Image)
 
 	profileRepoUOW := u.profileRepo.UoW()
 	err = profileRepoUOW.StartTx(ctx, &sql.TxOptions{
@@ -66,8 +77,7 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAcco
 		return nil, nil, err
 	}
 	defer func() {
-		errEndTx := profileRepoUOW.EndTx(err)
-		if errEndTx != nil {
+		if errEndTx := profileRepoUOW.EndTx(err); errEndTx != nil {
 			err = errEndTx
 			profileResp = nil
 			userResp = nil
@@ -89,26 +99,22 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAcco
 	if err != nil {
 		return nil, nil, err
 	}
+
 	user, err = u.userRepo.UpdateUser(ctx, userConv)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	filename := u.minioClient.GenerateFileName(req.Image, "user-images/public/", "")
 	if reqImageBool {
-		user.Image = fmt.Sprintf("/%s/%s", config.MinIoBucket, filename)
-	}
-
-	if reqImageBool {
-		err = u.minioClient.UploadFile(ctx, req.Image, filename, config.MinIoBucket)
+		err = u.minioClient.UploadFile(ctx, req.Image, newImageName, config.MinIoBucket)
 		if err != nil {
 			return nil, nil, err
 		}
 
 		if delImageBool {
 			oldImageArr := strings.Split(oldImage, "/")
-			filename = fmt.Sprintf("/%s/%s/%s", oldImageArr[2], oldImageArr[3], oldImageArr[4])
-			err = u.minioClient.DeleteFile(ctx, filename, config.MinIoBucket)
+			newImageName = fmt.Sprintf("/%s/%s/%s", oldImageArr[2], oldImageArr[3], oldImageArr[4])
+			err = u.minioClient.DeleteFile(ctx, newImageName, config.MinIoBucket)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -119,6 +125,7 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAcco
 	if err != nil {
 		return nil, nil, err
 	}
+	
 	userResp = user.ToResp(emailFormat)
 	profileResp = profile.ToResp()
 	return userResp, profileResp, nil

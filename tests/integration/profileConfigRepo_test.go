@@ -19,12 +19,12 @@ import (
 )
 
 func marshal(data any) string {
-	byte, err := json.Marshal(data)
+	byteData, err := json.Marshal(data)
 	if err != nil {
 		log.Err(err).Msg("cannot marshal")
 		os.Exit(1)
 	}
-	return string(byte)
+	return string(byteData)
 }
 
 var (
@@ -107,7 +107,7 @@ func TestProfileConfigREPO(t *testing.T) {
 		assert.NoError(t, err)
 		err = profileCfgRepo.StoreProfileCfg(context.Background(), profileConfig1)
 		assert.Error(t, err)
-		assert.Equal(t, exception.Err400ProfileConfigAlvailable, err)
+		assert.Equal(t, exception.Err400ProfileConfigAvailable, err)
 
 		profileCfgRepo.UoW().EndTx(errors.New("PROFILECFGEXISTS"))
 	})

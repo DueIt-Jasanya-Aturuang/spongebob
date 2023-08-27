@@ -45,7 +45,7 @@ func ProfileREPO(t *testing.T) {
 		profile, err := profileRepo.StoreProfile(context.Background(), dataProfile)
 		assert.Error(t, err)
 		assert.NotEqual(t, dataProfile, profile)
-		assert.Equal(t, exception.Err400ProfileAlvailable, err)
+		assert.Equal(t, exception.Err400ProfileAvailable, err)
 		profileRepo.UoW().EndTx(err)
 	})
 

@@ -115,8 +115,8 @@ func (repo *UserRepoImpl) UpdateUser(ctx context.Context, entity model.User) (*m
 	}()
 
 	if rows.Next() {
-		log.Info().Msg(exception.Err400PhoneAlvailable.Error())
-		return nil, exception.Err400PhoneAlvailable
+		log.Info().Msg(exception.Err400PhoneAvailable.Error())
+		return nil, exception.Err400PhoneAvailable
 	}
 
 	query = "UPDATE auth.m_users SET fullname = $1, gender = $2, image = $3, phone_number = $4, updated_at = $5, updated_by = $6 " +
@@ -179,8 +179,8 @@ func (repo *UserRepoImpl) UpdateUsername(ctx context.Context, entity model.User)
 	}()
 
 	if rows.Next() {
-		log.Info().Msg(exception.Err400UsernameAlvailable.Error())
-		return nil, exception.Err400UsernameAlvailable
+		log.Info().Msg(exception.Err400UsernameAvailable.Error())
+		return nil, exception.Err400UsernameAvailable
 	}
 
 	query = "UPDATE auth.m_users SET username = $1, updated_at = $2, updated_by = $3 WHERE id = $4 AND deleted_at IS NULL"

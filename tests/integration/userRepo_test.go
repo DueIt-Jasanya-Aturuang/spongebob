@@ -28,7 +28,7 @@ var (
 		PhoneNumber:     sql.NullString{},
 		EmailVerifiedAt: false,
 		CreatedAt:       unixUser,
-		CreatedBy:       "userId1",
+		CreatedBy:       "c",
 		UpdatedAt:       unixUser,
 		UpdatedBy:       sql.NullString{},
 		DeletedAt:       sql.NullInt64{},
@@ -148,7 +148,7 @@ func TestUserREPO(t *testing.T) {
 		user, err := userRepo.UpdateUser(context.TODO(), updateUser)
 		assert.Error(t, err)
 		assert.Nil(t, user)
-		assert.Equal(t, err, exception.Err400PhoneAlvailable)
+		assert.Equal(t, err, exception.Err400PhoneAvailable)
 		userRepo.UoW().EndTx(err)
 	})
 
@@ -159,7 +159,7 @@ func TestUserREPO(t *testing.T) {
 		user, err := userRepo.UpdateUsername(context.TODO(), updateUser)
 		assert.Error(t, err)
 		assert.Nil(t, user)
-		assert.Equal(t, err, exception.Err400UsernameAlvailable)
+		assert.Equal(t, err, exception.Err400UsernameAvailable)
 		userRepo.UoW().EndTx(err)
 	})
 

@@ -44,7 +44,7 @@ func multipartFileHeader() *multipart.FileHeader {
 	return fileHeader
 }
 
-func TestAccounUpdateUsecase(t *testing.T) {
+func TestAccountUpdateUsecase(t *testing.T) {
 	uow := &mocks.FakeUnitOfWork{}
 	profileRepoMock := &mocks.FakeProfileRepo{}
 	userRepoMock := &mocks.FakeUserRepo{}
@@ -93,8 +93,8 @@ func TestAccounUpdateUsecase(t *testing.T) {
 		Quote:       "semangat_update_1",
 	}
 
-	profileRepoMock.GetProfileByUserID(ctx, "userid_1")
-	profileRepoMock.GetProfileByUserIDReturns(&profile, nil)
+	profileRepoMock.GetProfileByID(ctx, "profileid_1")
+	profileRepoMock.GetProfileByIDReturns(&profile, nil)
 
 	userRepoMock.GetUserByID(ctx, "userid_1")
 	userRepoMock.GetUserByIDReturns(&user, nil)
@@ -102,7 +102,7 @@ func TestAccounUpdateUsecase(t *testing.T) {
 	profileRepoMock.UoW()
 	profileRepoMock.UoWReturns(uow)
 
-	profileConv, userConv := dtoconv.UpdateAccountToModel(req, profile.ProfileID, user.Image)
+	profileConv, userConv := dtoconv.UpdateAccountToModel(req, user.Image)
 	profileRepoMock.UpdateProfile(ctx, profileConv)
 	profileRepoMock.UpdateProfileReturns(&profile, nil)
 
@@ -174,6 +174,7 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 	}
 
 	req := dto.UpdateAccountReq{
+		ProfileID:   "profileid_1",
 		UserID:      "userid_1",
 		FullName:    "rama_update_1",
 		Gender:      "male",
@@ -182,8 +183,8 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 		Quote:       "semangat_update_1",
 	}
 
-	profileRepoMock.GetProfileByUserID(ctx, "userid_1")
-	profileRepoMock.GetProfileByUserIDReturns(&profile, nil)
+	profileRepoMock.GetProfileByID(ctx, "profileid_1")
+	profileRepoMock.GetProfileByIDReturns(&profile, nil)
 
 	userRepoMock.GetUserByID(ctx, "userid_1")
 	userRepoMock.GetUserByIDReturns(&user, nil)
@@ -191,7 +192,7 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 	profileRepoMock.UoW()
 	profileRepoMock.UoWReturns(uow)
 
-	profileConv, userConv := dtoconv.UpdateAccountToModel(req, profile.ProfileID, user.Image)
+	profileConv, userConv := dtoconv.UpdateAccountToModel(req, user.Image)
 	profileRepoMock.UpdateProfile(ctx, profileConv)
 	profileRepoMock.UpdateProfileReturns(&profile, nil)
 

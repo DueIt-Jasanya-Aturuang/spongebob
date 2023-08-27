@@ -33,6 +33,7 @@ func TestCreateProfileCfgUSECASE(t *testing.T) {
 		},
 		ConfigName:   "DAILY_NOTIFY",
 		Status:       "on",
+		UserID:       "userid_1",
 		Token:        "123",
 		Value:        "19:00",
 		IanaTimezone: "Asia/Jakarta",
@@ -128,26 +129,53 @@ func TestGetProfileCfgByNameAndIDUSECASE(t *testing.T) {
 		DeletedBy:   sql.NullString{},
 	}
 
+	profile := &model.Profile{
+		ProfileID: "profileid_1",
+		UserID:    "userId1",
+		Quote:     sql.NullString{String: "Semangat"},
+		CreatedAt: 0,
+		CreatedBy: "profileid_1",
+		UpdatedAt: 0,
+		UpdatedBy: sql.NullString{},
+		DeletedAt: sql.NullInt64{},
+		DeletedBy: sql.NullString{},
+	}
+
 	t.Run("SUCCESS_GetProfileCfgByNameAndID", func(t *testing.T) {
-		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, "profileid_1", "DAILY_NOTIF")
+		req := dto.GetProfileCfgReq{
+			UserID:     "userId1",
+			ConfigName: "DAILY_NOTIFY",
+			ProfileID:  "profileid_1",
+		}
+
+		profileRepoMock.GetProfileByID(ctx, req.ProfileID)
+		profileRepoMock.GetProfileByIDReturns(profile, nil)
+
+		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, req.ProfileID, req.ConfigName)
 		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(&profileCfg, nil)
 
 		profileCfgRepoMock.UoW()
 		profileCfgRepoMock.UoWReturns(uow)
 
-		profileCfgResp, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, "profileid_1", "DAILY_NOTIF")
+		profileCfgResp, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, req)
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfgResp)
 	})
 
 	t.Run("ERROR_GetProfileCfgByNameAndID_DATANIL", func(t *testing.T) {
-		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, "profileid_1", "DAILY_NOTIF")
-		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(nil, sql.ErrNoRows)
+		req := dto.GetProfileCfgReq{
+			UserID:     "nil",
+			ConfigName: "DAILY_NOTIFY",
+			ProfileID:  "nil",
+		}
+
+		profileRepoMock.GetProfileByID(ctx, req.ProfileID)
+		profileRepoMock.GetProfileByIDReturns(nil, sql.ErrNoRows)
 
 		profileCfgRepoMock.UoW()
 		profileCfgRepoMock.UoWReturns(uow)
 
-		profileCfgResp, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, "profileid_1", "DAILY_NOTIF")
+		profileCfgResp, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, req)
 		assert.Error(t, err)
 		assert.Nil(t, profileCfgResp)
 		assert.Equal(t, sql.ErrNoRows, err)
@@ -171,6 +199,8 @@ func TestUpdateProfileCfgUSECASE(t *testing.T) {
 		},
 		Status:       "on",
 		Token:        "123",
+		UserID:       "userId1",
+		ConfigName:   "profileid_1",
 		Value:        "19:00",
 		IanaTimezone: "Asia/Jakarta",
 	}
@@ -195,7 +225,22 @@ func TestUpdateProfileCfgUSECASE(t *testing.T) {
 		DeletedAt:   sql.NullInt64{},
 		DeletedBy:   sql.NullString{},
 	}
+
+	profile := model.Profile{
+		ProfileID: "profileid_1",
+		UserID:    "userId1",
+		Quote:     sql.NullString{},
+		CreatedAt: 0,
+		CreatedBy: "",
+		UpdatedAt: 0,
+		UpdatedBy: sql.NullString{},
+		DeletedAt: sql.NullInt64{},
+		DeletedBy: sql.NullString{},
+	}
 	t.Run("SUCCESS_UpdateProfileCfg", func(t *testing.T) {
+		profileRepoMock.GetProfileByID(ctx, "profileid_1")
+		profileRepoMock.GetProfileByIDReturns(&profile, nil)
+
 		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, "nil", "nil")
 		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(profileCfg, nil)
 		assert.Equal(t, 1, profileCfgRepoMock.GetProfileCfgByNameAndIDCallCount())
@@ -215,7 +260,7 @@ func TestUpdateProfileCfgUSECASE(t *testing.T) {
 		uow.EndTxReturns(nil)
 		assert.Equal(t, 1, uow.EndTxCallCount())
 
-		profileCfg, err := profileCfgUsecase.UpdateProfileCfg(ctx, request, "cfgid_1", "profileid_1")
+		profileCfg, err := profileCfgUsecase.UpdateProfileCfg(ctx, request)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfg)
@@ -238,7 +283,7 @@ func TestUpdateProfileCfgUSECASE(t *testing.T) {
 		uow.EndTx(nil)
 		uow.EndTxReturns(nil)
 
-		profileCfg, err := profileCfgUsecase.UpdateProfileCfg(ctx, request, "cfgid_1", "profileid_1")
+		profileCfg, err := profileCfgUsecase.UpdateProfileCfg(ctx, request)
 		assert.Error(t, err)
 		assert.Equal(t, sql.ErrNoRows, err)
 		assert.Nil(t, profileCfg)

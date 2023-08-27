@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func FormatConfigValue(configName, value, ianaTimezone string, days []string) (map[string]any, error) {
+func ConfigValue(configName, value, ianaTimezone string, days []string) (map[string]any, error) {
 	configValue := map[string]any{}
 
 	if configName == "DAILY_NOTIFY" {

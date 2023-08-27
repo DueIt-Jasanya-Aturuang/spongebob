@@ -1,6 +1,7 @@
 package unit
 
 import (
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/validation"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -9,7 +10,8 @@ import (
 func TestProfileCfgDTO(t *testing.T) {
 	t.Run("SUCCESS_ProfileCfgDTO_CREATE", func(t *testing.T) {
 		reqCreate := dto.CreateProfileCfgReq{
-			ProfileID:   "profileid1",
+			UserID:      "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
+			ProfileID:   "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
 			ConfigValue: "19:00 Asia/Jakarta",
 			Days:        []string{"monday", "tuesday"},
 			ConfigName:  "DAILY_NOTIFY",
@@ -17,46 +19,52 @@ func TestProfileCfgDTO(t *testing.T) {
 			Token:       "12345678901",
 		}
 
-		err := reqCreate.Validate()
+		err := validation.CreateProfileCfg(&reqCreate)
 		assert.NoError(t, err)
 	})
 
 	t.Run("ERROR_ProfileCfgDTO_CREATE", func(t *testing.T) {
 		reqCreate := dto.CreateProfileCfgReq{
-			ProfileID:   "123",
-			ConfigValue: "19:00 Asia/Jakarta",
+			UserID:      "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
+			ProfileID:   "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
+			ConfigValue: "as",
 			Days:        []string{"mondays", "tuesday"},
 			ConfigName:  "DAILY_NOTIFY",
 			Status:      "osn",
 			Token:       "678901",
 		}
 
-		err := reqCreate.Validate()
+		err := validation.CreateProfileCfg(&reqCreate)
+		t.Log(err)
 		assert.Error(t, err)
 	})
 
 	t.Run("SUCCESS_ProfileCfgDTO_UPDATE", func(t *testing.T) {
 		reqUpdate := dto.UpdateProfileCfgReq{
-			ProfileID:   "profileid1",
+			UserID:      "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
+			ProfileID:   "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
 			ConfigValue: "19:00 Asia/Jakarta",
 			Days:        []string{"monday", "tuesday"},
 			Status:      "on",
 			Token:       "12345678901",
+			ConfigName:  "DAILY_NOTIFY",
 		}
-		err := reqUpdate.Validate("DAILY_NOTIFY")
+		err := validation.UpdateProfileCfgValidate(&reqUpdate)
 		assert.NoError(t, err)
 	})
 
 	t.Run("ERROR_ProfileCfgDTO_UPDATE", func(t *testing.T) {
 		reqUpdate := dto.UpdateProfileCfgReq{
-			ProfileID:   "123",
+			UserID:      "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
+			ProfileID:   "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
 			ConfigValue: "1900",
 			Days:        []string{"mondays", "tuesday"},
 			Status:      "osn",
 			Token:       "678901",
+			ConfigName:  "asd",
 		}
 
-		err := reqUpdate.Validate("MONTHLY_sPERIOD")
+		err := validation.UpdateProfileCfgValidate(&reqUpdate)
 		assert.Error(t, err)
 	})
 }

@@ -13,7 +13,7 @@ var (
 	Err400InvalidIanaTimezone    = errors.New("INVALID IANA TIMEZONE")
 	Err500TxNil                  = errors.New("TX PROPERTY IS NIL")
 	Err500InvalidFormatEmail     = errors.New("INVALID EMAIL USER FROM UPDATE ACCOUNT")
-	Err401Unauthorization        = errors.New("UNAUTHORIZATION")
+	Err401Msg                    = errors.New("UNAUTHORIZATION")
 )
 
 var (
@@ -24,6 +24,7 @@ var (
 	FileSize     = "max %s size should be %d kb or %d mb"
 	FileContent  = "%s must be %s"
 	InvalidField = "%s invalid %s, example %s"
+	InvalidID    = "invalid %s"
 	Integer      = "%s must be number"
 	Enum         = "%s must be %s"
 	MinInteger   = "minimum %s number must be %d"

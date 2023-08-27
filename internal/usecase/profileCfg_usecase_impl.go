@@ -44,7 +44,7 @@ func (u *ProfileCfgUsecaseImpl) CreateProfileCfg(c context.Context, req dto.Crea
 	}
 	log.Debug().Msgf("profile user id : %s | user id %s", profile.UserID, req.UserID)
 	if profile.UserID != req.UserID {
-		return nil, exception.Err401Unauthorization
+		return nil, exception.Err401Msg
 	}
 
 	formatConfigValue, err := format.ConfigValue(req.ConfigName, req.Value, req.IanaTimezone, req.Days)
@@ -97,7 +97,7 @@ func (u *ProfileCfgUsecaseImpl) GetProfileCfgByNameAndID(c context.Context, req 
 		return nil, err
 	}
 	if profile.UserID != req.UserID {
-		return nil, exception.Err401Unauthorization
+		return nil, exception.Err401Msg
 	}
 
 	profileCfg, err := u.profileCfgRepo.GetProfileCfgByNameAndID(ctx, req.ProfileID, req.ConfigName)
@@ -139,7 +139,7 @@ func (u *ProfileCfgUsecaseImpl) UpdateProfileCfg(c context.Context, req dto.Upda
 	}
 	log.Debug().Msgf("data : %v", profile)
 	if profile.UserID != req.UserID {
-		return nil, exception.Err401Unauthorization
+		return nil, exception.Err401Msg
 	}
 
 	profileCfg, err := u.profileCfgRepo.GetProfileCfgByNameAndID(ctx, profile.ProfileID, req.ConfigName)

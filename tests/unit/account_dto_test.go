@@ -2,6 +2,7 @@ package unit
 
 import (
 	"bytes"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/validation"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/stretchr/testify/assert"
 	"mime/multipart"
@@ -42,8 +43,8 @@ func TestAccountDTO(t *testing.T) {
 
 	t.Run("SUCCESS_AccountDTO", func(t *testing.T) {
 		reqSuccess := dto.UpdateAccountReq{
-			ProfileID:   "profileid_1",
-			UserID:      "userid_1",
+			ProfileID:   "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
+			UserID:      "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
 			FullName:    "rama",
 			Gender:      "male",
 			Image:       fileHeader,
@@ -51,21 +52,21 @@ func TestAccountDTO(t *testing.T) {
 			Quote:       "semangat rama",
 		}
 
-		err := reqSuccess.Validate()
+		err := validation.UpdateAccountValidate(&reqSuccess)
 		assert.NoError(t, err)
 	})
 
 	t.Run("ERROR_AccountDTO", func(t *testing.T) {
 		fileHeader.Header.Set("Content-Type", "image/asd")
 		reqSuccess := dto.UpdateAccountReq{
-			UserID:      "userid_1",
+			UserID:      "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
 			FullName:    "",
 			Gender:      "maleasdasd",
 			Image:       fileHeader,
 			PhoneNumber: "1234asd56789012",
 			Quote:       "sama",
 		}
-		err := reqSuccess.Validate()
+		err := validation.UpdateAccountValidate(&reqSuccess)
 		assert.Error(t, err)
 		t.Log(err)
 	})

@@ -52,16 +52,16 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAcco
 	}
 
 	if profile.UserID != user.ID {
-		return nil, nil, exception.Err401Unauthorization
+		return nil, nil, exception.Err401Msg
 	}
 
 	oldImage := user.Image
 	email := user.Email
-	reqImageBool := req.Image != nil && req.Image.Size > 0
-	delImageBool := !strings.Contains(oldImage, "default-male") && !strings.Contains(oldImage, "google")
+	reqImageCondition := req.Image != nil && req.Image.Size > 0
+	delImageCondition := !strings.Contains(oldImage, "default-male") && !strings.Contains(oldImage, "google")
 
 	var newImageName string
-	if reqImageBool {
+	if reqImageCondition {
 		newImageName = u.minioClient.GenerateFileName(req.Image, "user-images/public/", "")
 		user.Image = fmt.Sprintf("/%s/%s", config.MinIoBucket, newImageName)
 	}
@@ -105,13 +105,13 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAcco
 		return nil, nil, err
 	}
 
-	if reqImageBool {
+	if reqImageCondition {
 		err = u.minioClient.UploadFile(ctx, req.Image, newImageName, config.MinIoBucket)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		if delImageBool {
+		if delImageCondition {
 			oldImageArr := strings.Split(oldImage, "/")
 			newImageName = fmt.Sprintf("/%s/%s/%s", oldImageArr[2], oldImageArr[3], oldImageArr[4])
 			err = u.minioClient.DeleteFile(ctx, newImageName, config.MinIoBucket)
@@ -125,7 +125,7 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAcco
 	if err != nil {
 		return nil, nil, err
 	}
-	
+
 	userResp = user.ToResp(emailFormat)
 	profileResp = profile.ToResp()
 	return userResp, profileResp, nil

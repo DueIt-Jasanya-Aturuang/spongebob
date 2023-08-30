@@ -36,8 +36,15 @@ func (p *Profile) DefaultValue(userID string) *Profile {
 }
 
 func (p *Profile) ToResp() *dto.ProfileResp {
+	var quote string
+	if p.Quote.Valid {
+		quote = p.Quote.String
+	} else {
+		quote = "null"
+	}
+
 	return &dto.ProfileResp{
 		ProfileID: p.ProfileID,
-		Quote:     p.Quote,
+		Quote:     quote,
 	}
 }

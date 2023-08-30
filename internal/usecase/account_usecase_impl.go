@@ -85,8 +85,8 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req *dto.UpdateAcc
 	}
 	if phoneNumberExists {
 		return nil, nil, response.Err409(map[string][]string{
-			"phone_numer": {
-				message.PhoneNumberIsAlavilable,
+			"phone_number": {
+				message.PhoneNumberIsAvailable,
 			},
 		}, err)
 	}

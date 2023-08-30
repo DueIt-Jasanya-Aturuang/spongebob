@@ -25,6 +25,14 @@ type User struct {
 }
 
 func (u *User) ToResp(emailFormat string) *dto.UserResp {
+	var phoneNumber string
+
+	if u.PhoneNumber.Valid {
+		phoneNumber = u.PhoneNumber.String
+	} else {
+		phoneNumber = "null"
+	}
+
 	return &dto.UserResp{
 		ID:              u.ID,
 		FullName:        u.FullName,
@@ -33,7 +41,7 @@ func (u *User) ToResp(emailFormat string) *dto.UserResp {
 		Username:        u.Username,
 		Email:           u.Email,
 		EmailFormat:     emailFormat,
-		PhoneNumber:     u.PhoneNumber,
+		PhoneNumber:     phoneNumber,
 		EmailVerifiedAt: u.EmailVerifiedAt,
 	}
 }

@@ -1,3 +1,5 @@
 #!/bin/bash
 
-echo "hello"
+set -e
+
+echo "start deploy"

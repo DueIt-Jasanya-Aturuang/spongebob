@@ -5,13 +5,17 @@ info:
 servers:
   - url: https://dueit.jasanya.tech
 paths:
-  /account:
+  /account/{profile-id}:
     parameters:
       - $ref: '#/components/parameters/AppId'
       - $ref: '#/components/parameters/Key'
       - $ref: '#/components/parameters/Authorization'
       - $ref: '#/components/parameters/UserId'
     put:
+      parameters:
+        - name: profile-id
+          in: path
+          required: true
       requestBody:
         content:
           multipart/form-data:
@@ -74,12 +78,6 @@ paths:
       - $ref: '#/components/parameters/Authorization'
       - $ref: '#/components/parameters/UserId'
     get:
-      parameters:
-        - in: query
-          name: id
-          schema:
-            type: string
-          description: "userid atau profileid"
       responses:
         200:
           description: OK
@@ -111,16 +109,12 @@ paths:
       - $ref: '#/components/parameters/UserId'
     get:
       parameters:
-        - in: query
-          name: profile_id
-          schema:
-            type: string
-            example: "profileid_1"
-        - in: query
-          name: config_name
-          schema:
-            type: string
-            example: "DAILY_NOTIFY"
+        - in: path
+          name: profile-id *id profile
+          required: true
+        - in: path
+          name: config-name *DAILY_NOTIFY OR MONTHLY_PERIOD
+          required: true
       responses:
         200:
           description: OK
@@ -144,15 +138,16 @@ paths:
         500:
           $ref: '#/components/responses/500InternalServerError'
     post:
+      parameters:
+        - in: path
+          name: profile-id *profile id
+          required: true
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                profile_id:
-                  type: string
-                  example: "profileid_1"
                 config_value:
                   type: string
                   example: "19:00 Asia/Jakarta OR 29"
@@ -198,26 +193,18 @@ paths:
           $ref: '#/components/responses/500InternalServerError'
     put:
       parameters:
-        - in: query
-          name: id
-          schema:
-            type: string
-            example: "profileid_1"
-          description: "profile config id"
-        - in: query
-          name: config_name
-          schema:
-            type: string
-            example: "DAILY_NOTIFY"
+        - in: path
+          name: profile-id *id profile
+          required: true
+        - in: path
+          name: config-name *DAILY_NOTIFY OR MONTHLY_PERIOD
+          required: true
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                profile_id:
-                  type: string
-                  example: "profileid_1"
                 config_value:
                   type: string
                   example: "19:00 Asia/Jakarta OR 29"
@@ -371,9 +358,6 @@ components:
            type: object
            properties:
              field1:
-               type: string
-               example: "unprocessable entity"
-             field2:
                type: string
                example: "unprocessable entity"
     403ERROR:

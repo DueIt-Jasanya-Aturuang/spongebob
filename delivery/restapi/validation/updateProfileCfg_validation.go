@@ -66,9 +66,13 @@ func UpdateProfileCfgValidate(req *dto.UpdateProfileCfgReq) error {
 		}
 	}
 
-	// days validation
-	if !dayValidate(req.Days) {
-		badReq["days"] = append(badReq["days"], fmt.Sprintf(InvalidField, "days", "your input", strings.Join(utils.Days(), ", ")))
+	if req.ConfigName == "DAILY_NOTIFY" {
+		if len(req.Days) < 1 {
+			badReq["days"] = append(badReq["days"], fmt.Sprintf(InvalidField, "days", "your days must be >= 1", strings.Join(utils.Days(), ", ")))
+		}
+		if !dayValidate(req.Days) {
+			badReq["days"] = append(badReq["days"], fmt.Sprintf(InvalidField, "days", "your input", strings.Join(utils.Days(), ", ")))
+		}
 	}
 
 	// status validation

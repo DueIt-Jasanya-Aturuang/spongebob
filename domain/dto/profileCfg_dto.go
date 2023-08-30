@@ -11,8 +11,8 @@ type CreateProfileCfgReq struct {
 	Token        string   `json:"token"`        // request body
 	UserID       string   // request header
 	ProfileID    string   // request param
-	Value        string   // response
-	IanaTimezone string   // response
+	Value        string   // helper
+	IanaTimezone string   // helper
 }
 
 // UpdateProfileCfgReq update profile config request
@@ -24,15 +24,15 @@ type UpdateProfileCfgReq struct {
 	ProfileID    string   // url parameter
 	UserID       string   // request header
 	ConfigName   string   // url parameter
-	Value        string   // response
-	IanaTimezone string   // response
+	Value        string   // helper
+	IanaTimezone string   // helper
 }
 
 // GetProfileCfgReq get profile config request
 type GetProfileCfgReq struct {
 	UserID     string // request header
-	ConfigName string // url parameter config_name
-	ProfileID  string // response
+	ConfigName string // url parameter config-name
+	ProfileID  string // url 		parameter profile-id
 }
 
 type ProfileCfgResp struct {

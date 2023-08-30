@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/utils/message"
 	"github.com/lib/pq"
@@ -24,7 +25,9 @@ func NewError(w http.ResponseWriter, _ *http.Request, err error) {
 		if err.Error() != "failed to decode: schema: converter not found for multipart.FileHeader" {
 			log.Info().Msgf("error pq : %v", err)
 			unprocessableEntity := map[string]string{
-				err.(*json.UnmarshalTypeError).Field: "invalid type input",
+				err.(*json.UnmarshalTypeError).Field: fmt.Sprintf(
+					"invalid type input, type must be %s", err.(*json.UnmarshalTypeError).Type.String(),
+				),
 			}
 			err = Err422(unprocessableEntity, err)
 			break

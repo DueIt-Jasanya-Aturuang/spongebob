@@ -2,7 +2,6 @@ package response
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/utils/message"
 	"github.com/rs/zerolog/log"
 	"io"
@@ -14,7 +13,11 @@ import (
 func DecodeReq(r *http.Request, data any) error {
 	err := json.NewDecoder(r.Body).Decode(data)
 	if err == io.EOF {
-		return errors.New("empty body request")
+		return Err400(map[string][]string{
+			"bad_request": {
+				"empty body request",
+			},
+		}, err)
 	}
 
 	if err != nil {

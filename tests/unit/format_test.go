@@ -2,9 +2,9 @@ package unit
 
 import (
 	"fmt"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
 	"testing"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/format"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,28 +12,26 @@ func TestFormatEmail(t *testing.T) {
 	t.Run("SUCCESS_FormatEmail", func(t *testing.T) {
 		expect := "i••••9@gmail.com"
 		email := "ibanrama29@gmail.com"
-		emailFormat, err := format.EmailFormat(email)
+		emailFormat := helpers.EmailFormat(email)
 		assert.Equal(t, expect, emailFormat)
-		assert.NoError(t, err)
 	})
 
 	t.Run("ERROR_FormatEmail", func(t *testing.T) {
 		expect := "i••••9@gmail.com"
 		email := "ibanrama29gmail.com"
-		emailFormat, err := format.EmailFormat(email)
+		emailFormat := helpers.EmailFormat(email)
 		assert.NotEqual(t, expect, emailFormat)
-		assert.Error(t, err)
 	})
 }
 
-func TestFormatConfigValue(t *testing.T) {
-	t.Run("SUCCESS_FormatConfigValueDAILY_NOTIFY", func(t *testing.T) {
+func TestConfigValue(t *testing.T) {
+	t.Run("SUCCESS_ConfigValueDAILY_NOTIFY", func(t *testing.T) {
 		configName := "DAILY_NOTIFY"
 		value := "19:00"
 		ianaTimezone := "Asia/Jakarta"
 		days := []string{
 			"monday",
-			"thuesday",
+			"yesterday",
 		}
 
 		hour := 12
@@ -46,25 +44,25 @@ func TestFormatConfigValue(t *testing.T) {
 			"days":                   days,
 		}
 
-		configValue, err := format.FormatConfigValue(configName, value, ianaTimezone, days)
+		configValue, err := helpers.ConfigValue(configName, value, ianaTimezone, days)
 		assert.NoError(t, err)
 		assert.Equal(t, expect, configValue)
 	})
-	t.Run("SUCCESS_FormatConfigValueMONTHLY_PERIOD", func(t *testing.T) {
+	t.Run("SUCCESS_ConfigValueMONTHLY_PERIOD", func(t *testing.T) {
 		configName := "MONTHLY_PERIOD"
 		value := "10"
 		ianaTimezone := ""
-		days := []string{}
+		var days []string
 
 		expect := map[string]any{
 			"config_date": value,
 		}
 
-		configValue, err := format.FormatConfigValue(configName, value, ianaTimezone, days)
+		configValue, err := helpers.ConfigValue(configName, value, ianaTimezone, days)
 		assert.NoError(t, err)
 		assert.Equal(t, expect, configValue)
 	})
 
-	// t.Run("ERROR_FormatConfigValue", func(t *testing.T) {
+	// t.Run("ERROR_ConfigValue", func(t *testing.T) {
 	// })
 }

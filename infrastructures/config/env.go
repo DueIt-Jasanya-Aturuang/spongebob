@@ -17,7 +17,7 @@ func EnvInit() {
 
 	AppPort = os.Getenv("APPLICATION_PORT")
 	AppStatus = os.Getenv("APPLICATION_STATUS")
-	AppGracefull = os.Getenv("APPLICATION_GRACEFUL_MAX_SECOND")
+	//AppGracefull = os.Getenv("APPLICATION_GRACEFUL_MAX_SECOND")
 
 	PgHost = os.Getenv("DB_POSTGRESQL_HOST")
 	PgPort = os.Getenv("DB_POSTGRESQL_PORT")
@@ -35,29 +35,29 @@ func EnvInit() {
 	RedisDB = dbInt
 	RedisPass = os.Getenv("REDIS_PASS")
 
-	miniosslBool, err := strconv.ParseBool(os.Getenv("MINIO_SSL"))
+	minioSslBool, err := strconv.ParseBool(os.Getenv("MINIO_SSL"))
 	if err != nil {
 		panic(err)
 	}
 	MinIoID = os.Getenv("MINIO_ID")
 	MinIoSecretKey = os.Getenv("MINIO_SECRETKEY")
 	MinIoEndpoint = os.Getenv("MINIO_ENDPOINT")
-	MinIoPort = os.Getenv("MINIO_PORT")
+	//MinIoPort = os.Getenv("MINIO_PORT")
 	MinIoBucket = os.Getenv("MINIO_BUCKET")
-	MinIoSSL = miniosslBool
+	MinIoSSL = minioSslBool
 
-	DefaultImage = os.Getenv("DEFAULT_DEFAULT_IMAGE")
-	AesCFB = os.Getenv("DEFAULT_AES_CFB_KEY")
-	AesCBC = os.Getenv("DEFAULT_AES_CBC_KEY")
-	AesCBCIV = os.Getenv("DEFAULT_AES_CBC_IV_KEY")
+	//DefaultImage = os.Getenv("DEFAULT_DEFAULT_IMAGE")
+	//AesCFB = os.Getenv("DEFAULT_AES_CFB_KEY")
+	//AesCBC = os.Getenv("DEFAULT_AES_CBC_KEY")
+	//AesCBCIV = os.Getenv("DEFAULT_AES_CBC_IV_KEY")
 
 	log.Info().Msg("config initialization successfully")
 }
 
 var (
-	AppPort      string
-	AppStatus    string
-	AppGracefull string
+	AppPort   string
+	AppStatus string
+	//AppGracefull string
 
 	PgHost string
 	PgPort string
@@ -74,12 +74,12 @@ var (
 	MinIoID        string
 	MinIoSecretKey string
 	MinIoEndpoint  string
-	MinIoPort      string
 	MinIoBucket    string
 	MinIoSSL       bool
+	//  MinIoPort      string
 
-	DefaultImage string
-	AesCFB       string
-	AesCBC       string
-	AesCBCIV     string
+	//DefaultImage string
+	//AesCFB       string
+	//AesCBC       string
+	//AesCBCIV     string
 )

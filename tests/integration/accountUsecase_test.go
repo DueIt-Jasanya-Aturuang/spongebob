@@ -17,12 +17,9 @@ import (
 
 func AccountUpdateUSECASE(t *testing.T) {
 	config.MinIoBucket = "files"
-	uow := repository.NewUnitOfWorkImpl(db)
-	profileRepo := repository.NewProfileRepoImpl(uow)
-	userRepo := repository.NewUserRepoImpl(uow)
 	minio := repository.NewMinioImpl(minioClient)
 	timeOut := 2 * time.Second
-	account := usecase.NewAccountUsecaseImpl(profileRepo, userRepo, minio, timeOut)
+	account := usecase.NewAccountUsecaseImpl(ProfileRepo, UserRepo, minio, timeOut)
 
 	fileContent := []byte("file content")
 	fileHeader := &multipart.FileHeader{
@@ -44,16 +41,17 @@ func AccountUpdateUSECASE(t *testing.T) {
 	defer file.Close()
 
 	accountUpdate := dto.UpdateAccountReq{
-		UserID:      "userId1",
+		ProfileID:   profileID_1,
+		UserID:      userID_1,
 		FullName:    "rama_update_usecase",
 		Gender:      "male",
 		Image:       fileHeader,
-		PhoneNumber: "12345678",
+		PhoneNumber: "123456782",
 		Quote:       "semangat_update_usecase",
 	}
 
 	t.Run("SUCCESS_AccountUpdate", func(t *testing.T) {
-		userResp, profileResp, err := account.UpdateAccount(context.Background(), accountUpdate)
+		userResp, profileResp, err := account.UpdateAccount(context.Background(), &accountUpdate)
 		assert.NoError(t, err)
 		assert.NotNil(t, userResp)
 		assert.NotNil(t, profileResp)

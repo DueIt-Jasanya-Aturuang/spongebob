@@ -2,7 +2,6 @@ package dto
 
 import "database/sql"
 
-// user resp
 type UserResp struct {
 	ID              string         `json:"id"`
 	FullName        string         `json:"full_name"`

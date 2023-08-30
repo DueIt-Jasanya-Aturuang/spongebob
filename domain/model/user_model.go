@@ -6,7 +6,6 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 )
 
-// user entities
 type User struct {
 	ID              string
 	FullName        string

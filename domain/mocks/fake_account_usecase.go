@@ -10,11 +10,11 @@ import (
 )
 
 type FakeAccountUsecase struct {
-	UpdateAccountStub        func(context.Context, dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error)
+	UpdateAccountStub        func(context.Context, *dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error)
 	updateAccountMutex       sync.RWMutex
 	updateAccountArgsForCall []struct {
 		arg1 context.Context
-		arg2 dto.UpdateAccountReq
+		arg2 *dto.UpdateAccountReq
 	}
 	updateAccountReturns struct {
 		result1 *dto.UserResp
@@ -30,12 +30,12 @@ type FakeAccountUsecase struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAccountUsecase) UpdateAccount(arg1 context.Context, arg2 dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error) {
+func (fake *FakeAccountUsecase) UpdateAccount(arg1 context.Context, arg2 *dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error) {
 	fake.updateAccountMutex.Lock()
 	ret, specificReturn := fake.updateAccountReturnsOnCall[len(fake.updateAccountArgsForCall)]
 	fake.updateAccountArgsForCall = append(fake.updateAccountArgsForCall, struct {
 		arg1 context.Context
-		arg2 dto.UpdateAccountReq
+		arg2 *dto.UpdateAccountReq
 	}{arg1, arg2})
 	stub := fake.UpdateAccountStub
 	fakeReturns := fake.updateAccountReturns
@@ -56,13 +56,13 @@ func (fake *FakeAccountUsecase) UpdateAccountCallCount() int {
 	return len(fake.updateAccountArgsForCall)
 }
 
-func (fake *FakeAccountUsecase) UpdateAccountCalls(stub func(context.Context, dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error)) {
+func (fake *FakeAccountUsecase) UpdateAccountCalls(stub func(context.Context, *dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error)) {
 	fake.updateAccountMutex.Lock()
 	defer fake.updateAccountMutex.Unlock()
 	fake.UpdateAccountStub = stub
 }
 
-func (fake *FakeAccountUsecase) UpdateAccountArgsForCall(i int) (context.Context, dto.UpdateAccountReq) {
+func (fake *FakeAccountUsecase) UpdateAccountArgsForCall(i int) (context.Context, *dto.UpdateAccountReq) {
 	fake.updateAccountMutex.RLock()
 	defer fake.updateAccountMutex.RUnlock()
 	argsForCall := fake.updateAccountArgsForCall[i]

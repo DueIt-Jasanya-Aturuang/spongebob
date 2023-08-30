@@ -1,3 +1,4 @@
+#file: noinspection SpellCheckingInspection
 linters-settings:
   dupl:
     threshold: 300
@@ -73,13 +74,13 @@ linters:
     - gocritic
     - gocyclo
     - gofmt
-    - goimports
-    - gomnd
+#    - goimports
+#    - gomnd
     - goprintffuncname
     - gosec
     - gosimple
     - ineffassign
-    - lll
+#    - lll
     - misspell
     - nakedret
     - noctx

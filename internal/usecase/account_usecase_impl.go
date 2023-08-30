@@ -3,7 +3,12 @@ package usecase
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/response"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/utils/message"
 	"strings"
 	"time"
 
@@ -11,8 +16,6 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/config"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/dtoconv"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/format"
 )
 
 type AccountUsecaseImpl struct {
@@ -36,38 +39,69 @@ func NewAccountUsecaseImpl(
 	}
 }
 
-func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAccountReq) (userResp *dto.UserResp, profileResp *dto.ProfileResp, err error) {
+func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req *dto.UpdateAccountReq) (userResp *dto.UserResp, profileResp *dto.ProfileResp, err error) {
 	ctx, cancel := context.WithTimeout(c, u.ctxTimeout)
 	defer cancel()
 
-	profile, err := u.profileRepo.GetProfileByUserID(ctx, req.UserID)
+	err = u.profileRepo.OpenConn(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer func() {
+		u.profileRepo.CloseConn()
+	}()
+
+	profile, err := u.profileRepo.GetProfileByID(ctx, req.ProfileID)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	user, err := u.userRepo.GetUserByID(ctx, req.UserID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil, model.ErrUnauthorization
+		}
 		return nil, nil, err
+	}
+
+	if profile.UserID != user.ID {
+		return nil, nil, model.ErrUnauthorization
 	}
 
 	oldImage := user.Image
 	email := user.Email
-	reqImageBool := req.Image != nil && req.Image.Size > 0
-	delImageBool := !strings.Contains(oldImage, "default-male") && !strings.Contains(oldImage, "google")
+	reqImageCondition := req.Image != nil && req.Image.Size > 0
+	delImageCondition := !strings.Contains(oldImage, "default-male") && !strings.Contains(oldImage, "google")
 
-	profileConv, userConv := dtoconv.UpdateAccountToModel(req, profile.ProfileID, user.Image)
+	var newImageName string
+	if reqImageCondition {
+		newImageName = u.minioClient.GenerateFileName(req.Image, "user-images/public/", "")
+		user.Image = fmt.Sprintf("/%s/%s", config.MinIoBucket, newImageName)
+	}
 
-	profileRepoUOW := u.profileRepo.UoW()
-	err = profileRepoUOW.StartTx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelSerializable,
+	phoneNumberExists, err := u.userRepo.CheckPhoneNumberExists(ctx, user.ID, req.PhoneNumber)
+	if err != nil {
+		return nil, nil, err
+	}
+	if phoneNumberExists {
+		return nil, nil, response.Err409(map[string][]string{
+			"phone_numer": {
+				message.PhoneNumberIsAlavilable,
+			},
+		}, err)
+	}
+
+	profileConv, userConv := helpers.UpdateAccountToModel(req, user.Image)
+
+	err = u.profileRepo.StartTx(ctx, &sql.TxOptions{
+		Isolation: sql.LevelReadCommitted,
 		ReadOnly:  false,
 	})
 	if err != nil {
 		return nil, nil, err
 	}
 	defer func() {
-		errEndTx := profileRepoUOW.EndTx(err)
-		if errEndTx != nil {
+		if errEndTx := u.profileRepo.EndTx(err); errEndTx != nil {
 			err = errEndTx
 			profileResp = nil
 			userResp = nil
@@ -79,47 +113,31 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAcco
 		return nil, nil, err
 	}
 
-	userRepoUOW := u.userRepo.UoW()
-	txProfileRepoUOW, err := profileRepoUOW.GetTx()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	err = userRepoUOW.CallTx(txProfileRepoUOW)
-	if err != nil {
-		return nil, nil, err
-	}
 	user, err = u.userRepo.UpdateUser(ctx, userConv)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	filename := u.minioClient.GenerateFileName(req.Image, "user-images/public/", "")
-	if reqImageBool {
-		user.Image = fmt.Sprintf("/%s/%s", config.MinIoBucket, filename)
-	}
-
-	if reqImageBool {
-		err = u.minioClient.UploadFile(ctx, req.Image, filename, config.MinIoBucket)
+	if reqImageCondition {
+		err = u.minioClient.UploadFile(ctx, req.Image, newImageName, config.MinIoBucket)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		if delImageBool {
+		if delImageCondition {
 			oldImageArr := strings.Split(oldImage, "/")
-			filename = fmt.Sprintf("/%s/%s/%s", oldImageArr[2], oldImageArr[3], oldImageArr[4])
-			err = u.minioClient.DeleteFile(ctx, filename, config.MinIoBucket)
+			newImageName = fmt.Sprintf("/%s/%s/%s", oldImageArr[2], oldImageArr[3], oldImageArr[4])
+			err = u.minioClient.DeleteFile(ctx, newImageName, config.MinIoBucket)
 			if err != nil {
 				return nil, nil, err
 			}
 		}
 	}
 
-	emailFormat, err := format.EmailFormat(email)
-	if err != nil {
-		return nil, nil, err
-	}
+	emailFormat := helpers.EmailFormat(email)
+
 	userResp = user.ToResp(emailFormat)
 	profileResp = profile.ToResp()
+
 	return userResp, profileResp, nil
 }

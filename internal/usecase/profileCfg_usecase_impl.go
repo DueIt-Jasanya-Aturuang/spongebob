@@ -4,14 +4,16 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/response"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
 	"time"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/dtoconv"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/format"
 )
 
 type ProfileCfgUsecaseImpl struct {
@@ -32,137 +34,204 @@ func NewProfileCfgUsecaseImpl(
 	}
 }
 
-func (u *ProfileCfgUsecaseImpl) CreateProfileCfg(c context.Context, req dto.CreateProfileCfgReq) (profileCfgResp *dto.ProfileCfgResp, err error) {
+func (u *ProfileCfgUsecaseImpl) CreateProfileCfg(
+	c context.Context, req dto.CreateProfileCfgReq,
+) (profileCfgResp dto.ProfileCfgResp, err error) {
 	ctx, cancel := context.WithTimeout(c, u.ctxTimeout)
 	defer cancel()
 
-	_, err = u.profileRepo.GetProfileByID(ctx, req.ProfileID)
+	err = u.profileRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, err
+		return dto.ProfileCfgResp{}, err
+	}
+	defer func() {
+		u.profileRepo.CloseConn()
+	}()
+
+	profile, err := u.profileRepo.GetProfileByID(ctx, req.ProfileID)
+	if err != nil {
+		return dto.ProfileCfgResp{}, err
 	}
 
-	formatConfigValue, err := format.FormatConfigValue(req.ConfigName, req.Value, req.IanaTimezone, req.Days)
+	if profile.UserID != req.UserID {
+		return dto.ProfileCfgResp{}, model.ErrUnauthorization
+	}
+
+	formatConfigValue, err := helpers.ConfigValue(req.ConfigName, req.Value, req.IanaTimezone, req.Days)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, model.ErrBadInput) {
+			return dto.ProfileCfgResp{}, response.Err400(map[string][]string{
+				"config_value": {
+					"invalid layout time or invalid iana timezone",
+				},
+			}, err)
+		}
+		return dto.ProfileCfgResp{}, err
 	}
 	formatConfigValue["token"] = req.Token
 
 	FormatConfigValueByte, err := json.Marshal(formatConfigValue)
 	if err != nil {
-		return nil, err
+		return dto.ProfileCfgResp{}, err
 	}
 
-	profileCfgRepoUOW := u.profileCfgRepo.UoW()
-	err = profileCfgRepoUOW.StartTx(ctx, &sql.TxOptions{
-		ReadOnly: false,
+	err = u.profileRepo.StartTx(ctx, &sql.TxOptions{
+		Isolation: sql.LevelReadCommitted,
+		ReadOnly:  false,
 	})
 	if err != nil {
-		return nil, err
+		return dto.ProfileCfgResp{}, err
 	}
 	defer func() {
-		errEndTx := profileCfgRepoUOW.EndTx(err)
-		if errEndTx != nil {
+		if errEndTx := u.profileRepo.EndTx(err); errEndTx != nil {
 			err = errEndTx
-			profileCfgResp = nil
+			profileCfgResp = dto.ProfileCfgResp{}
 		}
 	}()
 
-	profileCfg := dtoconv.CreateProfileCfgToModel(req, FormatConfigValueByte)
+	profileCfg := helpers.CreateProfileCfgToModel(req, FormatConfigValueByte)
 	err = u.profileCfgRepo.StoreProfileCfg(ctx, profileCfg)
 	if err != nil {
-		return nil, err
+		return dto.ProfileCfgResp{}, err
 	}
 
-	profileCfgResp = &dto.ProfileCfgResp{
+	profileCfgResp = dto.ProfileCfgResp{
 		ID:          profileCfg.ID,
 		ProfileID:   profileCfg.ProfileID,
 		ConfigName:  profileCfg.ConfigName,
 		ConfigValue: req.ConfigValue,
 		Status:      profileCfg.Status,
 	}
+
 	return profileCfgResp, nil
 }
 
-func (u *ProfileCfgUsecaseImpl) GetProfileCfgByNameAndID(c context.Context, profileID, configName string) (profileCfgResp *dto.ProfileCfgResp, err error) {
+func (u *ProfileCfgUsecaseImpl) GetProfileCfgByNameAndID(
+	c context.Context, req dto.GetProfileCfgReq,
+) (profileCfgResp dto.ProfileCfgResp, err error) {
 	ctx, cancel := context.WithTimeout(c, u.ctxTimeout)
 	defer cancel()
 
-	profileCfg, err := u.profileCfgRepo.GetProfileCfgByNameAndID(ctx, profileID, configName)
+	err = u.profileRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, err
+		return dto.ProfileCfgResp{}, err
+	}
+	defer func() {
+		u.profileRepo.CloseConn()
+	}()
+
+	profile, err := u.profileRepo.GetProfileByID(ctx, req.ProfileID)
+	if err != nil {
+		return dto.ProfileCfgResp{}, err
+	}
+
+	if profile.UserID != req.UserID {
+		return dto.ProfileCfgResp{}, model.ErrUnauthorization
+	}
+
+	profileCfg, err := u.profileCfgRepo.GetProfileCfgByNameAndID(ctx, req.ProfileID, req.ConfigName)
+	if err != nil {
+		return dto.ProfileCfgResp{}, err
 	}
 
 	formatConfigValue := map[string]any{}
 	err = json.Unmarshal([]byte(profileCfg.ConfigValue), &formatConfigValue)
 	if err != nil {
-		return nil, err
+		return dto.ProfileCfgResp{}, err
 	}
 
 	var configValue string
-	switch configName {
+	switch req.ConfigName {
 	case "DAILY_NOTIFY":
 		configValue = fmt.Sprintf("%s %s", formatConfigValue["config_time_user"], formatConfigValue["config_timezone_user"])
 	case "MONTHLY_PERIOD":
 		configValue = fmt.Sprintf("%s", formatConfigValue["config_date"])
 	}
 
-	profileCfgResp = &dto.ProfileCfgResp{
+	profileCfgResp = dto.ProfileCfgResp{
 		ID:          profileCfg.ID,
 		ProfileID:   profileCfg.ProfileID,
 		ConfigName:  profileCfg.ConfigName,
 		ConfigValue: configValue,
 		Status:      profileCfg.Status,
 	}
-	return profileCfgResp, err
+
+	return profileCfgResp, nil
 }
 
-func (u *ProfileCfgUsecaseImpl) UpdateProfileCfg(c context.Context, req dto.UpdateProfileCfgReq, id, configName string) (profileCfgResp *dto.ProfileCfgResp, err error) {
+func (u *ProfileCfgUsecaseImpl) UpdateProfileCfg(
+	c context.Context, req dto.UpdateProfileCfgReq,
+) (profileCfgResp dto.ProfileCfgResp, err error) {
 	ctx, cancel := context.WithTimeout(c, u.ctxTimeout)
 	defer cancel()
 
-	_, err = u.profileCfgRepo.GetProfileCfgByNameAndID(ctx, req.ProfileID, configName)
+	err = u.profileRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, err
+		return dto.ProfileCfgResp{}, err
+	}
+	defer func() {
+		u.profileRepo.CloseConn()
+	}()
+
+	profile, err := u.profileRepo.GetProfileByID(ctx, req.ProfileID)
+	if err != nil {
+		return dto.ProfileCfgResp{}, err
 	}
 
-	formatConfigValue, err := format.FormatConfigValue(configName, req.Value, req.IanaTimezone, req.Days)
+	if profile.UserID != req.UserID {
+		return dto.ProfileCfgResp{}, model.ErrUnauthorization
+	}
+
+	profileCfg, err := u.profileCfgRepo.GetProfileCfgByNameAndID(ctx, profile.ProfileID, req.ConfigName)
 	if err != nil {
-		return nil, err
+		return dto.ProfileCfgResp{}, err
+	}
+
+	formatConfigValue, err := helpers.ConfigValue(req.ConfigName, req.Value, req.IanaTimezone, req.Days)
+	if err != nil {
+		if errors.Is(err, model.ErrBadInput) {
+			return dto.ProfileCfgResp{}, response.Err400(map[string][]string{
+				"config_value": {
+					"invalid layout time or invalid iana timezone",
+				},
+			}, err)
+		}
+		return dto.ProfileCfgResp{}, err
 	}
 	formatConfigValue["token"] = req.Token
 
 	FormatConfigValueByte, err := json.Marshal(formatConfigValue)
 	if err != nil {
-		return nil, err
+		return dto.ProfileCfgResp{}, err
 	}
 
-	profileCfgRepoUOW := u.profileCfgRepo.UoW()
-	err = profileCfgRepoUOW.StartTx(ctx, &sql.TxOptions{
+	err = u.profileRepo.StartTx(ctx, &sql.TxOptions{
 		ReadOnly: false,
 	})
 	if err != nil {
-		return nil, err
+		return dto.ProfileCfgResp{}, err
 	}
 	defer func() {
-		errEndTx := profileCfgRepoUOW.EndTx(err)
-		if errEndTx != nil {
+		if errEndTx := u.profileRepo.EndTx(err); errEndTx != nil {
 			err = errEndTx
-			profileCfgResp = nil
+			profileCfgResp = dto.ProfileCfgResp{}
+
 		}
 	}()
 
-	profileCfg := dtoconv.UpdateProfileCfgToModel(req, FormatConfigValueByte, configName, id)
-	err = u.profileCfgRepo.UpdateProfileCfg(ctx, profileCfg)
+	profileCfgConv := helpers.UpdateProfileCfgToModel(req, FormatConfigValueByte, req.ConfigName, profileCfg.ID)
+	err = u.profileCfgRepo.UpdateProfileCfg(ctx, profileCfgConv)
 	if err != nil {
-		return nil, err
+		return dto.ProfileCfgResp{}, err
 	}
 
-	profileCfgResp = &dto.ProfileCfgResp{
-		ID:          id,
+	profileCfgResp = dto.ProfileCfgResp{
+		ID:          profileCfg.ID,
 		ProfileID:   req.ProfileID,
-		ConfigName:  configName,
+		ConfigName:  req.ConfigName,
 		ConfigValue: req.ConfigValue,
 		Status:      req.Status,
 	}
+
 	return profileCfgResp, nil
 }

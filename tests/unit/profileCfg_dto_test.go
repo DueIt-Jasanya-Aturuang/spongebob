@@ -10,8 +10,8 @@ import (
 func TestProfileCfgDTO(t *testing.T) {
 	t.Run("SUCCESS_ProfileCfgDTO_CREATE", func(t *testing.T) {
 		reqCreate := dto.CreateProfileCfgReq{
-			UserID:      "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
-			ProfileID:   "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
+			UserID:      "699137ef-1f24-46d7-82bf-862fde7b36d8",
+			ProfileID:   "699137ef-1f24-46d7-82bf-862fde7b36d8",
 			ConfigValue: "19:00 Asia/Jakarta",
 			Days:        []string{"monday", "tuesday"},
 			ConfigName:  "DAILY_NOTIFY",
@@ -25,8 +25,8 @@ func TestProfileCfgDTO(t *testing.T) {
 
 	t.Run("ERROR_ProfileCfgDTO_CREATE", func(t *testing.T) {
 		reqCreate := dto.CreateProfileCfgReq{
-			UserID:      "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
-			ProfileID:   "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
+			UserID:      "699137ef-1f24-46d7-82bf-862fde7b36d8",
+			ProfileID:   "699137ef-1f24-46d7-82bf-862fde7b36d8",
 			ConfigValue: "as",
 			Days:        []string{"mondays", "tuesday"},
 			ConfigName:  "DAILY_NOTIFY",
@@ -41,8 +41,8 @@ func TestProfileCfgDTO(t *testing.T) {
 
 	t.Run("SUCCESS_ProfileCfgDTO_UPDATE", func(t *testing.T) {
 		reqUpdate := dto.UpdateProfileCfgReq{
-			UserID:      "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
-			ProfileID:   "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
+			UserID:      "699137ef-1f24-46d7-82bf-862fde7b36d8",
+			ProfileID:   "699137ef-1f24-46d7-82bf-862fde7b36d8",
 			ConfigValue: "19:00 Asia/Jakarta",
 			Days:        []string{"monday", "tuesday"},
 			Status:      "on",
@@ -55,8 +55,8 @@ func TestProfileCfgDTO(t *testing.T) {
 
 	t.Run("ERROR_ProfileCfgDTO_UPDATE", func(t *testing.T) {
 		reqUpdate := dto.UpdateProfileCfgReq{
-			UserID:      "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
-			ProfileID:   "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
+			UserID:      "699137ef-1f24-46d7-82bf-862fde7b36d8",
+			ProfileID:   "699137ef-1f24-46d7-82bf-862fde7b36d8",
 			ConfigValue: "1900",
 			Days:        []string{"mondays", "tuesday"},
 			Status:      "osn",

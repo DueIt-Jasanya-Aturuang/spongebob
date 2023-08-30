@@ -5,19 +5,18 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
 	"testing"
 	"time"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/mocks"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/dtoconv"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/usecase"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateProfileCfgUSECASE(t *testing.T) {
-	uow := &mocks.FakeUnitOfWork{}
 	profileRepoMock := &mocks.FakeProfileRepo{}
 	profileCfgRepoMock := &mocks.FakeProfileCfgRepo{}
 	timeOutCtx := 3 * time.Second
@@ -52,55 +51,61 @@ func TestCreateProfileCfgUSECASE(t *testing.T) {
 	}
 
 	t.Run("SUCCESS_CreateProfileCfg", func(t *testing.T) {
+		profileRepoMock.OpenConn(ctx)
+		profileRepoMock.OpenConnReturns(nil)
+
+		profileRepoMock.StartTx(ctx, &sql.TxOptions{
+			Isolation: sql.LevelReadCommitted,
+			ReadOnly:  false,
+		})
+		profileRepoMock.StartTxReturns(nil)
+
 		profileRepoMock.GetProfileByID(ctx, request.ProfileID)
-		profileRepoMock.GetProfileByIDReturns(&profile, nil)
+		profileRepoMock.GetProfileByIDReturns(profile, nil)
 
-		uow.StartTx(ctx, &sql.TxOptions{})
-		uow.StartTxReturns(nil)
-
-		profileCfgRepoMock.UoW()
-		profileCfgRepoMock.UoWReturns(uow)
-
-		profileCfgConv := dtoconv.CreateProfileCfgToModel(request, []byte("asd"))
+		profileCfgConv := helpers.CreateProfileCfgToModel(request, []byte("asd"))
 		profileCfgRepoMock.StoreProfileCfg(ctx, profileCfgConv)
 		profileCfgRepoMock.StoreProfileCfgReturns(nil)
 
-		uow.EndTx(nil)
-		uow.EndTxReturns(nil)
-
 		profileCfg, err := profileCfgUsecase.CreateProfileCfg(ctx, request)
+		profileRepoMock.EndTx(err)
+		profileRepoMock.EndTxReturns(nil)
+
+		profileRepoMock.CloseConn()
 
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfg)
 	})
 
 	t.Run("ERROR_CreateProfileCfg_DATANIL", func(t *testing.T) {
+		profileRepoMock.OpenConn(ctx)
+		profileRepoMock.OpenConnReturns(nil)
+
+		profileRepoMock.StartTx(ctx, &sql.TxOptions{
+			Isolation: sql.LevelReadCommitted,
+			ReadOnly:  false,
+		})
+		profileRepoMock.StartTxReturns(nil)
+
 		profileRepoMock.GetProfileByID(ctx, request.ProfileID)
-		profileRepoMock.GetProfileByIDReturns(nil, sql.ErrNoRows)
+		profileRepoMock.GetProfileByIDReturns(model.Profile{}, sql.ErrNoRows)
 
-		uow.StartTx(ctx, &sql.TxOptions{})
-		uow.StartTxReturns(nil)
-
-		profileCfgRepoMock.UoW()
-		profileCfgRepoMock.UoWReturns(uow)
-
-		profileCfgConv := dtoconv.CreateProfileCfgToModel(request, []byte("asd"))
+		profileCfgConv := helpers.CreateProfileCfgToModel(request, []byte("asd"))
 		profileCfgRepoMock.StoreProfileCfg(ctx, profileCfgConv)
 		profileCfgRepoMock.StoreProfileCfgReturns(nil)
 
-		uow.EndTx(nil)
-		uow.EndTxReturns(nil)
-
 		profileCfg, err := profileCfgUsecase.CreateProfileCfg(ctx, request)
+		profileRepoMock.EndTx(err)
+		profileRepoMock.EndTxReturns(nil)
 
+		profileRepoMock.CloseConn()
 		assert.Error(t, err)
 		assert.Equal(t, sql.ErrNoRows, err)
-		assert.Nil(t, profileCfg)
+		assert.Equal(t, "", profileCfg.ProfileID)
 	})
 }
 
 func TestGetProfileCfgByNameAndIDUSECASE(t *testing.T) {
-	uow := &mocks.FakeUnitOfWork{}
 	profileRepoMock := &mocks.FakeProfileRepo{}
 	profileCfgRepoMock := &mocks.FakeProfileCfgRepo{}
 	timeOutCtx := 3 * time.Second
@@ -129,7 +134,7 @@ func TestGetProfileCfgByNameAndIDUSECASE(t *testing.T) {
 		DeletedBy:   sql.NullString{},
 	}
 
-	profile := &model.Profile{
+	profile := model.Profile{
 		ProfileID: "profileid_1",
 		UserID:    "userId1",
 		Quote:     sql.NullString{String: "Semangat"},
@@ -148,16 +153,17 @@ func TestGetProfileCfgByNameAndIDUSECASE(t *testing.T) {
 			ProfileID:  "profileid_1",
 		}
 
+		profileRepoMock.OpenConn(ctx)
+		profileRepoMock.OpenConnReturns(nil)
+
 		profileRepoMock.GetProfileByID(ctx, req.ProfileID)
 		profileRepoMock.GetProfileByIDReturns(profile, nil)
 
 		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, req.ProfileID, req.ConfigName)
-		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(&profileCfg, nil)
-
-		profileCfgRepoMock.UoW()
-		profileCfgRepoMock.UoWReturns(uow)
+		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(profileCfg, nil)
 
 		profileCfgResp, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, req)
+		profileRepoMock.CloseConn()
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfgResp)
 	})
@@ -169,21 +175,21 @@ func TestGetProfileCfgByNameAndIDUSECASE(t *testing.T) {
 			ProfileID:  "nil",
 		}
 
-		profileRepoMock.GetProfileByID(ctx, req.ProfileID)
-		profileRepoMock.GetProfileByIDReturns(nil, sql.ErrNoRows)
+		profileRepoMock.OpenConn(ctx)
+		profileRepoMock.OpenConnReturns(nil)
 
-		profileCfgRepoMock.UoW()
-		profileCfgRepoMock.UoWReturns(uow)
+		profileRepoMock.GetProfileByID(ctx, req.ProfileID)
+		profileRepoMock.GetProfileByIDReturns(model.Profile{}, sql.ErrNoRows)
 
 		profileCfgResp, err := profileCfgUsecase.GetProfileCfgByNameAndID(ctx, req)
+		profileRepoMock.CloseConn()
 		assert.Error(t, err)
-		assert.Nil(t, profileCfgResp)
+		assert.Equal(t, "", profileCfgResp.ProfileID)
 		assert.Equal(t, sql.ErrNoRows, err)
 	})
 }
 
 func TestUpdateProfileCfgUSECASE(t *testing.T) {
-	uow := &mocks.FakeUnitOfWork{}
 	profileRepoMock := &mocks.FakeProfileRepo{}
 	profileCfgRepoMock := &mocks.FakeProfileCfgRepo{}
 	timeOutCtx := 3 * time.Second
@@ -212,7 +218,7 @@ func TestUpdateProfileCfgUSECASE(t *testing.T) {
 		"config_timezone_notify": "UTC",
 		"days":                   []string{"monday"},
 	})
-	profileCfg := &model.ProfileCfg{
+	profileCfg := model.ProfileCfg{
 		ID:          "cfgid_1",
 		ProfileID:   "profileid_1",
 		ConfigName:  "DAILY_NOTIF",
@@ -238,54 +244,57 @@ func TestUpdateProfileCfgUSECASE(t *testing.T) {
 		DeletedBy: sql.NullString{},
 	}
 	t.Run("SUCCESS_UpdateProfileCfg", func(t *testing.T) {
+		profileRepoMock.OpenConn(ctx)
+		profileRepoMock.OpenConnReturns(nil)
+
+		profileRepoMock.StartTx(ctx, &sql.TxOptions{
+			Isolation: sql.LevelReadCommitted,
+			ReadOnly:  false,
+		})
+		profileRepoMock.StartTxReturns(nil)
+
 		profileRepoMock.GetProfileByID(ctx, "profileid_1")
-		profileRepoMock.GetProfileByIDReturns(&profile, nil)
+		profileRepoMock.GetProfileByIDReturns(profile, nil)
 
 		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, "nil", "nil")
 		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(profileCfg, nil)
 		assert.Equal(t, 1, profileCfgRepoMock.GetProfileCfgByNameAndIDCallCount())
 
-		uow.StartTx(ctx, &sql.TxOptions{})
-		uow.StartTxReturns(nil)
-
-		profileCfgRepoMock.UoW()
-		profileCfgRepoMock.UoWReturns(uow)
-
-		profileCfgConv := dtoconv.UpdateProfileCfgToModel(request, []byte("asd"), "DAILY_NOTIF", "cfgid_1")
+		profileCfgConv := helpers.UpdateProfileCfgToModel(request, []byte("asd"), "DAILY_NOTIF", "cfgid_1")
 		profileCfgRepoMock.UpdateProfileCfg(ctx, profileCfgConv)
 		profileCfgRepoMock.UpdateProfileCfgReturns(nil)
 		assert.Equal(t, 1, profileCfgRepoMock.UpdateProfileCfgCallCount())
 
-		uow.EndTx(nil)
-		uow.EndTxReturns(nil)
-		assert.Equal(t, 1, uow.EndTxCallCount())
-
 		profileCfg, err := profileCfgUsecase.UpdateProfileCfg(ctx, request)
-
+		profileRepoMock.EndTx(err)
+		profileRepoMock.EndTxReturns(nil)
+		profileRepoMock.CloseConn()
 		assert.NoError(t, err)
 		assert.NotNil(t, profileCfg)
 	})
 
 	t.Run("ERROR_UpdateProfileCfg_DATANIL", func(t *testing.T) {
+		profileRepoMock.OpenConn(ctx)
+		profileRepoMock.OpenConnReturns(nil)
+
+		profileRepoMock.StartTx(ctx, &sql.TxOptions{
+			Isolation: sql.LevelReadCommitted,
+			ReadOnly:  false,
+		})
+		profileRepoMock.StartTxReturns(nil)
 		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, "nil", "nil")
-		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(nil, sql.ErrNoRows)
+		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(model.ProfileCfg{}, sql.ErrNoRows)
 
-		uow.StartTx(ctx, &sql.TxOptions{})
-		uow.StartTxReturns(nil)
-
-		profileCfgRepoMock.UoW()
-		profileCfgRepoMock.UoWReturns(uow)
-
-		profileCfgConv := dtoconv.UpdateProfileCfgToModel(request, []byte("asd"), "DAILY_NOTIF", "cfgid_1")
+		profileCfgConv := helpers.UpdateProfileCfgToModel(request, []byte("asd"), "DAILY_NOTIF", "cfgid_1")
 		profileCfgRepoMock.UpdateProfileCfg(ctx, profileCfgConv)
 		profileCfgRepoMock.UpdateProfileCfgReturns(nil)
 
-		uow.EndTx(nil)
-		uow.EndTxReturns(nil)
-
 		profileCfg, err := profileCfgUsecase.UpdateProfileCfg(ctx, request)
+		profileRepoMock.EndTx(err)
+		profileRepoMock.EndTxReturns(nil)
+		profileRepoMock.CloseConn()
 		assert.Error(t, err)
 		assert.Equal(t, sql.ErrNoRows, err)
-		assert.Nil(t, profileCfg)
+		assert.Equal(t, "", profileCfg.ProfileID)
 	})
 }

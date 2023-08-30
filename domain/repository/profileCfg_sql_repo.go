@@ -11,7 +11,7 @@ import (
 type ProfileCfgRepo interface {
 	StoreProfileCfg(c context.Context, profileCfg model.ProfileCfg) error
 	UpdateProfileCfg(c context.Context, profileCfg model.ProfileCfg) error
-	GetProfileCfgByNameAndID(c context.Context, profileID, configName string) (*model.ProfileCfg, error)
-	GetProfileCfgByScheduler(c context.Context, profileCfgScheduler dto.ProfileCfgScheduler) (*[]model.ProfileCfg, error)
-	UoW() UnitOfWork
+	GetProfileCfgByNameAndID(c context.Context, profileID string, configName string) (model.ProfileCfg, error)
+	GetProfileCfgByScheduler(c context.Context, profileCfgSche dto.ProfileCfgSche) ([]model.ProfileCfg, error)
+	UnitOfWork
 }

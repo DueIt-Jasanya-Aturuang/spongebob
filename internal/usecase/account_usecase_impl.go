@@ -3,8 +3,12 @@ package usecase
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exception"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/response"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/utils/message"
 	"strings"
 	"time"
 
@@ -12,8 +16,6 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/config"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/dtoconv"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/format"
 )
 
 type AccountUsecaseImpl struct {
@@ -37,9 +39,17 @@ func NewAccountUsecaseImpl(
 	}
 }
 
-func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAccountReq) (userResp *dto.UserResp, profileResp *dto.ProfileResp, err error) {
+func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req *dto.UpdateAccountReq) (userResp *dto.UserResp, profileResp *dto.ProfileResp, err error) {
 	ctx, cancel := context.WithTimeout(c, u.ctxTimeout)
 	defer cancel()
+
+	err = u.profileRepo.OpenConn(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer func() {
+		u.profileRepo.CloseConn()
+	}()
 
 	profile, err := u.profileRepo.GetProfileByID(ctx, req.ProfileID)
 	if err != nil {
@@ -48,11 +58,14 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAcco
 
 	user, err := u.userRepo.GetUserByID(ctx, req.UserID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil, model.ErrUnauthorization
+		}
 		return nil, nil, err
 	}
 
 	if profile.UserID != user.ID {
-		return nil, nil, exception.Err401Msg
+		return nil, nil, model.ErrUnauthorization
 	}
 
 	oldImage := user.Image
@@ -66,18 +79,29 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAcco
 		user.Image = fmt.Sprintf("/%s/%s", config.MinIoBucket, newImageName)
 	}
 
-	profileConv, userConv := dtoconv.UpdateAccountToModel(req, user.Image)
+	phoneNumberExists, err := u.userRepo.CheckPhoneNumberExists(ctx, user.ID, req.PhoneNumber)
+	if err != nil {
+		return nil, nil, err
+	}
+	if phoneNumberExists {
+		return nil, nil, response.Err409(map[string][]string{
+			"phone_numer": {
+				message.PhoneNumberIsAlavilable,
+			},
+		}, err)
+	}
 
-	profileRepoUOW := u.profileRepo.UoW()
-	err = profileRepoUOW.StartTx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelSerializable,
+	profileConv, userConv := helpers.UpdateAccountToModel(req, user.Image)
+
+	err = u.profileRepo.StartTx(ctx, &sql.TxOptions{
+		Isolation: sql.LevelReadCommitted,
 		ReadOnly:  false,
 	})
 	if err != nil {
 		return nil, nil, err
 	}
 	defer func() {
-		if errEndTx := profileRepoUOW.EndTx(err); errEndTx != nil {
+		if errEndTx := u.profileRepo.EndTx(err); errEndTx != nil {
 			err = errEndTx
 			profileResp = nil
 			userResp = nil
@@ -85,17 +109,6 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAcco
 	}()
 
 	profile, err = u.profileRepo.UpdateProfile(ctx, profileConv)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	userRepoUOW := u.userRepo.UoW()
-	txProfileRepoUOW, err := profileRepoUOW.GetTx()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	err = userRepoUOW.CallTx(txProfileRepoUOW)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -121,12 +134,10 @@ func (u *AccountUsecaseImpl) UpdateAccount(c context.Context, req dto.UpdateAcco
 		}
 	}
 
-	emailFormat, err := format.EmailFormat(email)
-	if err != nil {
-		return nil, nil, err
-	}
+	emailFormat := helpers.EmailFormat(email)
 
 	userResp = user.ToResp(emailFormat)
 	profileResp = profile.ToResp()
+
 	return userResp, profileResp, nil
 }

@@ -10,5 +10,5 @@ import (
 
 //counterfeiter:generate -o ./../mocks . AccountUsecase
 type AccountUsecase interface {
-	UpdateAccount(context.Context, dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error)
+	UpdateAccount(context.Context, *dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error)
 }

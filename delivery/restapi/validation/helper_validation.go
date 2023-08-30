@@ -49,3 +49,17 @@ func checkContentType(headerContentType string, typeContent string) bool {
 	}
 	return status
 }
+
+var (
+	Required     = "%s is required"
+	MaxString    = "maximum %s character must be %d"
+	MinString    = "minimum %s character must be %d"
+	Gender       = "%s gender must be male, female, or undefinied"
+	FileSize     = "max %s size should be %d kb or %d mb"
+	FileContent  = "%s must be %s"
+	InvalidField = "%s invalid %s, example %s"
+	Integer      = "%s must be number"
+	Enum         = "%s must be %s"
+	MinInteger   = "minimum %s number must be %d"
+	MaxInteger   = "maximum %s number must be %d"
+)

@@ -43,8 +43,8 @@ func TestAccountDTO(t *testing.T) {
 
 	t.Run("SUCCESS_AccountDTO", func(t *testing.T) {
 		reqSuccess := dto.UpdateAccountReq{
-			ProfileID:   "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
-			UserID:      "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
+			ProfileID:   "699137ef-1f24-46d7-82bf-862fde7b36d8",
+			UserID:      "699137ef-1f24-46d7-82bf-862fde7b36d8",
 			FullName:    "rama",
 			Gender:      "male",
 			Image:       fileHeader,
@@ -59,7 +59,7 @@ func TestAccountDTO(t *testing.T) {
 	t.Run("ERROR_AccountDTO", func(t *testing.T) {
 		fileHeader.Header.Set("Content-Type", "image/asd")
 		reqSuccess := dto.UpdateAccountReq{
-			UserID:      "6AVIT2RNnoYUersvhF9I6QDY8zC5wK2jYcMJKjRM",
+			UserID:      "699137ef-1f24-46d7-82bf-862fde7b36d8",
 			FullName:    "",
 			Gender:      "maleasdasd",
 			Image:       fileHeader,

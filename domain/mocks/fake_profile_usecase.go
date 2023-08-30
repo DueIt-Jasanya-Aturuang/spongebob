@@ -6,16 +6,15 @@ import (
 	"sync"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
 )
 
 type FakeProfileUsecase struct {
-	GetProfileByIDStub        func(context.Context, dto.GetProfileReq) (*dto.ProfileResp, error)
+	GetProfileByIDStub        func(context.Context, *dto.GetProfileReq) (*dto.ProfileResp, error)
 	getProfileByIDMutex       sync.RWMutex
 	getProfileByIDArgsForCall []struct {
 		arg1 context.Context
-		arg2 dto.GetProfileReq
+		arg2 *dto.GetProfileReq
 	}
 	getProfileByIDReturns struct {
 		result1 *dto.ProfileResp
@@ -25,30 +24,30 @@ type FakeProfileUsecase struct {
 		result1 *dto.ProfileResp
 		result2 error
 	}
-	StoreProfileStub        func(context.Context, dto.StoreProfileReq) (*model.Profile, error)
+	StoreProfileStub        func(context.Context, *dto.StoreProfileReq) (*dto.ProfileResp, error)
 	storeProfileMutex       sync.RWMutex
 	storeProfileArgsForCall []struct {
 		arg1 context.Context
-		arg2 dto.StoreProfileReq
+		arg2 *dto.StoreProfileReq
 	}
 	storeProfileReturns struct {
-		result1 *model.Profile
+		result1 *dto.ProfileResp
 		result2 error
 	}
 	storeProfileReturnsOnCall map[int]struct {
-		result1 *model.Profile
+		result1 *dto.ProfileResp
 		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeProfileUsecase) GetProfileByID(arg1 context.Context, arg2 dto.GetProfileReq) (*dto.ProfileResp, error) {
+func (fake *FakeProfileUsecase) GetProfileByID(arg1 context.Context, arg2 *dto.GetProfileReq) (*dto.ProfileResp, error) {
 	fake.getProfileByIDMutex.Lock()
 	ret, specificReturn := fake.getProfileByIDReturnsOnCall[len(fake.getProfileByIDArgsForCall)]
 	fake.getProfileByIDArgsForCall = append(fake.getProfileByIDArgsForCall, struct {
 		arg1 context.Context
-		arg2 dto.GetProfileReq
+		arg2 *dto.GetProfileReq
 	}{arg1, arg2})
 	stub := fake.GetProfileByIDStub
 	fakeReturns := fake.getProfileByIDReturns
@@ -69,13 +68,13 @@ func (fake *FakeProfileUsecase) GetProfileByIDCallCount() int {
 	return len(fake.getProfileByIDArgsForCall)
 }
 
-func (fake *FakeProfileUsecase) GetProfileByIDCalls(stub func(context.Context, dto.GetProfileReq) (*dto.ProfileResp, error)) {
+func (fake *FakeProfileUsecase) GetProfileByIDCalls(stub func(context.Context, *dto.GetProfileReq) (*dto.ProfileResp, error)) {
 	fake.getProfileByIDMutex.Lock()
 	defer fake.getProfileByIDMutex.Unlock()
 	fake.GetProfileByIDStub = stub
 }
 
-func (fake *FakeProfileUsecase) GetProfileByIDArgsForCall(i int) (context.Context, dto.GetProfileReq) {
+func (fake *FakeProfileUsecase) GetProfileByIDArgsForCall(i int) (context.Context, *dto.GetProfileReq) {
 	fake.getProfileByIDMutex.RLock()
 	defer fake.getProfileByIDMutex.RUnlock()
 	argsForCall := fake.getProfileByIDArgsForCall[i]
@@ -108,12 +107,12 @@ func (fake *FakeProfileUsecase) GetProfileByIDReturnsOnCall(i int, result1 *dto.
 	}{result1, result2}
 }
 
-func (fake *FakeProfileUsecase) StoreProfile(arg1 context.Context, arg2 dto.StoreProfileReq) (*model.Profile, error) {
+func (fake *FakeProfileUsecase) StoreProfile(arg1 context.Context, arg2 *dto.StoreProfileReq) (*dto.ProfileResp, error) {
 	fake.storeProfileMutex.Lock()
 	ret, specificReturn := fake.storeProfileReturnsOnCall[len(fake.storeProfileArgsForCall)]
 	fake.storeProfileArgsForCall = append(fake.storeProfileArgsForCall, struct {
 		arg1 context.Context
-		arg2 dto.StoreProfileReq
+		arg2 *dto.StoreProfileReq
 	}{arg1, arg2})
 	stub := fake.StoreProfileStub
 	fakeReturns := fake.storeProfileReturns
@@ -134,41 +133,41 @@ func (fake *FakeProfileUsecase) StoreProfileCallCount() int {
 	return len(fake.storeProfileArgsForCall)
 }
 
-func (fake *FakeProfileUsecase) StoreProfileCalls(stub func(context.Context, dto.StoreProfileReq) (*model.Profile, error)) {
+func (fake *FakeProfileUsecase) StoreProfileCalls(stub func(context.Context, *dto.StoreProfileReq) (*dto.ProfileResp, error)) {
 	fake.storeProfileMutex.Lock()
 	defer fake.storeProfileMutex.Unlock()
 	fake.StoreProfileStub = stub
 }
 
-func (fake *FakeProfileUsecase) StoreProfileArgsForCall(i int) (context.Context, dto.StoreProfileReq) {
+func (fake *FakeProfileUsecase) StoreProfileArgsForCall(i int) (context.Context, *dto.StoreProfileReq) {
 	fake.storeProfileMutex.RLock()
 	defer fake.storeProfileMutex.RUnlock()
 	argsForCall := fake.storeProfileArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeProfileUsecase) StoreProfileReturns(result1 *model.Profile, result2 error) {
+func (fake *FakeProfileUsecase) StoreProfileReturns(result1 *dto.ProfileResp, result2 error) {
 	fake.storeProfileMutex.Lock()
 	defer fake.storeProfileMutex.Unlock()
 	fake.StoreProfileStub = nil
 	fake.storeProfileReturns = struct {
-		result1 *model.Profile
+		result1 *dto.ProfileResp
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeProfileUsecase) StoreProfileReturnsOnCall(i int, result1 *model.Profile, result2 error) {
+func (fake *FakeProfileUsecase) StoreProfileReturnsOnCall(i int, result1 *dto.ProfileResp, result2 error) {
 	fake.storeProfileMutex.Lock()
 	defer fake.storeProfileMutex.Unlock()
 	fake.StoreProfileStub = nil
 	if fake.storeProfileReturnsOnCall == nil {
 		fake.storeProfileReturnsOnCall = make(map[int]struct {
-			result1 *model.Profile
+			result1 *dto.ProfileResp
 			result2 error
 		})
 	}
 	fake.storeProfileReturnsOnCall[i] = struct {
-		result1 *model.Profile
+		result1 *dto.ProfileResp
 		result2 error
 	}{result1, result2}
 }

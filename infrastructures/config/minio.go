@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exception"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/utils/message"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/zerolog/log"
@@ -13,7 +13,7 @@ func NewMinioConn(endPoint, id, secretKey string, ssl bool) (*minio.Client, erro
 		Secure: ssl,
 	})
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrMinioConn)
+		log.Err(err).Msg(message.ErrOpenConnMinio)
 	}
 
 	return minioConn, err

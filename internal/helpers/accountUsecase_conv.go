@@ -1,4 +1,4 @@
-package dtoconv
+package helpers
 
 import (
 	"database/sql"
@@ -9,7 +9,7 @@ import (
 )
 
 func UpdateAccountToModel(
-	req dto.UpdateAccountReq,
+	req *dto.UpdateAccountReq,
 	image string,
 ) (model.Profile, model.User) {
 	timeUnix := time.Now().Unix()

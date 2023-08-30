@@ -3,6 +3,7 @@ package mocks
 
 import (
 	"context"
+	"database/sql"
 	"sync"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
@@ -10,63 +11,393 @@ import (
 )
 
 type FakeUserRepo struct {
-	GetUserByIDStub        func(context.Context, string) (*model.User, error)
+	CheckPhoneNumberExistsStub        func(context.Context, string, string) (bool, error)
+	checkPhoneNumberExistsMutex       sync.RWMutex
+	checkPhoneNumberExistsArgsForCall []struct {
+		arg1 context.Context
+		arg2 string
+		arg3 string
+	}
+	checkPhoneNumberExistsReturns struct {
+		result1 bool
+		result2 error
+	}
+	checkPhoneNumberExistsReturnsOnCall map[int]struct {
+		result1 bool
+		result2 error
+	}
+	CloseConnStub        func()
+	closeConnMutex       sync.RWMutex
+	closeConnArgsForCall []struct {
+	}
+	EndTxStub        func(error) error
+	endTxMutex       sync.RWMutex
+	endTxArgsForCall []struct {
+		arg1 error
+	}
+	endTxReturns struct {
+		result1 error
+	}
+	endTxReturnsOnCall map[int]struct {
+		result1 error
+	}
+	GetConnStub        func() (*sql.Conn, error)
+	getConnMutex       sync.RWMutex
+	getConnArgsForCall []struct {
+	}
+	getConnReturns struct {
+		result1 *sql.Conn
+		result2 error
+	}
+	getConnReturnsOnCall map[int]struct {
+		result1 *sql.Conn
+		result2 error
+	}
+	GetTxStub        func() (*sql.Tx, error)
+	getTxMutex       sync.RWMutex
+	getTxArgsForCall []struct {
+	}
+	getTxReturns struct {
+		result1 *sql.Tx
+		result2 error
+	}
+	getTxReturnsOnCall map[int]struct {
+		result1 *sql.Tx
+		result2 error
+	}
+	GetUserByIDStub        func(context.Context, string) (model.User, error)
 	getUserByIDMutex       sync.RWMutex
 	getUserByIDArgsForCall []struct {
 		arg1 context.Context
 		arg2 string
 	}
 	getUserByIDReturns struct {
-		result1 *model.User
+		result1 model.User
 		result2 error
 	}
 	getUserByIDReturnsOnCall map[int]struct {
-		result1 *model.User
+		result1 model.User
 		result2 error
 	}
-	UoWStub        func() repository.UnitOfWork
-	uoWMutex       sync.RWMutex
-	uoWArgsForCall []struct {
+	OpenConnStub        func(context.Context) error
+	openConnMutex       sync.RWMutex
+	openConnArgsForCall []struct {
+		arg1 context.Context
 	}
-	uoWReturns struct {
-		result1 repository.UnitOfWork
+	openConnReturns struct {
+		result1 error
 	}
-	uoWReturnsOnCall map[int]struct {
-		result1 repository.UnitOfWork
+	openConnReturnsOnCall map[int]struct {
+		result1 error
 	}
-	UpdateUserStub        func(context.Context, model.User) (*model.User, error)
+	StartTxStub        func(context.Context, *sql.TxOptions) error
+	startTxMutex       sync.RWMutex
+	startTxArgsForCall []struct {
+		arg1 context.Context
+		arg2 *sql.TxOptions
+	}
+	startTxReturns struct {
+		result1 error
+	}
+	startTxReturnsOnCall map[int]struct {
+		result1 error
+	}
+	UpdateUserStub        func(context.Context, model.User) (model.User, error)
 	updateUserMutex       sync.RWMutex
 	updateUserArgsForCall []struct {
 		arg1 context.Context
 		arg2 model.User
 	}
 	updateUserReturns struct {
-		result1 *model.User
+		result1 model.User
 		result2 error
 	}
 	updateUserReturnsOnCall map[int]struct {
-		result1 *model.User
+		result1 model.User
 		result2 error
 	}
-	UpdateUsernameStub        func(context.Context, model.User) (*model.User, error)
+	UpdateUsernameStub        func(context.Context, model.User) (model.User, error)
 	updateUsernameMutex       sync.RWMutex
 	updateUsernameArgsForCall []struct {
 		arg1 context.Context
 		arg2 model.User
 	}
 	updateUsernameReturns struct {
-		result1 *model.User
+		result1 model.User
 		result2 error
 	}
 	updateUsernameReturnsOnCall map[int]struct {
-		result1 *model.User
+		result1 model.User
 		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUserRepo) GetUserByID(arg1 context.Context, arg2 string) (*model.User, error) {
+func (fake *FakeUserRepo) CheckPhoneNumberExists(arg1 context.Context, arg2 string, arg3 string) (bool, error) {
+	fake.checkPhoneNumberExistsMutex.Lock()
+	ret, specificReturn := fake.checkPhoneNumberExistsReturnsOnCall[len(fake.checkPhoneNumberExistsArgsForCall)]
+	fake.checkPhoneNumberExistsArgsForCall = append(fake.checkPhoneNumberExistsArgsForCall, struct {
+		arg1 context.Context
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	stub := fake.CheckPhoneNumberExistsStub
+	fakeReturns := fake.checkPhoneNumberExistsReturns
+	fake.recordInvocation("CheckPhoneNumberExists", []interface{}{arg1, arg2, arg3})
+	fake.checkPhoneNumberExistsMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeUserRepo) CheckPhoneNumberExistsCallCount() int {
+	fake.checkPhoneNumberExistsMutex.RLock()
+	defer fake.checkPhoneNumberExistsMutex.RUnlock()
+	return len(fake.checkPhoneNumberExistsArgsForCall)
+}
+
+func (fake *FakeUserRepo) CheckPhoneNumberExistsCalls(stub func(context.Context, string, string) (bool, error)) {
+	fake.checkPhoneNumberExistsMutex.Lock()
+	defer fake.checkPhoneNumberExistsMutex.Unlock()
+	fake.CheckPhoneNumberExistsStub = stub
+}
+
+func (fake *FakeUserRepo) CheckPhoneNumberExistsArgsForCall(i int) (context.Context, string, string) {
+	fake.checkPhoneNumberExistsMutex.RLock()
+	defer fake.checkPhoneNumberExistsMutex.RUnlock()
+	argsForCall := fake.checkPhoneNumberExistsArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeUserRepo) CheckPhoneNumberExistsReturns(result1 bool, result2 error) {
+	fake.checkPhoneNumberExistsMutex.Lock()
+	defer fake.checkPhoneNumberExistsMutex.Unlock()
+	fake.CheckPhoneNumberExistsStub = nil
+	fake.checkPhoneNumberExistsReturns = struct {
+		result1 bool
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUserRepo) CheckPhoneNumberExistsReturnsOnCall(i int, result1 bool, result2 error) {
+	fake.checkPhoneNumberExistsMutex.Lock()
+	defer fake.checkPhoneNumberExistsMutex.Unlock()
+	fake.CheckPhoneNumberExistsStub = nil
+	if fake.checkPhoneNumberExistsReturnsOnCall == nil {
+		fake.checkPhoneNumberExistsReturnsOnCall = make(map[int]struct {
+			result1 bool
+			result2 error
+		})
+	}
+	fake.checkPhoneNumberExistsReturnsOnCall[i] = struct {
+		result1 bool
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUserRepo) CloseConn() {
+	fake.closeConnMutex.Lock()
+	fake.closeConnArgsForCall = append(fake.closeConnArgsForCall, struct {
+	}{})
+	stub := fake.CloseConnStub
+	fake.recordInvocation("CloseConn", []interface{}{})
+	fake.closeConnMutex.Unlock()
+	if stub != nil {
+		fake.CloseConnStub()
+	}
+}
+
+func (fake *FakeUserRepo) CloseConnCallCount() int {
+	fake.closeConnMutex.RLock()
+	defer fake.closeConnMutex.RUnlock()
+	return len(fake.closeConnArgsForCall)
+}
+
+func (fake *FakeUserRepo) CloseConnCalls(stub func()) {
+	fake.closeConnMutex.Lock()
+	defer fake.closeConnMutex.Unlock()
+	fake.CloseConnStub = stub
+}
+
+func (fake *FakeUserRepo) EndTx(arg1 error) error {
+	fake.endTxMutex.Lock()
+	ret, specificReturn := fake.endTxReturnsOnCall[len(fake.endTxArgsForCall)]
+	fake.endTxArgsForCall = append(fake.endTxArgsForCall, struct {
+		arg1 error
+	}{arg1})
+	stub := fake.EndTxStub
+	fakeReturns := fake.endTxReturns
+	fake.recordInvocation("EndTx", []interface{}{arg1})
+	fake.endTxMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeUserRepo) EndTxCallCount() int {
+	fake.endTxMutex.RLock()
+	defer fake.endTxMutex.RUnlock()
+	return len(fake.endTxArgsForCall)
+}
+
+func (fake *FakeUserRepo) EndTxCalls(stub func(error) error) {
+	fake.endTxMutex.Lock()
+	defer fake.endTxMutex.Unlock()
+	fake.EndTxStub = stub
+}
+
+func (fake *FakeUserRepo) EndTxArgsForCall(i int) error {
+	fake.endTxMutex.RLock()
+	defer fake.endTxMutex.RUnlock()
+	argsForCall := fake.endTxArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeUserRepo) EndTxReturns(result1 error) {
+	fake.endTxMutex.Lock()
+	defer fake.endTxMutex.Unlock()
+	fake.EndTxStub = nil
+	fake.endTxReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeUserRepo) EndTxReturnsOnCall(i int, result1 error) {
+	fake.endTxMutex.Lock()
+	defer fake.endTxMutex.Unlock()
+	fake.EndTxStub = nil
+	if fake.endTxReturnsOnCall == nil {
+		fake.endTxReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.endTxReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeUserRepo) GetConn() (*sql.Conn, error) {
+	fake.getConnMutex.Lock()
+	ret, specificReturn := fake.getConnReturnsOnCall[len(fake.getConnArgsForCall)]
+	fake.getConnArgsForCall = append(fake.getConnArgsForCall, struct {
+	}{})
+	stub := fake.GetConnStub
+	fakeReturns := fake.getConnReturns
+	fake.recordInvocation("GetConn", []interface{}{})
+	fake.getConnMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeUserRepo) GetConnCallCount() int {
+	fake.getConnMutex.RLock()
+	defer fake.getConnMutex.RUnlock()
+	return len(fake.getConnArgsForCall)
+}
+
+func (fake *FakeUserRepo) GetConnCalls(stub func() (*sql.Conn, error)) {
+	fake.getConnMutex.Lock()
+	defer fake.getConnMutex.Unlock()
+	fake.GetConnStub = stub
+}
+
+func (fake *FakeUserRepo) GetConnReturns(result1 *sql.Conn, result2 error) {
+	fake.getConnMutex.Lock()
+	defer fake.getConnMutex.Unlock()
+	fake.GetConnStub = nil
+	fake.getConnReturns = struct {
+		result1 *sql.Conn
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUserRepo) GetConnReturnsOnCall(i int, result1 *sql.Conn, result2 error) {
+	fake.getConnMutex.Lock()
+	defer fake.getConnMutex.Unlock()
+	fake.GetConnStub = nil
+	if fake.getConnReturnsOnCall == nil {
+		fake.getConnReturnsOnCall = make(map[int]struct {
+			result1 *sql.Conn
+			result2 error
+		})
+	}
+	fake.getConnReturnsOnCall[i] = struct {
+		result1 *sql.Conn
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUserRepo) GetTx() (*sql.Tx, error) {
+	fake.getTxMutex.Lock()
+	ret, specificReturn := fake.getTxReturnsOnCall[len(fake.getTxArgsForCall)]
+	fake.getTxArgsForCall = append(fake.getTxArgsForCall, struct {
+	}{})
+	stub := fake.GetTxStub
+	fakeReturns := fake.getTxReturns
+	fake.recordInvocation("GetTx", []interface{}{})
+	fake.getTxMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeUserRepo) GetTxCallCount() int {
+	fake.getTxMutex.RLock()
+	defer fake.getTxMutex.RUnlock()
+	return len(fake.getTxArgsForCall)
+}
+
+func (fake *FakeUserRepo) GetTxCalls(stub func() (*sql.Tx, error)) {
+	fake.getTxMutex.Lock()
+	defer fake.getTxMutex.Unlock()
+	fake.GetTxStub = stub
+}
+
+func (fake *FakeUserRepo) GetTxReturns(result1 *sql.Tx, result2 error) {
+	fake.getTxMutex.Lock()
+	defer fake.getTxMutex.Unlock()
+	fake.GetTxStub = nil
+	fake.getTxReturns = struct {
+		result1 *sql.Tx
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUserRepo) GetTxReturnsOnCall(i int, result1 *sql.Tx, result2 error) {
+	fake.getTxMutex.Lock()
+	defer fake.getTxMutex.Unlock()
+	fake.GetTxStub = nil
+	if fake.getTxReturnsOnCall == nil {
+		fake.getTxReturnsOnCall = make(map[int]struct {
+			result1 *sql.Tx
+			result2 error
+		})
+	}
+	fake.getTxReturnsOnCall[i] = struct {
+		result1 *sql.Tx
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUserRepo) GetUserByID(arg1 context.Context, arg2 string) (model.User, error) {
 	fake.getUserByIDMutex.Lock()
 	ret, specificReturn := fake.getUserByIDReturnsOnCall[len(fake.getUserByIDArgsForCall)]
 	fake.getUserByIDArgsForCall = append(fake.getUserByIDArgsForCall, struct {
@@ -92,7 +423,7 @@ func (fake *FakeUserRepo) GetUserByIDCallCount() int {
 	return len(fake.getUserByIDArgsForCall)
 }
 
-func (fake *FakeUserRepo) GetUserByIDCalls(stub func(context.Context, string) (*model.User, error)) {
+func (fake *FakeUserRepo) GetUserByIDCalls(stub func(context.Context, string) (model.User, error)) {
 	fake.getUserByIDMutex.Lock()
 	defer fake.getUserByIDMutex.Unlock()
 	fake.GetUserByIDStub = stub
@@ -105,43 +436,44 @@ func (fake *FakeUserRepo) GetUserByIDArgsForCall(i int) (context.Context, string
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeUserRepo) GetUserByIDReturns(result1 *model.User, result2 error) {
+func (fake *FakeUserRepo) GetUserByIDReturns(result1 model.User, result2 error) {
 	fake.getUserByIDMutex.Lock()
 	defer fake.getUserByIDMutex.Unlock()
 	fake.GetUserByIDStub = nil
 	fake.getUserByIDReturns = struct {
-		result1 *model.User
+		result1 model.User
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeUserRepo) GetUserByIDReturnsOnCall(i int, result1 *model.User, result2 error) {
+func (fake *FakeUserRepo) GetUserByIDReturnsOnCall(i int, result1 model.User, result2 error) {
 	fake.getUserByIDMutex.Lock()
 	defer fake.getUserByIDMutex.Unlock()
 	fake.GetUserByIDStub = nil
 	if fake.getUserByIDReturnsOnCall == nil {
 		fake.getUserByIDReturnsOnCall = make(map[int]struct {
-			result1 *model.User
+			result1 model.User
 			result2 error
 		})
 	}
 	fake.getUserByIDReturnsOnCall[i] = struct {
-		result1 *model.User
+		result1 model.User
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeUserRepo) UoW() repository.UnitOfWork {
-	fake.uoWMutex.Lock()
-	ret, specificReturn := fake.uoWReturnsOnCall[len(fake.uoWArgsForCall)]
-	fake.uoWArgsForCall = append(fake.uoWArgsForCall, struct {
-	}{})
-	stub := fake.UoWStub
-	fakeReturns := fake.uoWReturns
-	fake.recordInvocation("UoW", []interface{}{})
-	fake.uoWMutex.Unlock()
+func (fake *FakeUserRepo) OpenConn(arg1 context.Context) error {
+	fake.openConnMutex.Lock()
+	ret, specificReturn := fake.openConnReturnsOnCall[len(fake.openConnArgsForCall)]
+	fake.openConnArgsForCall = append(fake.openConnArgsForCall, struct {
+		arg1 context.Context
+	}{arg1})
+	stub := fake.OpenConnStub
+	fakeReturns := fake.openConnReturns
+	fake.recordInvocation("OpenConn", []interface{}{arg1})
+	fake.openConnMutex.Unlock()
 	if stub != nil {
-		return stub()
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
@@ -149,42 +481,111 @@ func (fake *FakeUserRepo) UoW() repository.UnitOfWork {
 	return fakeReturns.result1
 }
 
-func (fake *FakeUserRepo) UoWCallCount() int {
-	fake.uoWMutex.RLock()
-	defer fake.uoWMutex.RUnlock()
-	return len(fake.uoWArgsForCall)
+func (fake *FakeUserRepo) OpenConnCallCount() int {
+	fake.openConnMutex.RLock()
+	defer fake.openConnMutex.RUnlock()
+	return len(fake.openConnArgsForCall)
 }
 
-func (fake *FakeUserRepo) UoWCalls(stub func() repository.UnitOfWork) {
-	fake.uoWMutex.Lock()
-	defer fake.uoWMutex.Unlock()
-	fake.UoWStub = stub
+func (fake *FakeUserRepo) OpenConnCalls(stub func(context.Context) error) {
+	fake.openConnMutex.Lock()
+	defer fake.openConnMutex.Unlock()
+	fake.OpenConnStub = stub
 }
 
-func (fake *FakeUserRepo) UoWReturns(result1 repository.UnitOfWork) {
-	fake.uoWMutex.Lock()
-	defer fake.uoWMutex.Unlock()
-	fake.UoWStub = nil
-	fake.uoWReturns = struct {
-		result1 repository.UnitOfWork
+func (fake *FakeUserRepo) OpenConnArgsForCall(i int) context.Context {
+	fake.openConnMutex.RLock()
+	defer fake.openConnMutex.RUnlock()
+	argsForCall := fake.openConnArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeUserRepo) OpenConnReturns(result1 error) {
+	fake.openConnMutex.Lock()
+	defer fake.openConnMutex.Unlock()
+	fake.OpenConnStub = nil
+	fake.openConnReturns = struct {
+		result1 error
 	}{result1}
 }
 
-func (fake *FakeUserRepo) UoWReturnsOnCall(i int, result1 repository.UnitOfWork) {
-	fake.uoWMutex.Lock()
-	defer fake.uoWMutex.Unlock()
-	fake.UoWStub = nil
-	if fake.uoWReturnsOnCall == nil {
-		fake.uoWReturnsOnCall = make(map[int]struct {
-			result1 repository.UnitOfWork
+func (fake *FakeUserRepo) OpenConnReturnsOnCall(i int, result1 error) {
+	fake.openConnMutex.Lock()
+	defer fake.openConnMutex.Unlock()
+	fake.OpenConnStub = nil
+	if fake.openConnReturnsOnCall == nil {
+		fake.openConnReturnsOnCall = make(map[int]struct {
+			result1 error
 		})
 	}
-	fake.uoWReturnsOnCall[i] = struct {
-		result1 repository.UnitOfWork
+	fake.openConnReturnsOnCall[i] = struct {
+		result1 error
 	}{result1}
 }
 
-func (fake *FakeUserRepo) UpdateUser(arg1 context.Context, arg2 model.User) (*model.User, error) {
+func (fake *FakeUserRepo) StartTx(arg1 context.Context, arg2 *sql.TxOptions) error {
+	fake.startTxMutex.Lock()
+	ret, specificReturn := fake.startTxReturnsOnCall[len(fake.startTxArgsForCall)]
+	fake.startTxArgsForCall = append(fake.startTxArgsForCall, struct {
+		arg1 context.Context
+		arg2 *sql.TxOptions
+	}{arg1, arg2})
+	stub := fake.StartTxStub
+	fakeReturns := fake.startTxReturns
+	fake.recordInvocation("StartTx", []interface{}{arg1, arg2})
+	fake.startTxMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeUserRepo) StartTxCallCount() int {
+	fake.startTxMutex.RLock()
+	defer fake.startTxMutex.RUnlock()
+	return len(fake.startTxArgsForCall)
+}
+
+func (fake *FakeUserRepo) StartTxCalls(stub func(context.Context, *sql.TxOptions) error) {
+	fake.startTxMutex.Lock()
+	defer fake.startTxMutex.Unlock()
+	fake.StartTxStub = stub
+}
+
+func (fake *FakeUserRepo) StartTxArgsForCall(i int) (context.Context, *sql.TxOptions) {
+	fake.startTxMutex.RLock()
+	defer fake.startTxMutex.RUnlock()
+	argsForCall := fake.startTxArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeUserRepo) StartTxReturns(result1 error) {
+	fake.startTxMutex.Lock()
+	defer fake.startTxMutex.Unlock()
+	fake.StartTxStub = nil
+	fake.startTxReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeUserRepo) StartTxReturnsOnCall(i int, result1 error) {
+	fake.startTxMutex.Lock()
+	defer fake.startTxMutex.Unlock()
+	fake.StartTxStub = nil
+	if fake.startTxReturnsOnCall == nil {
+		fake.startTxReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.startTxReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeUserRepo) UpdateUser(arg1 context.Context, arg2 model.User) (model.User, error) {
 	fake.updateUserMutex.Lock()
 	ret, specificReturn := fake.updateUserReturnsOnCall[len(fake.updateUserArgsForCall)]
 	fake.updateUserArgsForCall = append(fake.updateUserArgsForCall, struct {
@@ -210,7 +611,7 @@ func (fake *FakeUserRepo) UpdateUserCallCount() int {
 	return len(fake.updateUserArgsForCall)
 }
 
-func (fake *FakeUserRepo) UpdateUserCalls(stub func(context.Context, model.User) (*model.User, error)) {
+func (fake *FakeUserRepo) UpdateUserCalls(stub func(context.Context, model.User) (model.User, error)) {
 	fake.updateUserMutex.Lock()
 	defer fake.updateUserMutex.Unlock()
 	fake.UpdateUserStub = stub
@@ -223,33 +624,33 @@ func (fake *FakeUserRepo) UpdateUserArgsForCall(i int) (context.Context, model.U
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeUserRepo) UpdateUserReturns(result1 *model.User, result2 error) {
+func (fake *FakeUserRepo) UpdateUserReturns(result1 model.User, result2 error) {
 	fake.updateUserMutex.Lock()
 	defer fake.updateUserMutex.Unlock()
 	fake.UpdateUserStub = nil
 	fake.updateUserReturns = struct {
-		result1 *model.User
+		result1 model.User
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeUserRepo) UpdateUserReturnsOnCall(i int, result1 *model.User, result2 error) {
+func (fake *FakeUserRepo) UpdateUserReturnsOnCall(i int, result1 model.User, result2 error) {
 	fake.updateUserMutex.Lock()
 	defer fake.updateUserMutex.Unlock()
 	fake.UpdateUserStub = nil
 	if fake.updateUserReturnsOnCall == nil {
 		fake.updateUserReturnsOnCall = make(map[int]struct {
-			result1 *model.User
+			result1 model.User
 			result2 error
 		})
 	}
 	fake.updateUserReturnsOnCall[i] = struct {
-		result1 *model.User
+		result1 model.User
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeUserRepo) UpdateUsername(arg1 context.Context, arg2 model.User) (*model.User, error) {
+func (fake *FakeUserRepo) UpdateUsername(arg1 context.Context, arg2 model.User) (model.User, error) {
 	fake.updateUsernameMutex.Lock()
 	ret, specificReturn := fake.updateUsernameReturnsOnCall[len(fake.updateUsernameArgsForCall)]
 	fake.updateUsernameArgsForCall = append(fake.updateUsernameArgsForCall, struct {
@@ -275,7 +676,7 @@ func (fake *FakeUserRepo) UpdateUsernameCallCount() int {
 	return len(fake.updateUsernameArgsForCall)
 }
 
-func (fake *FakeUserRepo) UpdateUsernameCalls(stub func(context.Context, model.User) (*model.User, error)) {
+func (fake *FakeUserRepo) UpdateUsernameCalls(stub func(context.Context, model.User) (model.User, error)) {
 	fake.updateUsernameMutex.Lock()
 	defer fake.updateUsernameMutex.Unlock()
 	fake.UpdateUsernameStub = stub
@@ -288,28 +689,28 @@ func (fake *FakeUserRepo) UpdateUsernameArgsForCall(i int) (context.Context, mod
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeUserRepo) UpdateUsernameReturns(result1 *model.User, result2 error) {
+func (fake *FakeUserRepo) UpdateUsernameReturns(result1 model.User, result2 error) {
 	fake.updateUsernameMutex.Lock()
 	defer fake.updateUsernameMutex.Unlock()
 	fake.UpdateUsernameStub = nil
 	fake.updateUsernameReturns = struct {
-		result1 *model.User
+		result1 model.User
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeUserRepo) UpdateUsernameReturnsOnCall(i int, result1 *model.User, result2 error) {
+func (fake *FakeUserRepo) UpdateUsernameReturnsOnCall(i int, result1 model.User, result2 error) {
 	fake.updateUsernameMutex.Lock()
 	defer fake.updateUsernameMutex.Unlock()
 	fake.UpdateUsernameStub = nil
 	if fake.updateUsernameReturnsOnCall == nil {
 		fake.updateUsernameReturnsOnCall = make(map[int]struct {
-			result1 *model.User
+			result1 model.User
 			result2 error
 		})
 	}
 	fake.updateUsernameReturnsOnCall[i] = struct {
-		result1 *model.User
+		result1 model.User
 		result2 error
 	}{result1, result2}
 }
@@ -317,10 +718,22 @@ func (fake *FakeUserRepo) UpdateUsernameReturnsOnCall(i int, result1 *model.User
 func (fake *FakeUserRepo) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.checkPhoneNumberExistsMutex.RLock()
+	defer fake.checkPhoneNumberExistsMutex.RUnlock()
+	fake.closeConnMutex.RLock()
+	defer fake.closeConnMutex.RUnlock()
+	fake.endTxMutex.RLock()
+	defer fake.endTxMutex.RUnlock()
+	fake.getConnMutex.RLock()
+	defer fake.getConnMutex.RUnlock()
+	fake.getTxMutex.RLock()
+	defer fake.getTxMutex.RUnlock()
 	fake.getUserByIDMutex.RLock()
 	defer fake.getUserByIDMutex.RUnlock()
-	fake.uoWMutex.RLock()
-	defer fake.uoWMutex.RUnlock()
+	fake.openConnMutex.RLock()
+	defer fake.openConnMutex.RUnlock()
+	fake.startTxMutex.RLock()
+	defer fake.startTxMutex.RUnlock()
 	fake.updateUserMutex.RLock()
 	defer fake.updateUserMutex.RUnlock()
 	fake.updateUsernameMutex.RLock()

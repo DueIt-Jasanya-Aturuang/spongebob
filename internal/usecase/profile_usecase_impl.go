@@ -94,7 +94,7 @@ func (u *ProfileUsecaseImpl) StoreProfile(c context.Context, req *dto.StoreProfi
 		if errors.Is(err, model.ErrConflict) {
 			return nil, response.Err409(map[string][]string{
 				"profile": {
-					message.ProfileIsAlvailable,
+					message.ProfileIsAvailable,
 				},
 			}, err)
 		}

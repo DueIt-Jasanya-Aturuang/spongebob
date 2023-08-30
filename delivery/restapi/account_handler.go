@@ -25,7 +25,7 @@ func NewAccountHandler(
 func (h *AccountHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 	req := new(dto.UpdateAccountReq)
 
-	err := response.ParserMultiparForm(r, req)
+	err := response.ParserMultipartForm(r, req)
 	if err != nil {
 		response.NewError(w, r, err)
 		return

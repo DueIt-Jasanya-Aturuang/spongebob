@@ -9,9 +9,9 @@ import (
 
 //counterfeiter:generate -o ./../mocks . ProfileCfgRepo
 type ProfileCfgRepo interface {
-	StoreProfileCfg(context.Context, model.ProfileCfg) error
-	UpdateProfileCfg(context.Context, model.ProfileCfg) error
-	GetProfileCfgByID(context.Context, string) (*model.ProfileCfg, error)
-	GetProfileCfgByScheduler(context.Context, dto.ProfileCfgScheduler) (*[]model.ProfileCfg, error)
+	StoreProfileCfg(c context.Context, profileCfg model.ProfileCfg) error
+	UpdateProfileCfg(c context.Context, profileCfg model.ProfileCfg) error
+	GetProfileCfgByNameAndID(c context.Context, profileID string, configName string) (model.ProfileCfg, error)
+	GetProfileCfgByScheduler(c context.Context, profileCfgSche dto.ProfileCfgSche) ([]model.ProfileCfg, error)
 	UnitOfWork
 }

@@ -5,10 +5,11 @@ import (
 )
 
 type UpdateAccountReq struct {
-	UserID      string
-	FullName    string                `json:"full_name" form:"full_name" validate:"required,min=3,max=32"`
-	Gender      string                `json:"gender" form:"gender"`
-	Image       *multipart.FileHeader `json:"image" form:"image" swaggerignore:"true"`
-	PhoneNumber string                `json:"phone_number"`
-	Quote       string                `json:"quote" form:"quote" validate:"required,min=6,max=128"`
+	UserID      string                // request header 'User-Id'
+	ProfileID   string                // request param 'profile-id'
+	FullName    string                `json:"full_name" form:"full_name"`       // request body
+	Gender      string                `json:"gender" form:"gender"`             // request body
+	Image       *multipart.FileHeader `json:"image" form:"image"`               // request body
+	PhoneNumber string                `json:"phone_number" form:"phone_number"` // request body
+	Quote       string                `json:"quote" form:"quote"`               // request body
 }

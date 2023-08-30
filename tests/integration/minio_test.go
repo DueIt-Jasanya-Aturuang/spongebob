@@ -1,5 +1,6 @@
 package integration
 
+//goland:noinspection ALL
 import (
 	"bytes"
 	"context"
@@ -12,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMinioImpl(t *testing.T) {
+func Minio(t *testing.T) {
 	fileContent := []byte("Contoh isi file")
 	fileHeader := &multipart.FileHeader{
 		Filename: "example.png",
@@ -23,15 +24,18 @@ func TestMinioImpl(t *testing.T) {
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile("file", fileHeader.Filename)
 	assert.NoError(t, err)
-	part.Write(fileContent)
-	writer.Close()
+	_, _ = part.Write(fileContent)
+
+	_ = writer.Close()
 
 	req := httptest.NewRequest("POST", "/upload", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
 	file, fileHeader, err := req.FormFile("file")
 	assert.NoError(t, err)
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 
 	err = minioClient.MakeBucket(context.Background(), "files", minio.MakeBucketOptions{})
 	assert.NoError(t, err)

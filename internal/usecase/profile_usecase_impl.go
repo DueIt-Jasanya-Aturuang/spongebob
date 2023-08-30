@@ -4,99 +4,104 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/response"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/utils/message"
 	"time"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exception"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
-	"github.com/rs/zerolog/log"
 )
 
 type ProfileUsecaseImpl struct {
 	profileRepo repository.ProfileRepo
+	userRepo    repository.UserRepo
 	ctxTimeout  time.Duration
 }
 
 func NewProfileUsecaseImpl(
 	profileRepo repository.ProfileRepo,
+	userRepo repository.UserRepo,
 	timeout time.Duration,
 ) usecase.ProfileUsecase {
 	return &ProfileUsecaseImpl{
 		profileRepo: profileRepo,
+		userRepo:    userRepo,
 		ctxTimeout:  timeout,
 	}
 }
 
-func (u *ProfileUsecaseImpl) GetProfileByID(c context.Context, id string) (*dto.ProfileResp, error) {
+func (u *ProfileUsecaseImpl) GetProfileByID(c context.Context, req *dto.GetProfileReq) (resp *dto.ProfileResp, err error) {
 	ctx, cancel := context.WithTimeout(c, u.ctxTimeout)
 	defer cancel()
 
-	var resp dto.ProfileResp
-	res, err := u.profileRepo.GetProfileByID(ctx, id)
+	err = u.profileRepo.OpenConn(ctx)
 	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			return nil, err
-		}
+		return nil, err
+	}
+	defer func() {
+		u.profileRepo.CloseConn()
+	}()
 
-		res, err = u.profileRepo.GetProfileByUserID(ctx, id)
-		if err != nil {
-			if !errors.Is(err, sql.ErrNoRows) {
-				return nil, err
-			}
-			// store profile
-			profile, err := u.storeProfile(ctx, id)
-			if err != nil {
-				return nil, err
-			}
-
-			resp = profile.ToResp()
-			return &resp, nil
-		}
+	res, err := u.profileRepo.GetProfileByUserID(ctx, req.UserID)
+	if err != nil {
+		return nil, err
 	}
 
 	resp = res.ToResp()
-	return &resp, nil
+	return resp, nil
 }
 
-func (u *ProfileUsecaseImpl) storeProfile(c context.Context, userID string) (*model.Profile, error) {
+func (u *ProfileUsecaseImpl) StoreProfile(c context.Context, req *dto.StoreProfileReq) (profileResp *dto.ProfileResp, err error) {
 	ctx, cancel := context.WithTimeout(c, u.ctxTimeout)
 	defer cancel()
 
-	var profile model.Profile
-	profile.UserID = userID
-	profile = profile.DefaultValue()
+	err = u.profileRepo.OpenConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		u.profileRepo.CloseConn()
+	}()
 
-	err := u.profileRepo.BeginTx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelSerializable,
+	_, err = u.userRepo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, model.ErrForbidden
+		}
+		return nil, err
+	}
+	var profile *model.Profile
+	profile = profile.DefaultValue(req.UserID)
+
+	err = u.profileRepo.StartTx(ctx, &sql.TxOptions{
+		Isolation: sql.LevelReadCommitted,
 		ReadOnly:  false,
 	})
+	if err != nil {
+		return nil, err
+	}
 	defer func() {
-		if err != nil {
-			log.Info().Msg(exception.LogInfoTxRollback)
-			if rbErr := u.profileRepo.Rollback(); rbErr != nil {
-				log.Err(rbErr).Msg(exception.LogErrTxRollback)
-				err = fmt.Errorf("error : %v || rbError : %v", err, rbErr)
-			}
-			return
-		}
-		log.Info().Msg(exception.LogInfoTxCommit)
-		if cmErr := u.profileRepo.Commit(); cmErr != nil {
-			log.Err(cmErr).Msg(exception.LogErrTxCommit)
-			err = fmt.Errorf("error commit: %v", cmErr)
+		if errEndTx := u.profileRepo.EndTx(err); errEndTx != nil {
+			err = errEndTx
+			profile = nil
 		}
 	}()
 
+	profileRes, err := u.profileRepo.StoreProfile(ctx, *profile)
 	if err != nil {
+		if errors.Is(err, model.ErrConflict) {
+			return nil, response.Err409(map[string][]string{
+				"profile": {
+					message.ProfileIsAlvailable,
+				},
+			}, err)
+		}
 		return nil, err
 	}
 
-	profileRes, err := u.profileRepo.StoreProfile(ctx, profile)
-	if err != nil {
-		return nil, err
-	}
-	profile = profileRes
-	return &profile, err
+	profileResp = profileRes.ToResp()
+
+	return profileResp, nil
 }

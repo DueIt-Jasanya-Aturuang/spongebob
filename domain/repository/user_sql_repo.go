@@ -8,8 +8,9 @@ import (
 
 //counterfeiter:generate -o ./../mocks . UserRepo
 type UserRepo interface {
-	GetUserByID(context.Context, string) (*model.User, error)
-	UpdateUser(context.Context, model.User) (*model.User, error)
-	UpdateUsername(context.Context, model.User) (*model.User, error)
+	GetUserByID(c context.Context, id string) (model.User, error)
+	UpdateUser(c context.Context, user model.User) (model.User, error)
+	CheckPhoneNumberExists(c context.Context, id string, newPhoneNumber string) (exists bool, err error)
+	UpdateUsername(c context.Context, user model.User) (model.User, error)
 	UnitOfWork
 }

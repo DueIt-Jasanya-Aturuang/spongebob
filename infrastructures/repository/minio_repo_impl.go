@@ -3,11 +3,11 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/utils/message"
 	"mime/multipart"
 	"path/filepath"
 	"time"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exception"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
 	"github.com/minio/minio-go/v7"
 	"github.com/rs/zerolog/log"
@@ -28,10 +28,15 @@ func NewMinioImpl(c *minio.Client) repository.MinioRepo {
 func (m *MinioImpl) UploadFile(ctx context.Context, file *multipart.FileHeader, objectName, bucket string) error {
 	fileReader, err := file.Open()
 	if err != nil {
-		log.Err(err).Msg("cannot open file header")
+		log.Err(err).Msg(message.ErrOpenFile)
 		return err
 	}
-	defer fileReader.Close()
+	defer func() {
+		errCloseFile := fileReader.Close()
+		if errCloseFile != nil {
+			log.Err(err).Msg(message.ErrCloseFile)
+		}
+	}()
 
 	contentType := file.Header["Content-Type"][0]
 	fileSize := file.Size
@@ -40,7 +45,7 @@ func (m *MinioImpl) UploadFile(ctx context.Context, file *multipart.FileHeader, 
 		ContentType: contentType,
 	})
 	if err != nil {
-		log.Err(err).Msg(exception.LogErrMinioPut)
+		log.Err(err).Msg(message.ErrPutMinio)
 		return err
 	}
 
@@ -50,7 +55,7 @@ func (m *MinioImpl) UploadFile(ctx context.Context, file *multipart.FileHeader, 
 
 func (m *MinioImpl) DeleteFile(ctx context.Context, objectName, bucket string) error {
 	if err := m.c.RemoveObject(ctx, bucket, objectName, minio.RemoveObjectOptions{}); err != nil {
-		log.Err(err).Msg(exception.LogErrMinioDel)
+		log.Err(err).Msg(message.ErrDelMinio)
 		return err
 	}
 

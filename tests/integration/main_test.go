@@ -1,20 +1,13 @@
 package integration
 
 import (
-	"database/sql"
 	"log"
 	"os"
 	"testing"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/config"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/tests/integration/utils"
-	"github.com/minio/minio-go/v7"
 	"github.com/ory/dockertest/v3"
-)
-
-var (
-	db          *sql.DB
-	minioClient *minio.Client
 )
 
 func TestMain(t *testing.M) {
@@ -38,7 +31,6 @@ func TestMain(t *testing.M) {
 	utils.StartMigration(url, db)
 	// Run tests
 	code := t.Run()
-
 	// You can't defer this because os.Exit doesn't care for defer
 	for _, resource := range resources {
 		if err := pool.Purge(resource); err != nil {

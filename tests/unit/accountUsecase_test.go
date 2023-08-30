@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
 	"mime/multipart"
 	"net/http/httptest"
 	"testing"
@@ -12,7 +13,6 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/mocks"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers/dtoconv"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/usecase"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,8 +30,8 @@ func multipartFileHeader() *multipart.FileHeader {
 	if err != nil {
 		panic(err)
 	}
-	part.Write(fileContent)
-	writer.Close()
+	_, _ = part.Write(fileContent)
+	_ = writer.Close()
 
 	req := httptest.NewRequest("POST", "/upload", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -40,17 +40,20 @@ func multipartFileHeader() *multipart.FileHeader {
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
+	defer func(file multipart.File) {
+		_ = file.Close()
+	}(file)
 	return fileHeader
 }
 
-func TestAccounUpdateUsecase(t *testing.T) {
+func TestAccountUpdateUsecase(t *testing.T) {
+	uow := &mocks.FakeUnitOfWork{}
 	profileRepoMock := &mocks.FakeProfileRepo{}
 	userRepoMock := &mocks.FakeUserRepo{}
 	minioRepoMock := &mocks.FakeMinioRepo{}
 	timeOutCtx := 3 * time.Second
 	ctx := context.Background()
-
+	image := "user-images/public/asd.png"
 	accountUsecase := usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
 
 	profile := model.Profile{
@@ -92,35 +95,32 @@ func TestAccounUpdateUsecase(t *testing.T) {
 		Quote:       "semangat_update_1",
 	}
 
-	profileRepoMock.GetProfileByUserID(ctx, "userid_1")
-	profileRepoMock.GetProfileByUserIDReturns(&profile, nil)
+	profileRepoMock.GetProfileByID(ctx, "profileid_1")
+	profileRepoMock.GetProfileByIDReturns(profile, nil)
 
 	userRepoMock.GetUserByID(ctx, "userid_1")
-	userRepoMock.GetUserByIDReturns(&user, nil)
+	userRepoMock.GetUserByIDReturns(user, nil)
 
-	profileRepoMock.BeginTx(context.Background(), &sql.TxOptions{})
-	profileRepoMock.BeginTxReturns(nil)
-
-	profileConv, userConv := dtoconv.UpdateAccountToModel(req, profile.ProfileID, user.Image)
+	profileConv, userConv := helpers.UpdateAccountToModel(&req, user.Image)
 	profileRepoMock.UpdateProfile(ctx, profileConv)
-	profileRepoMock.UpdateProfileReturns(&profile, nil)
+	profileRepoMock.UpdateProfileReturns(profile, nil)
 
-	profileRepoMock.GetTx()
-	profileRepoMock.GetTxReturns(&sql.Tx{})
-
-	profileRepoMock.CallTx(&sql.Tx{})
-	profileRepoMock.CallTxReturns(nil)
+	uow.GetTx()
+	uow.GetTxReturns(&sql.Tx{}, nil)
 
 	userRepoMock.UpdateUser(ctx, userConv)
-	userRepoMock.UpdateUserReturns(&user, nil)
+	userRepoMock.UpdateUserReturns(user, nil)
 
 	minioRepoMock.GenerateFileName(multipartFileHeader(), "user-images/public/", "")
-	minioRepoMock.GenerateFileNameReturns("user-images/public/asd.png")
+	minioRepoMock.GenerateFileNameReturns(image)
 
-	minioRepoMock.UploadFile(ctx, multipartFileHeader(), "user-images/public/asd.png", "files")
+	minioRepoMock.UploadFile(ctx, multipartFileHeader(), image, "files")
 	minioRepoMock.UploadFileReturns(nil)
 
-	profileRes, userRes, err := accountUsecase.AccountUpdate(ctx, req)
+	uow.EndTx(nil)
+	uow.EndTxReturns(nil)
+
+	profileRes, userRes, err := accountUsecase.UpdateAccount(ctx, &req)
 	assert.NoError(t, err)
 	assert.NotNil(t, profileRes)
 	assert.NotNil(t, userRes)
@@ -132,6 +132,7 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 	minioRepoMock := &mocks.FakeMinioRepo{}
 	timeOutCtx := 3 * time.Second
 	ctx := context.Background()
+	image := "/files/user-images/public/asd.png"
 
 	accountUsecase := usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
 
@@ -151,7 +152,7 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 		ID:              "userid_1",
 		FullName:        "rama_1",
 		Gender:          "undefinied",
-		Image:           "/files/user-images/public/asd.png",
+		Image:           image,
 		Username:        "ibanrmaa_1",
 		Email:           "1_ibanrama29@gmail.com",
 		Password:        "123456",
@@ -166,6 +167,7 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 	}
 
 	req := dto.UpdateAccountReq{
+		ProfileID:   "profileid_1",
 		UserID:      "userid_1",
 		FullName:    "rama_update_1",
 		Gender:      "male",
@@ -174,38 +176,29 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 		Quote:       "semangat_update_1",
 	}
 
-	profileRepoMock.GetProfileByUserID(ctx, "userid_1")
-	profileRepoMock.GetProfileByUserIDReturns(&profile, nil)
+	profileRepoMock.GetProfileByID(ctx, "profileid_1")
+	profileRepoMock.GetProfileByIDReturns(profile, nil)
 
 	userRepoMock.GetUserByID(ctx, "userid_1")
-	userRepoMock.GetUserByIDReturns(&user, nil)
+	userRepoMock.GetUserByIDReturns(user, nil)
 
-	profileRepoMock.BeginTx(context.Background(), &sql.TxOptions{})
-	profileRepoMock.BeginTxReturns(nil)
-
-	profileConv, userConv := dtoconv.UpdateAccountToModel(req, profile.ProfileID, user.Image)
+	profileConv, userConv := helpers.UpdateAccountToModel(&req, user.Image)
 	profileRepoMock.UpdateProfile(ctx, profileConv)
-	profileRepoMock.UpdateProfileReturns(&profile, nil)
-
-	profileRepoMock.GetTx()
-	profileRepoMock.GetTxReturns(&sql.Tx{})
-
-	profileRepoMock.CallTx(&sql.Tx{})
-	profileRepoMock.CallTxReturns(nil)
+	profileRepoMock.UpdateProfileReturns(profile, nil)
 
 	userRepoMock.UpdateUser(ctx, userConv)
-	userRepoMock.UpdateUserReturns(&user, nil)
+	userRepoMock.UpdateUserReturns(user, nil)
 
 	minioRepoMock.GenerateFileName(multipartFileHeader(), "user-images/public/", "")
 	minioRepoMock.GenerateFileNameReturns("user-images/public/asd.png")
 
-	minioRepoMock.UploadFile(ctx, multipartFileHeader(), "/files/user-images/public/asd.png", "files")
+	minioRepoMock.UploadFile(ctx, multipartFileHeader(), image, "files")
 	minioRepoMock.UploadFileReturns(nil)
 
-	minioRepoMock.DeleteFile(ctx, "/files/user-images/public/asd.png", "files")
+	minioRepoMock.DeleteFile(ctx, image, "files")
 	minioRepoMock.DeleteFileReturns(nil)
 
-	profileRes, userRes, err := accountUsecase.AccountUpdate(ctx, req)
+	profileRes, userRes, err := accountUsecase.UpdateAccount(ctx, &req)
 	assert.NoError(t, err)
 	assert.NotNil(t, profileRes)
 	assert.NotNil(t, userRes)

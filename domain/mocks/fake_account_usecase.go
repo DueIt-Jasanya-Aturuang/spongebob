@@ -10,18 +10,18 @@ import (
 )
 
 type FakeAccountUsecase struct {
-	AccountUpdateStub        func(context.Context, dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error)
-	accountUpdateMutex       sync.RWMutex
-	accountUpdateArgsForCall []struct {
+	UpdateAccountStub        func(context.Context, *dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error)
+	updateAccountMutex       sync.RWMutex
+	updateAccountArgsForCall []struct {
 		arg1 context.Context
-		arg2 dto.UpdateAccountReq
+		arg2 *dto.UpdateAccountReq
 	}
-	accountUpdateReturns struct {
+	updateAccountReturns struct {
 		result1 *dto.UserResp
 		result2 *dto.ProfileResp
 		result3 error
 	}
-	accountUpdateReturnsOnCall map[int]struct {
+	updateAccountReturnsOnCall map[int]struct {
 		result1 *dto.UserResp
 		result2 *dto.ProfileResp
 		result3 error
@@ -30,17 +30,17 @@ type FakeAccountUsecase struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAccountUsecase) AccountUpdate(arg1 context.Context, arg2 dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error) {
-	fake.accountUpdateMutex.Lock()
-	ret, specificReturn := fake.accountUpdateReturnsOnCall[len(fake.accountUpdateArgsForCall)]
-	fake.accountUpdateArgsForCall = append(fake.accountUpdateArgsForCall, struct {
+func (fake *FakeAccountUsecase) UpdateAccount(arg1 context.Context, arg2 *dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error) {
+	fake.updateAccountMutex.Lock()
+	ret, specificReturn := fake.updateAccountReturnsOnCall[len(fake.updateAccountArgsForCall)]
+	fake.updateAccountArgsForCall = append(fake.updateAccountArgsForCall, struct {
 		arg1 context.Context
-		arg2 dto.UpdateAccountReq
+		arg2 *dto.UpdateAccountReq
 	}{arg1, arg2})
-	stub := fake.AccountUpdateStub
-	fakeReturns := fake.accountUpdateReturns
-	fake.recordInvocation("AccountUpdate", []interface{}{arg1, arg2})
-	fake.accountUpdateMutex.Unlock()
+	stub := fake.UpdateAccountStub
+	fakeReturns := fake.updateAccountReturns
+	fake.recordInvocation("UpdateAccount", []interface{}{arg1, arg2})
+	fake.updateAccountMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)
 	}
@@ -50,48 +50,48 @@ func (fake *FakeAccountUsecase) AccountUpdate(arg1 context.Context, arg2 dto.Upd
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
-func (fake *FakeAccountUsecase) AccountUpdateCallCount() int {
-	fake.accountUpdateMutex.RLock()
-	defer fake.accountUpdateMutex.RUnlock()
-	return len(fake.accountUpdateArgsForCall)
+func (fake *FakeAccountUsecase) UpdateAccountCallCount() int {
+	fake.updateAccountMutex.RLock()
+	defer fake.updateAccountMutex.RUnlock()
+	return len(fake.updateAccountArgsForCall)
 }
 
-func (fake *FakeAccountUsecase) AccountUpdateCalls(stub func(context.Context, dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error)) {
-	fake.accountUpdateMutex.Lock()
-	defer fake.accountUpdateMutex.Unlock()
-	fake.AccountUpdateStub = stub
+func (fake *FakeAccountUsecase) UpdateAccountCalls(stub func(context.Context, *dto.UpdateAccountReq) (*dto.UserResp, *dto.ProfileResp, error)) {
+	fake.updateAccountMutex.Lock()
+	defer fake.updateAccountMutex.Unlock()
+	fake.UpdateAccountStub = stub
 }
 
-func (fake *FakeAccountUsecase) AccountUpdateArgsForCall(i int) (context.Context, dto.UpdateAccountReq) {
-	fake.accountUpdateMutex.RLock()
-	defer fake.accountUpdateMutex.RUnlock()
-	argsForCall := fake.accountUpdateArgsForCall[i]
+func (fake *FakeAccountUsecase) UpdateAccountArgsForCall(i int) (context.Context, *dto.UpdateAccountReq) {
+	fake.updateAccountMutex.RLock()
+	defer fake.updateAccountMutex.RUnlock()
+	argsForCall := fake.updateAccountArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeAccountUsecase) AccountUpdateReturns(result1 *dto.UserResp, result2 *dto.ProfileResp, result3 error) {
-	fake.accountUpdateMutex.Lock()
-	defer fake.accountUpdateMutex.Unlock()
-	fake.AccountUpdateStub = nil
-	fake.accountUpdateReturns = struct {
+func (fake *FakeAccountUsecase) UpdateAccountReturns(result1 *dto.UserResp, result2 *dto.ProfileResp, result3 error) {
+	fake.updateAccountMutex.Lock()
+	defer fake.updateAccountMutex.Unlock()
+	fake.UpdateAccountStub = nil
+	fake.updateAccountReturns = struct {
 		result1 *dto.UserResp
 		result2 *dto.ProfileResp
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeAccountUsecase) AccountUpdateReturnsOnCall(i int, result1 *dto.UserResp, result2 *dto.ProfileResp, result3 error) {
-	fake.accountUpdateMutex.Lock()
-	defer fake.accountUpdateMutex.Unlock()
-	fake.AccountUpdateStub = nil
-	if fake.accountUpdateReturnsOnCall == nil {
-		fake.accountUpdateReturnsOnCall = make(map[int]struct {
+func (fake *FakeAccountUsecase) UpdateAccountReturnsOnCall(i int, result1 *dto.UserResp, result2 *dto.ProfileResp, result3 error) {
+	fake.updateAccountMutex.Lock()
+	defer fake.updateAccountMutex.Unlock()
+	fake.UpdateAccountStub = nil
+	if fake.updateAccountReturnsOnCall == nil {
+		fake.updateAccountReturnsOnCall = make(map[int]struct {
 			result1 *dto.UserResp
 			result2 *dto.ProfileResp
 			result3 error
 		})
 	}
-	fake.accountUpdateReturnsOnCall[i] = struct {
+	fake.updateAccountReturnsOnCall[i] = struct {
 		result1 *dto.UserResp
 		result2 *dto.ProfileResp
 		result3 error
@@ -101,8 +101,8 @@ func (fake *FakeAccountUsecase) AccountUpdateReturnsOnCall(i int, result1 *dto.U
 func (fake *FakeAccountUsecase) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.accountUpdateMutex.RLock()
-	defer fake.accountUpdateMutex.RUnlock()
+	fake.updateAccountMutex.RLock()
+	defer fake.updateAccountMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

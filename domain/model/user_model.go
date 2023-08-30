@@ -6,7 +6,6 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 )
 
-// user entities
 type User struct {
 	ID              string
 	FullName        string
@@ -25,8 +24,8 @@ type User struct {
 	DeletedBy       sql.NullString
 }
 
-func (u *User) ToResp(emailFormat string) dto.UserResp {
-	return dto.UserResp{
+func (u *User) ToResp(emailFormat string) *dto.UserResp {
+	return &dto.UserResp{
 		ID:              u.ID,
 		FullName:        u.FullName,
 		Gender:          u.Gender,

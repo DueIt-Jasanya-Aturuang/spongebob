@@ -10,135 +10,106 @@ import (
 )
 
 type FakeUnitOfWork struct {
-	BeginTxStub        func(context.Context, *sql.TxOptions) error
-	beginTxMutex       sync.RWMutex
-	beginTxArgsForCall []struct {
-		arg1 context.Context
-		arg2 *sql.TxOptions
+	CloseConnStub        func()
+	closeConnMutex       sync.RWMutex
+	closeConnArgsForCall []struct {
 	}
-	beginTxReturns struct {
+	EndTxStub        func(error) error
+	endTxMutex       sync.RWMutex
+	endTxArgsForCall []struct {
+		arg1 error
+	}
+	endTxReturns struct {
 		result1 error
 	}
-	beginTxReturnsOnCall map[int]struct {
+	endTxReturnsOnCall map[int]struct {
 		result1 error
 	}
-	CallTxStub        func(*sql.Tx) error
-	callTxMutex       sync.RWMutex
-	callTxArgsForCall []struct {
-		arg1 *sql.Tx
+	GetConnStub        func() (*sql.Conn, error)
+	getConnMutex       sync.RWMutex
+	getConnArgsForCall []struct {
 	}
-	callTxReturns struct {
-		result1 error
+	getConnReturns struct {
+		result1 *sql.Conn
+		result2 error
 	}
-	callTxReturnsOnCall map[int]struct {
-		result1 error
+	getConnReturnsOnCall map[int]struct {
+		result1 *sql.Conn
+		result2 error
 	}
-	CommitStub        func() error
-	commitMutex       sync.RWMutex
-	commitArgsForCall []struct {
-	}
-	commitReturns struct {
-		result1 error
-	}
-	commitReturnsOnCall map[int]struct {
-		result1 error
-	}
-	GetTxStub        func() *sql.Tx
+	GetTxStub        func() (*sql.Tx, error)
 	getTxMutex       sync.RWMutex
 	getTxArgsForCall []struct {
 	}
 	getTxReturns struct {
 		result1 *sql.Tx
+		result2 error
 	}
 	getTxReturnsOnCall map[int]struct {
 		result1 *sql.Tx
+		result2 error
 	}
-	RollbackStub        func() error
-	rollbackMutex       sync.RWMutex
-	rollbackArgsForCall []struct {
+	OpenConnStub        func(context.Context) error
+	openConnMutex       sync.RWMutex
+	openConnArgsForCall []struct {
+		arg1 context.Context
 	}
-	rollbackReturns struct {
+	openConnReturns struct {
 		result1 error
 	}
-	rollbackReturnsOnCall map[int]struct {
+	openConnReturnsOnCall map[int]struct {
+		result1 error
+	}
+	StartTxStub        func(context.Context, *sql.TxOptions) error
+	startTxMutex       sync.RWMutex
+	startTxArgsForCall []struct {
+		arg1 context.Context
+		arg2 *sql.TxOptions
+	}
+	startTxReturns struct {
+		result1 error
+	}
+	startTxReturnsOnCall map[int]struct {
 		result1 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUnitOfWork) BeginTx(arg1 context.Context, arg2 *sql.TxOptions) error {
-	fake.beginTxMutex.Lock()
-	ret, specificReturn := fake.beginTxReturnsOnCall[len(fake.beginTxArgsForCall)]
-	fake.beginTxArgsForCall = append(fake.beginTxArgsForCall, struct {
-		arg1 context.Context
-		arg2 *sql.TxOptions
-	}{arg1, arg2})
-	stub := fake.BeginTxStub
-	fakeReturns := fake.beginTxReturns
-	fake.recordInvocation("BeginTx", []interface{}{arg1, arg2})
-	fake.beginTxMutex.Unlock()
+func (fake *FakeUnitOfWork) CloseConn() {
+	fake.closeConnMutex.Lock()
+	fake.closeConnArgsForCall = append(fake.closeConnArgsForCall, struct {
+	}{})
+	stub := fake.CloseConnStub
+	fake.recordInvocation("CloseConn", []interface{}{})
+	fake.closeConnMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2)
+		fake.CloseConnStub()
 	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fakeReturns.result1
 }
 
-func (fake *FakeUnitOfWork) BeginTxCallCount() int {
-	fake.beginTxMutex.RLock()
-	defer fake.beginTxMutex.RUnlock()
-	return len(fake.beginTxArgsForCall)
+func (fake *FakeUnitOfWork) CloseConnCallCount() int {
+	fake.closeConnMutex.RLock()
+	defer fake.closeConnMutex.RUnlock()
+	return len(fake.closeConnArgsForCall)
 }
 
-func (fake *FakeUnitOfWork) BeginTxCalls(stub func(context.Context, *sql.TxOptions) error) {
-	fake.beginTxMutex.Lock()
-	defer fake.beginTxMutex.Unlock()
-	fake.BeginTxStub = stub
+func (fake *FakeUnitOfWork) CloseConnCalls(stub func()) {
+	fake.closeConnMutex.Lock()
+	defer fake.closeConnMutex.Unlock()
+	fake.CloseConnStub = stub
 }
 
-func (fake *FakeUnitOfWork) BeginTxArgsForCall(i int) (context.Context, *sql.TxOptions) {
-	fake.beginTxMutex.RLock()
-	defer fake.beginTxMutex.RUnlock()
-	argsForCall := fake.beginTxArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeUnitOfWork) BeginTxReturns(result1 error) {
-	fake.beginTxMutex.Lock()
-	defer fake.beginTxMutex.Unlock()
-	fake.BeginTxStub = nil
-	fake.beginTxReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeUnitOfWork) BeginTxReturnsOnCall(i int, result1 error) {
-	fake.beginTxMutex.Lock()
-	defer fake.beginTxMutex.Unlock()
-	fake.BeginTxStub = nil
-	if fake.beginTxReturnsOnCall == nil {
-		fake.beginTxReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.beginTxReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeUnitOfWork) CallTx(arg1 *sql.Tx) error {
-	fake.callTxMutex.Lock()
-	ret, specificReturn := fake.callTxReturnsOnCall[len(fake.callTxArgsForCall)]
-	fake.callTxArgsForCall = append(fake.callTxArgsForCall, struct {
-		arg1 *sql.Tx
+func (fake *FakeUnitOfWork) EndTx(arg1 error) error {
+	fake.endTxMutex.Lock()
+	ret, specificReturn := fake.endTxReturnsOnCall[len(fake.endTxArgsForCall)]
+	fake.endTxArgsForCall = append(fake.endTxArgsForCall, struct {
+		arg1 error
 	}{arg1})
-	stub := fake.CallTxStub
-	fakeReturns := fake.callTxReturns
-	fake.recordInvocation("CallTx", []interface{}{arg1})
-	fake.callTxMutex.Unlock()
+	stub := fake.EndTxStub
+	fakeReturns := fake.endTxReturns
+	fake.recordInvocation("EndTx", []interface{}{arg1})
+	fake.endTxMutex.Unlock()
 	if stub != nil {
 		return stub(arg1)
 	}
@@ -148,102 +119,105 @@ func (fake *FakeUnitOfWork) CallTx(arg1 *sql.Tx) error {
 	return fakeReturns.result1
 }
 
-func (fake *FakeUnitOfWork) CallTxCallCount() int {
-	fake.callTxMutex.RLock()
-	defer fake.callTxMutex.RUnlock()
-	return len(fake.callTxArgsForCall)
+func (fake *FakeUnitOfWork) EndTxCallCount() int {
+	fake.endTxMutex.RLock()
+	defer fake.endTxMutex.RUnlock()
+	return len(fake.endTxArgsForCall)
 }
 
-func (fake *FakeUnitOfWork) CallTxCalls(stub func(*sql.Tx) error) {
-	fake.callTxMutex.Lock()
-	defer fake.callTxMutex.Unlock()
-	fake.CallTxStub = stub
+func (fake *FakeUnitOfWork) EndTxCalls(stub func(error) error) {
+	fake.endTxMutex.Lock()
+	defer fake.endTxMutex.Unlock()
+	fake.EndTxStub = stub
 }
 
-func (fake *FakeUnitOfWork) CallTxArgsForCall(i int) *sql.Tx {
-	fake.callTxMutex.RLock()
-	defer fake.callTxMutex.RUnlock()
-	argsForCall := fake.callTxArgsForCall[i]
+func (fake *FakeUnitOfWork) EndTxArgsForCall(i int) error {
+	fake.endTxMutex.RLock()
+	defer fake.endTxMutex.RUnlock()
+	argsForCall := fake.endTxArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeUnitOfWork) CallTxReturns(result1 error) {
-	fake.callTxMutex.Lock()
-	defer fake.callTxMutex.Unlock()
-	fake.CallTxStub = nil
-	fake.callTxReturns = struct {
+func (fake *FakeUnitOfWork) EndTxReturns(result1 error) {
+	fake.endTxMutex.Lock()
+	defer fake.endTxMutex.Unlock()
+	fake.EndTxStub = nil
+	fake.endTxReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeUnitOfWork) CallTxReturnsOnCall(i int, result1 error) {
-	fake.callTxMutex.Lock()
-	defer fake.callTxMutex.Unlock()
-	fake.CallTxStub = nil
-	if fake.callTxReturnsOnCall == nil {
-		fake.callTxReturnsOnCall = make(map[int]struct {
+func (fake *FakeUnitOfWork) EndTxReturnsOnCall(i int, result1 error) {
+	fake.endTxMutex.Lock()
+	defer fake.endTxMutex.Unlock()
+	fake.EndTxStub = nil
+	if fake.endTxReturnsOnCall == nil {
+		fake.endTxReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.callTxReturnsOnCall[i] = struct {
+	fake.endTxReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeUnitOfWork) Commit() error {
-	fake.commitMutex.Lock()
-	ret, specificReturn := fake.commitReturnsOnCall[len(fake.commitArgsForCall)]
-	fake.commitArgsForCall = append(fake.commitArgsForCall, struct {
+func (fake *FakeUnitOfWork) GetConn() (*sql.Conn, error) {
+	fake.getConnMutex.Lock()
+	ret, specificReturn := fake.getConnReturnsOnCall[len(fake.getConnArgsForCall)]
+	fake.getConnArgsForCall = append(fake.getConnArgsForCall, struct {
 	}{})
-	stub := fake.CommitStub
-	fakeReturns := fake.commitReturns
-	fake.recordInvocation("Commit", []interface{}{})
-	fake.commitMutex.Unlock()
+	stub := fake.GetConnStub
+	fakeReturns := fake.getConnReturns
+	fake.recordInvocation("GetConn", []interface{}{})
+	fake.getConnMutex.Unlock()
 	if stub != nil {
 		return stub()
 	}
 	if specificReturn {
-		return ret.result1
+		return ret.result1, ret.result2
 	}
-	return fakeReturns.result1
+	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeUnitOfWork) CommitCallCount() int {
-	fake.commitMutex.RLock()
-	defer fake.commitMutex.RUnlock()
-	return len(fake.commitArgsForCall)
+func (fake *FakeUnitOfWork) GetConnCallCount() int {
+	fake.getConnMutex.RLock()
+	defer fake.getConnMutex.RUnlock()
+	return len(fake.getConnArgsForCall)
 }
 
-func (fake *FakeUnitOfWork) CommitCalls(stub func() error) {
-	fake.commitMutex.Lock()
-	defer fake.commitMutex.Unlock()
-	fake.CommitStub = stub
+func (fake *FakeUnitOfWork) GetConnCalls(stub func() (*sql.Conn, error)) {
+	fake.getConnMutex.Lock()
+	defer fake.getConnMutex.Unlock()
+	fake.GetConnStub = stub
 }
 
-func (fake *FakeUnitOfWork) CommitReturns(result1 error) {
-	fake.commitMutex.Lock()
-	defer fake.commitMutex.Unlock()
-	fake.CommitStub = nil
-	fake.commitReturns = struct {
-		result1 error
-	}{result1}
+func (fake *FakeUnitOfWork) GetConnReturns(result1 *sql.Conn, result2 error) {
+	fake.getConnMutex.Lock()
+	defer fake.getConnMutex.Unlock()
+	fake.GetConnStub = nil
+	fake.getConnReturns = struct {
+		result1 *sql.Conn
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeUnitOfWork) CommitReturnsOnCall(i int, result1 error) {
-	fake.commitMutex.Lock()
-	defer fake.commitMutex.Unlock()
-	fake.CommitStub = nil
-	if fake.commitReturnsOnCall == nil {
-		fake.commitReturnsOnCall = make(map[int]struct {
-			result1 error
+func (fake *FakeUnitOfWork) GetConnReturnsOnCall(i int, result1 *sql.Conn, result2 error) {
+	fake.getConnMutex.Lock()
+	defer fake.getConnMutex.Unlock()
+	fake.GetConnStub = nil
+	if fake.getConnReturnsOnCall == nil {
+		fake.getConnReturnsOnCall = make(map[int]struct {
+			result1 *sql.Conn
+			result2 error
 		})
 	}
-	fake.commitReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
+	fake.getConnReturnsOnCall[i] = struct {
+		result1 *sql.Conn
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeUnitOfWork) GetTx() *sql.Tx {
+func (fake *FakeUnitOfWork) GetTx() (*sql.Tx, error) {
 	fake.getTxMutex.Lock()
 	ret, specificReturn := fake.getTxReturnsOnCall[len(fake.getTxArgsForCall)]
 	fake.getTxArgsForCall = append(fake.getTxArgsForCall, struct {
@@ -256,9 +230,9 @@ func (fake *FakeUnitOfWork) GetTx() *sql.Tx {
 		return stub()
 	}
 	if specificReturn {
-		return ret.result1
+		return ret.result1, ret.result2
 	}
-	return fakeReturns.result1
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeUnitOfWork) GetTxCallCount() int {
@@ -267,46 +241,50 @@ func (fake *FakeUnitOfWork) GetTxCallCount() int {
 	return len(fake.getTxArgsForCall)
 }
 
-func (fake *FakeUnitOfWork) GetTxCalls(stub func() *sql.Tx) {
+func (fake *FakeUnitOfWork) GetTxCalls(stub func() (*sql.Tx, error)) {
 	fake.getTxMutex.Lock()
 	defer fake.getTxMutex.Unlock()
 	fake.GetTxStub = stub
 }
 
-func (fake *FakeUnitOfWork) GetTxReturns(result1 *sql.Tx) {
+func (fake *FakeUnitOfWork) GetTxReturns(result1 *sql.Tx, result2 error) {
 	fake.getTxMutex.Lock()
 	defer fake.getTxMutex.Unlock()
 	fake.GetTxStub = nil
 	fake.getTxReturns = struct {
 		result1 *sql.Tx
-	}{result1}
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeUnitOfWork) GetTxReturnsOnCall(i int, result1 *sql.Tx) {
+func (fake *FakeUnitOfWork) GetTxReturnsOnCall(i int, result1 *sql.Tx, result2 error) {
 	fake.getTxMutex.Lock()
 	defer fake.getTxMutex.Unlock()
 	fake.GetTxStub = nil
 	if fake.getTxReturnsOnCall == nil {
 		fake.getTxReturnsOnCall = make(map[int]struct {
 			result1 *sql.Tx
+			result2 error
 		})
 	}
 	fake.getTxReturnsOnCall[i] = struct {
 		result1 *sql.Tx
-	}{result1}
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeUnitOfWork) Rollback() error {
-	fake.rollbackMutex.Lock()
-	ret, specificReturn := fake.rollbackReturnsOnCall[len(fake.rollbackArgsForCall)]
-	fake.rollbackArgsForCall = append(fake.rollbackArgsForCall, struct {
-	}{})
-	stub := fake.RollbackStub
-	fakeReturns := fake.rollbackReturns
-	fake.recordInvocation("Rollback", []interface{}{})
-	fake.rollbackMutex.Unlock()
+func (fake *FakeUnitOfWork) OpenConn(arg1 context.Context) error {
+	fake.openConnMutex.Lock()
+	ret, specificReturn := fake.openConnReturnsOnCall[len(fake.openConnArgsForCall)]
+	fake.openConnArgsForCall = append(fake.openConnArgsForCall, struct {
+		arg1 context.Context
+	}{arg1})
+	stub := fake.OpenConnStub
+	fakeReturns := fake.openConnReturns
+	fake.recordInvocation("OpenConn", []interface{}{arg1})
+	fake.openConnMutex.Unlock()
 	if stub != nil {
-		return stub()
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
@@ -314,37 +292,106 @@ func (fake *FakeUnitOfWork) Rollback() error {
 	return fakeReturns.result1
 }
 
-func (fake *FakeUnitOfWork) RollbackCallCount() int {
-	fake.rollbackMutex.RLock()
-	defer fake.rollbackMutex.RUnlock()
-	return len(fake.rollbackArgsForCall)
+func (fake *FakeUnitOfWork) OpenConnCallCount() int {
+	fake.openConnMutex.RLock()
+	defer fake.openConnMutex.RUnlock()
+	return len(fake.openConnArgsForCall)
 }
 
-func (fake *FakeUnitOfWork) RollbackCalls(stub func() error) {
-	fake.rollbackMutex.Lock()
-	defer fake.rollbackMutex.Unlock()
-	fake.RollbackStub = stub
+func (fake *FakeUnitOfWork) OpenConnCalls(stub func(context.Context) error) {
+	fake.openConnMutex.Lock()
+	defer fake.openConnMutex.Unlock()
+	fake.OpenConnStub = stub
 }
 
-func (fake *FakeUnitOfWork) RollbackReturns(result1 error) {
-	fake.rollbackMutex.Lock()
-	defer fake.rollbackMutex.Unlock()
-	fake.RollbackStub = nil
-	fake.rollbackReturns = struct {
+func (fake *FakeUnitOfWork) OpenConnArgsForCall(i int) context.Context {
+	fake.openConnMutex.RLock()
+	defer fake.openConnMutex.RUnlock()
+	argsForCall := fake.openConnArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeUnitOfWork) OpenConnReturns(result1 error) {
+	fake.openConnMutex.Lock()
+	defer fake.openConnMutex.Unlock()
+	fake.OpenConnStub = nil
+	fake.openConnReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeUnitOfWork) RollbackReturnsOnCall(i int, result1 error) {
-	fake.rollbackMutex.Lock()
-	defer fake.rollbackMutex.Unlock()
-	fake.RollbackStub = nil
-	if fake.rollbackReturnsOnCall == nil {
-		fake.rollbackReturnsOnCall = make(map[int]struct {
+func (fake *FakeUnitOfWork) OpenConnReturnsOnCall(i int, result1 error) {
+	fake.openConnMutex.Lock()
+	defer fake.openConnMutex.Unlock()
+	fake.OpenConnStub = nil
+	if fake.openConnReturnsOnCall == nil {
+		fake.openConnReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.rollbackReturnsOnCall[i] = struct {
+	fake.openConnReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeUnitOfWork) StartTx(arg1 context.Context, arg2 *sql.TxOptions) error {
+	fake.startTxMutex.Lock()
+	ret, specificReturn := fake.startTxReturnsOnCall[len(fake.startTxArgsForCall)]
+	fake.startTxArgsForCall = append(fake.startTxArgsForCall, struct {
+		arg1 context.Context
+		arg2 *sql.TxOptions
+	}{arg1, arg2})
+	stub := fake.StartTxStub
+	fakeReturns := fake.startTxReturns
+	fake.recordInvocation("StartTx", []interface{}{arg1, arg2})
+	fake.startTxMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *FakeUnitOfWork) StartTxCallCount() int {
+	fake.startTxMutex.RLock()
+	defer fake.startTxMutex.RUnlock()
+	return len(fake.startTxArgsForCall)
+}
+
+func (fake *FakeUnitOfWork) StartTxCalls(stub func(context.Context, *sql.TxOptions) error) {
+	fake.startTxMutex.Lock()
+	defer fake.startTxMutex.Unlock()
+	fake.StartTxStub = stub
+}
+
+func (fake *FakeUnitOfWork) StartTxArgsForCall(i int) (context.Context, *sql.TxOptions) {
+	fake.startTxMutex.RLock()
+	defer fake.startTxMutex.RUnlock()
+	argsForCall := fake.startTxArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeUnitOfWork) StartTxReturns(result1 error) {
+	fake.startTxMutex.Lock()
+	defer fake.startTxMutex.Unlock()
+	fake.StartTxStub = nil
+	fake.startTxReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeUnitOfWork) StartTxReturnsOnCall(i int, result1 error) {
+	fake.startTxMutex.Lock()
+	defer fake.startTxMutex.Unlock()
+	fake.StartTxStub = nil
+	if fake.startTxReturnsOnCall == nil {
+		fake.startTxReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.startTxReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
@@ -352,16 +399,18 @@ func (fake *FakeUnitOfWork) RollbackReturnsOnCall(i int, result1 error) {
 func (fake *FakeUnitOfWork) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.beginTxMutex.RLock()
-	defer fake.beginTxMutex.RUnlock()
-	fake.callTxMutex.RLock()
-	defer fake.callTxMutex.RUnlock()
-	fake.commitMutex.RLock()
-	defer fake.commitMutex.RUnlock()
+	fake.closeConnMutex.RLock()
+	defer fake.closeConnMutex.RUnlock()
+	fake.endTxMutex.RLock()
+	defer fake.endTxMutex.RUnlock()
+	fake.getConnMutex.RLock()
+	defer fake.getConnMutex.RUnlock()
 	fake.getTxMutex.RLock()
 	defer fake.getTxMutex.RUnlock()
-	fake.rollbackMutex.RLock()
-	defer fake.rollbackMutex.RUnlock()
+	fake.openConnMutex.RLock()
+	defer fake.openConnMutex.RUnlock()
+	fake.startTxMutex.RLock()
+	defer fake.startTxMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

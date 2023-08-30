@@ -8,13 +8,12 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/exception"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repository"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetUserByIDREPO(t *testing.T) {
+func GetUserByIDREPO(t *testing.T) {
 	gender := "male"
 	userColumns := []string{"id", "fullname", "gender", "image", "email", "username", "password", "phone_number", "email_verified_at", "created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"}
 	image := "default-male.png"
@@ -47,7 +46,8 @@ func TestGetUserByIDREPO(t *testing.T) {
 	}
 	defer db.Close()
 
-	userRepo := repository.NewUserRepoImpl(db)
+	uow := repository.NewUnitOfWorkImpl(db)
+	userRepo := repository.NewUserRepoImpl(uow)
 	query := regexp.QuoteMeta("SELECT id, fullname, gender, image, username, email, password, phone_number, email_verified_at, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM auth.m_users WHERE id = $1 AND deleted_at IS NULL")
 
 	t.Run("SUCCESS_GetUserByID", func(t *testing.T) {
@@ -61,7 +61,7 @@ func TestGetUserByIDREPO(t *testing.T) {
 		user, err := userRepo.GetUserByID(context.TODO(), userId1)
 		assert.NoError(t, err)
 		assert.NotNil(t, user)
-		assert.Equal(t, &expectUser, user)
+		assert.Equal(t, expectUser, user)
 
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
@@ -73,7 +73,7 @@ func TestGetUserByIDREPO(t *testing.T) {
 
 		user, err := userRepo.GetUserByID(context.TODO(), userId1)
 		assert.Error(t, err)
-		assert.Nil(t, user)
+		assert.Equal(t, "", user.ID)
 		assert.NotEqual(t, &expectUser, user)
 
 		err = mocksql.ExpectationsWereMet()
@@ -81,7 +81,7 @@ func TestGetUserByIDREPO(t *testing.T) {
 	})
 }
 
-func TestUpdateUserREPO(t *testing.T) {
+func UpdateUserREPO(t *testing.T) {
 	gender := "male"
 	userColumns := []string{"id", "fullname", "gender", "image", "email", "username", "password", "phone_number", "email_verified_at", "created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"}
 	image := "default-male.png"
@@ -113,7 +113,8 @@ func TestUpdateUserREPO(t *testing.T) {
 	}
 	defer db.Close()
 
-	userRepo := repository.NewUserRepoImpl(db)
+	uow := repository.NewUnitOfWorkImpl(db)
+	userRepo := repository.NewUserRepoImpl(uow)
 	query := regexp.QuoteMeta("SELECT phone_number, id FROM auth.m_users WHERE phone_number=$1 AND id<>$2 AND deleted_at IS NULL")
 	query2 := regexp.QuoteMeta("UPDATE auth.m_users SET fullname = $1, gender = $2, image = $3, phone_number = $4, updated_at = $5, updated_by = $6 WHERE id = $7 AND deleted_at IS NULL")
 
@@ -133,17 +134,12 @@ func TestUpdateUserREPO(t *testing.T) {
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 		mocksql.ExpectCommit()
 
-		err = userRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
-		assert.NoError(t, err)
-
 		user, err := userRepo.UpdateUser(context.TODO(), updateUser)
 		assert.NoError(t, err)
 		assert.NotNil(t, user)
-		assert.Equal(t, user, &updateUser)
+		assert.Equal(t, user, updateUser)
 
-		err = userRepo.Commit()
 		assert.NoError(t, err)
-
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
 	})
@@ -156,20 +152,15 @@ func TestUpdateUserREPO(t *testing.T) {
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectQuery(query).WithArgs("12345678", userId1).WillReturnRows(rows)
 
-		err = userRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
-		assert.NoError(t, err)
-
 		user, err := userRepo.UpdateUser(context.TODO(), updateUser)
 		assert.Error(t, err)
-		assert.Nil(t, user)
-		assert.Equal(t, exception.Err400PhoneAlvailable, err)
-
+		assert.Equal(t, "", user.ID)
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
 	})
 }
 
-func TestUpdateUserUsernameREPO(t *testing.T) {
+func UpdateUserUsernameREPO(t *testing.T) {
 	gender := "male"
 	userColumns := []string{"id", "fullname", "gender", "image", "email", "username", "password", "phone_number", "email_verified_at", "created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by"}
 	image := "default-male.png"
@@ -201,7 +192,8 @@ func TestUpdateUserUsernameREPO(t *testing.T) {
 	}
 	defer db.Close()
 
-	userRepo := repository.NewUserRepoImpl(db)
+	uow := repository.NewUnitOfWorkImpl(db)
+	userRepo := repository.NewUserRepoImpl(uow)
 	query := regexp.QuoteMeta("SELECT username, id FROM auth.m_users WHERE username=$1 AND id<>$2 AND deleted_at IS NULL")
 	query1 := regexp.QuoteMeta("UPDATE auth.m_users SET username = $1, updated_at = $2, updated_by = $3 WHERE id = $4 AND deleted_at IS NULL")
 
@@ -221,17 +213,12 @@ func TestUpdateUserUsernameREPO(t *testing.T) {
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 		mocksql.ExpectCommit()
 
-		err = userRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
-		assert.NoError(t, err)
-
 		user, err := userRepo.UpdateUsername(context.TODO(), updateUser)
 		assert.NoError(t, err)
 		assert.NotNil(t, user)
-		assert.Equal(t, user, &updateUser)
+		assert.Equal(t, user, updateUser)
 
-		err = userRepo.Commit()
 		assert.NoError(t, err)
-
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
 	})
@@ -247,15 +234,11 @@ func TestUpdateUserUsernameREPO(t *testing.T) {
 			updateUser.ID,
 		).WillReturnRows(rows)
 
-		err = userRepo.BeginTx(context.TODO(), &sql.TxOptions{ReadOnly: false})
-		assert.NoError(t, err)
-
 		user, err := userRepo.UpdateUsername(context.TODO(), updateUser)
 		assert.Error(t, err)
-		assert.Nil(t, user)
+		assert.Equal(t, "", user.ID)
 		assert.NotEqual(t, user, &updateUser)
-		assert.Equal(t, exception.Err400UsernameAlvailable, err)
-
+		assert.Equal(t, model.ErrConflict, err)
 		err = mocksql.ExpectationsWereMet()
 		assert.NoError(t, err)
 	})

@@ -20,11 +20,11 @@ type Profile struct {
 	DeletedBy sql.NullString
 }
 
-func (p *Profile) DefaultValue() Profile {
+func (p *Profile) DefaultValue(userID string) *Profile {
 	id := uuid.NewV4().String()
-	return Profile{
+	return &Profile{
 		ProfileID: id,
-		UserID:    p.UserID,
+		UserID:    userID,
 		Quote:     sql.NullString{},
 		CreatedAt: time.Now().Unix(),
 		CreatedBy: id,
@@ -35,8 +35,8 @@ func (p *Profile) DefaultValue() Profile {
 	}
 }
 
-func (p *Profile) ToResp() dto.ProfileResp {
-	return dto.ProfileResp{
+func (p *Profile) ToResp() *dto.ProfileResp {
+	return &dto.ProfileResp{
 		ProfileID: p.ProfileID,
 		Quote:     p.Quote,
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/rs/zerolog/log"
 )
@@ -29,9 +30,17 @@ func NewPgConn() *sql.DB {
 
 	db.SetMaxIdleConns(setMaxIdleConnsDB)
 	db.SetMaxOpenConns(setMaxOpenConnsDB)
-	db.SetConnMaxIdleTime(setMaxIdleConnsDB)
+	db.SetConnMaxIdleTime(SetConnMaxIdleTimeDB)
 	db.SetConnMaxLifetime(setConnMaxLifetimeDB)
 
 	log.Info().Msgf("connection postgres successfully : %s", PgName)
 	return db
 }
+
+const (
+	setMaxIdleConnsDB    = 5
+	setMaxOpenConnsDB    = 100
+	SetConnMaxIdleTimeDB = 5 * time.Minute
+	setConnMaxLifetimeDB = 60 * time.Minute
+	pgPingTimeOut        = 5 * time.Second
+)

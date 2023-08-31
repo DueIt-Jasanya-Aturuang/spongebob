@@ -46,6 +46,7 @@ func TestAccountDTO(t *testing.T) {
 			ProfileID:   "699137ef-1f24-46d7-82bf-862fde7b36d8",
 			UserID:      "699137ef-1f24-46d7-82bf-862fde7b36d8",
 			FullName:    "rama",
+			Profesi:     "123456",
 			Gender:      "male",
 			Image:       fileHeader,
 			PhoneNumber: "123456789012",

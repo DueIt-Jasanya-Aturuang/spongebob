@@ -27,6 +27,8 @@ paths:
               properties:
                 full_name:
                   type: string
+                profesi:
+                  type: string
                 gender:
                   type: string
                   enum:

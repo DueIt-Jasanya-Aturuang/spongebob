@@ -84,6 +84,7 @@ func SuccessUpdateProfile(t *testing.T) {
 			ProfileID: profileID_1,
 			UserID:    userID_1,
 			Quote:     sql.NullString{String: "semagat", Valid: true},
+			Profesi:   sql.NullString{String: "semagat", Valid: true},
 			CreatedAt: time.Now().Unix(),
 			CreatedBy: "id1",
 			UpdatedAt: time.Now().Unix(),

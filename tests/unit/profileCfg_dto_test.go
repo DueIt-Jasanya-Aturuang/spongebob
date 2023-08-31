@@ -1,7 +1,7 @@
 package unit
 
 import (
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/validation"
+	validation2 "github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/validation"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -19,7 +19,7 @@ func TestProfileCfgDTO(t *testing.T) {
 			Token:       "12345678901",
 		}
 
-		err := validation.CreateProfileCfg(&reqCreate)
+		err := validation2.CreateProfileCfg(&reqCreate)
 		assert.NoError(t, err)
 	})
 
@@ -34,7 +34,7 @@ func TestProfileCfgDTO(t *testing.T) {
 			Token:       "678901",
 		}
 
-		err := validation.CreateProfileCfg(&reqCreate)
+		err := validation2.CreateProfileCfg(&reqCreate)
 		t.Log(err)
 		assert.Error(t, err)
 	})
@@ -49,7 +49,7 @@ func TestProfileCfgDTO(t *testing.T) {
 			Token:       "12345678901",
 			ConfigName:  "DAILY_NOTIFY",
 		}
-		err := validation.UpdateProfileCfgValidate(&reqUpdate)
+		err := validation2.UpdateProfileCfgValidate(&reqUpdate)
 		assert.NoError(t, err)
 	})
 
@@ -64,7 +64,7 @@ func TestProfileCfgDTO(t *testing.T) {
 			ConfigName:  "asd",
 		}
 
-		err := validation.UpdateProfileCfgValidate(&reqUpdate)
+		err := validation2.UpdateProfileCfgValidate(&reqUpdate)
 		assert.Error(t, err)
 	})
 }

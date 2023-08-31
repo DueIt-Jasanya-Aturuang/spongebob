@@ -51,7 +51,7 @@ func UpdateAccountValidate(req *dto.UpdateAccountReq) error {
 		badReq["profesi"] = append(badReq["profesi"], fmt.Sprintf(MinString, "profesi", 6))
 	}
 
-	if req.Gender != "male" && req.Gender != "female" && req.Gender != "undefinied" {
+	if req.Gender != "male" && req.Gender != "female" && req.Gender != "undefined" {
 		badReq["gender"] = append(badReq["gender"], fmt.Sprintf(Gender, "gender"))
 	}
 

@@ -35,7 +35,7 @@ paths:
                     - male
                     - female
                   description: >
-                    * enum : male | female | undefinied
+                    * enum : male | female | undefined
                 phone_number:
                   type: string
                 image:

@@ -17,6 +17,7 @@ func UpdateAccountToModel(
 		ProfileID: req.ProfileID,
 		UserID:    req.UserID,
 		Quote:     sql.NullString{String: req.Quote},
+		Profesi:   sql.NullString{String: req.Profesi},
 		UpdatedAt: timeUnix,
 		UpdatedBy: sql.NullString{String: req.ProfileID},
 	}

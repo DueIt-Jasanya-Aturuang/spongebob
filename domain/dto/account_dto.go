@@ -12,4 +12,5 @@ type UpdateAccountReq struct {
 	Image       *multipart.FileHeader `json:"image" form:"image"`               // request body
 	PhoneNumber string                `json:"phone_number" form:"phone_number"` // request body
 	Quote       string                `json:"quote" form:"quote"`               // request body
+	Profesi     string                `json:"profesi" form:"profesi"`           // request body
 }

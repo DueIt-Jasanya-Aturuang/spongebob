@@ -20,7 +20,7 @@ func NewProfileRepoImpl(uow repository.UnitOfWork) repository.ProfileRepo {
 }
 
 func (repo *ProfileRepoImpl) GetProfileByID(ctx context.Context, id string) (model.Profile, error) {
-	query := `SELECT id, user_id, quotes, created_at, created_by, 
+	query := `SELECT id, user_id, quotes, profesi, created_at, created_by, 
        				 updated_at, updated_by, deleted_at, deleted_by 
 			  FROM dueit.m_profiles WHERE id = $1 AND deleted_at IS NULL`
 
@@ -51,7 +51,7 @@ func (repo *ProfileRepoImpl) GetProfileByID(ctx context.Context, id string) (mod
 
 // GetProfileByUserID get profile by user id
 func (repo *ProfileRepoImpl) GetProfileByUserID(ctx context.Context, userID string) (model.Profile, error) {
-	query := `SELECT id, user_id, quotes, created_at, created_by, 
+	query := `SELECT id, user_id, quotes, profesi, created_at, created_by, 
        				 updated_at, updated_by, deleted_at, deleted_by 
 			  FROM dueit.m_profiles WHERE user_id = $1 AND deleted_at IS NULL`
 
@@ -110,8 +110,8 @@ func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, profile model.Pro
 		return model.Profile{}, model.ErrConflict
 	}
 
-	query = `INSERT INTO dueit.m_profiles (id, user_id, quotes, created_at, created_by, updated_at) 
-			 VALUES ($1, $2, $3, $4, $5, $6)`
+	query = `INSERT INTO dueit.m_profiles (id, user_id, quotes, profesi, created_at, created_by, updated_at) 
+			 VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
 	execSTMT, err := tx.PrepareContext(ctx, query)
 	if err != nil {
@@ -129,6 +129,7 @@ func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, profile model.Pro
 		profile.ProfileID,
 		profile.UserID,
 		profile.Quote,
+		profile.Profesi,
 		profile.CreatedAt,
 		profile.CreatedBy,
 		profile.UpdatedAt,
@@ -141,8 +142,8 @@ func (repo *ProfileRepoImpl) StoreProfile(ctx context.Context, profile model.Pro
 }
 
 func (repo *ProfileRepoImpl) UpdateProfile(ctx context.Context, profile model.Profile) (model.Profile, error) {
-	query := `UPDATE dueit.m_profiles SET quotes = $1, updated_by = $2, updated_at = $3 
-              WHERE user_id = $4 AND id = $5 AND deleted_at IS NULL`
+	query := `UPDATE dueit.m_profiles SET quotes = $1, profesi = $2,  updated_by = $3, updated_at = $4 
+              WHERE user_id = $5 AND id = $6 AND deleted_at IS NULL`
 
 	tx, err := repo.GetTx()
 	if err != nil {
@@ -163,6 +164,7 @@ func (repo *ProfileRepoImpl) UpdateProfile(ctx context.Context, profile model.Pr
 	if _, err = stmt.ExecContext(
 		ctx,
 		profile.Quote,
+		profile.Profesi,
 		profile.ProfileID,
 		profile.UpdatedAt,
 		profile.UserID,
@@ -182,6 +184,7 @@ func (repo *ProfileRepoImpl) scanRow(row *sql.Row) (model.Profile, error) {
 		&profile.ProfileID,
 		&profile.UserID,
 		&profile.Quote,
+		&profile.Profesi,
 		&profile.CreatedAt,
 		&profile.CreatedBy,
 		&profile.UpdatedAt,

@@ -2,7 +2,7 @@ package unit
 
 import (
 	"bytes"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/validation"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/validation"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/stretchr/testify/assert"
 	"mime/multipart"

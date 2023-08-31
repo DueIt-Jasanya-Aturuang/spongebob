@@ -2,7 +2,7 @@ package restapi
 
 import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/response"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/validation"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/validation"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"

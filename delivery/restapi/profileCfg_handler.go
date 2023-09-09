@@ -108,6 +108,13 @@ func (h *ProfileCfgHandler) UpdateProfileCfg(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	if req.ConfigName == "DAILY_NOTIFY" {
+		req.Value = strings.Split(req.ConfigValue, " ")[0]
+		req.IanaTimezone = strings.Split(req.ConfigValue, " ")[1]
+	} else {
+		req.Value = req.ConfigValue
+	}
+
 	profileCfg, err := h.profileCfgUsecase.UpdateProfileCfg(r.Context(), *req)
 	if err != nil {
 		response.NewError(w, r, err)

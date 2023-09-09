@@ -4,10 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
+
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/response"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/utils/message"
-	"time"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
@@ -67,10 +68,9 @@ func (u *ProfileUsecaseImpl) StoreProfile(c context.Context, req *dto.StoreProfi
 
 	_, err = u.userRepo.GetUserByID(ctx, req.UserID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, model.ErrForbidden
+		if !errors.Is(err, sql.ErrNoRows) {
+			return nil, err
 		}
-		return nil, err
 	}
 	var profile *model.Profile
 	profile = profile.DefaultValue(req.UserID)

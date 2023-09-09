@@ -1,13 +1,15 @@
 package restapi
 
 import (
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/response"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/validation"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/validation"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
-	"github.com/go-chi/chi/v5"
-	"net/http"
 )
 
 type AccountHandler struct {
@@ -25,13 +27,13 @@ func NewAccountHandler(
 func (h *AccountHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 	req := new(dto.UpdateAccountReq)
 
-	err := response.ParserMultiparForm(r, req)
+	err := response.ParserMultipartForm(r, req)
 	if err != nil {
 		response.NewError(w, r, err)
 		return
 	}
 
-	req.UserID = r.Header.Get("User-Id")
+	req.UserID = r.Header.Get("User-ID")
 	req.ProfileID = chi.URLParam(r, "profile-id")
 
 	err = validation.UpdateAccountValidate(req)

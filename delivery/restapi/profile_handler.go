@@ -1,12 +1,13 @@
 package restapi
 
 import (
+	"net/http"
+
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/response"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/validation"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/validation"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
-	"net/http"
 )
 
 type ProfileHandler struct {
@@ -24,7 +25,7 @@ func NewProfileHandler(
 func (h *ProfileHandler) GetProfileByID(w http.ResponseWriter, r *http.Request) {
 	req := new(dto.GetProfileReq)
 
-	userId := r.Header.Get("User-Id")
+	userId := r.Header.Get("User-ID")
 
 	req.UserID = userId
 

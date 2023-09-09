@@ -1,4 +1,4 @@
 package message
 
-const PhoneNumberIsAlavilable = "cellphone number is registered / available"
-const ProfileIsAlvailable = "profiles are available"
+const PhoneNumberIsAvailable = "cellphone number is registered / available"
+const ProfileIsAvailable = "profiles are available"

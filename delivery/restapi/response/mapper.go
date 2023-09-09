@@ -27,7 +27,7 @@ func DecodeReq(r *http.Request, data any) error {
 	return nil
 }
 
-func ParserMultiparForm(r *http.Request, data any) error {
+func ParserMultipartForm(r *http.Request, data any) error {
 	if err := r.ParseMultipartForm(3 << 20); err != nil {
 		log.Err(err).Msg(message.ErrParseForm)
 		return Err400(map[string][]string{

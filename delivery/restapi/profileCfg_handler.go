@@ -1,14 +1,16 @@
 package restapi
 
 import (
+	"net/http"
+	"strings"
+
+	"github.com/go-chi/chi/v5"
+
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/response"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/validation"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/validation"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
-	"github.com/go-chi/chi/v5"
-	"net/http"
-	"strings"
 )
 
 type ProfileCfgHandler struct {
@@ -32,7 +34,7 @@ func (h *ProfileCfgHandler) CreateProfileCfg(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	req.UserID = r.Header.Get("User-Id")
+	req.UserID = r.Header.Get("User-ID")
 	req.ProfileID = chi.URLParam(r, "profile-id")
 
 	err = validation.CreateProfileCfg(req)
@@ -66,7 +68,7 @@ func (h *ProfileCfgHandler) GetProfileCfgByNameAndID(w http.ResponseWriter, r *h
 
 	req.ConfigName = chi.URLParam(r, "config-name")
 	req.ProfileID = chi.URLParam(r, "profile-id")
-	req.UserID = r.Header.Get("User-id")
+	req.UserID = r.Header.Get("User-ID")
 
 	err := validation.GetProfileCfgValidation(req)
 	if err != nil {
@@ -98,12 +100,19 @@ func (h *ProfileCfgHandler) UpdateProfileCfg(w http.ResponseWriter, r *http.Requ
 
 	req.ConfigName = chi.URLParam(r, "config-name")
 	req.ProfileID = chi.URLParam(r, "profile-id")
-	req.UserID = r.Header.Get("User-id")
+	req.UserID = r.Header.Get("User-ID")
 
 	err = validation.UpdateProfileCfgValidate(req)
 	if err != nil {
 		response.NewError(w, r, err)
 		return
+	}
+
+	if req.ConfigName == "DAILY_NOTIFY" {
+		req.Value = strings.Split(req.ConfigValue, " ")[0]
+		req.IanaTimezone = strings.Split(req.ConfigValue, " ")[1]
+	} else {
+		req.Value = req.ConfigValue
 	}
 
 	profileCfg, err := h.profileCfgUsecase.UpdateProfileCfg(r.Context(), *req)

@@ -2,7 +2,6 @@ package dto
 
 import "C"
 
-// CreateProfileCfgReq create profile config request
 type CreateProfileCfgReq struct {
 	ConfigValue  string   `json:"config_value"` // request body
 	Days         []string `json:"days"`         // request body
@@ -15,7 +14,6 @@ type CreateProfileCfgReq struct {
 	IanaTimezone string   // helper
 }
 
-// UpdateProfileCfgReq update profile config request
 type UpdateProfileCfgReq struct {
 	ConfigValue  string   `json:"config_value"` // request body
 	Days         []string `json:"days"`         // request body
@@ -28,7 +26,6 @@ type UpdateProfileCfgReq struct {
 	IanaTimezone string   // helper
 }
 
-// GetProfileCfgReq get profile config request
 type GetProfileCfgReq struct {
 	UserID     string // request header
 	ConfigName string // url parameter config-name

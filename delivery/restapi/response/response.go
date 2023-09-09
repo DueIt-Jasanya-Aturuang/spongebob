@@ -5,12 +5,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/utils/message"
+	"net/http"
+
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-	"net/http"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/utils/message"
 )
 
 func NewError(w http.ResponseWriter, _ *http.Request, err error) {
@@ -57,6 +59,13 @@ func NewError(w http.ResponseWriter, _ *http.Request, err error) {
 
 	case errors.Is(err, sql.ErrNoRows):
 		err = Err404("DATA NOT FOUND", err)
+
+	case errors.Is(err, model.ErrConflict):
+		err = Err409(map[string][]string{
+			"conflict": {
+				"your profile sudah tersedia",
+			},
+		}, err)
 
 	//	type error checking
 	case errors.Is(err, model.ErrUnauthorization):

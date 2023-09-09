@@ -12,6 +12,7 @@ type Profile struct {
 	ProfileID string
 	UserID    string
 	Quote     sql.NullString
+	Profesi   sql.NullString
 	CreatedAt int64
 	CreatedBy string
 	UpdatedAt int64
@@ -26,6 +27,7 @@ func (p *Profile) DefaultValue(userID string) *Profile {
 		ProfileID: id,
 		UserID:    userID,
 		Quote:     sql.NullString{},
+		Profesi:   sql.NullString{},
 		CreatedAt: time.Now().Unix(),
 		CreatedBy: id,
 		UpdatedAt: time.Now().Unix(),
@@ -36,8 +38,23 @@ func (p *Profile) DefaultValue(userID string) *Profile {
 }
 
 func (p *Profile) ToResp() *dto.ProfileResp {
+	var quote string
+	var profesi string
+	if p.Quote.Valid {
+		quote = p.Quote.String
+	} else {
+		quote = "null"
+	}
+
+	if p.Profesi.Valid {
+		profesi = p.Profesi.String
+	} else {
+		profesi = "null"
+	}
+
 	return &dto.ProfileResp{
 		ProfileID: p.ProfileID,
-		Quote:     p.Quote,
+		Quote:     quote,
+		Profesi:   profesi,
 	}
 }

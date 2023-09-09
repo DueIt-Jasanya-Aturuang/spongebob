@@ -44,7 +44,14 @@ func UpdateAccountValidate(req *dto.UpdateAccountReq) error {
 		badReq["full_name"] = append(badReq["full_name"], fmt.Sprintf(MinString, "full_name", 3))
 	}
 
-	if req.Gender != "male" && req.Gender != "female" && req.Gender != "undefinied" {
+	if len(req.Profesi) > 30 {
+		badReq["profesi"] = append(badReq["profesi"], fmt.Sprintf(MaxString, "profesi", 30))
+	}
+	if len(req.Profesi) < 6 {
+		badReq["profesi"] = append(badReq["profesi"], fmt.Sprintf(MinString, "profesi", 6))
+	}
+
+	if req.Gender != "male" && req.Gender != "female" && req.Gender != "undefined" {
 		badReq["gender"] = append(badReq["gender"], fmt.Sprintf(Gender, "gender"))
 	}
 

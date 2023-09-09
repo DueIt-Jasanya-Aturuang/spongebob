@@ -1,7 +1,7 @@
 FROM golang:1.20 AS builder
 
-ENV GO11MODULE=on \
-    CGO_ENABLE=0 \
+ENV GO111MODULE=on \
+    CGO_ENABLED=0 \
     GOOS=linux \
     GOARCH=amd64
 
@@ -19,6 +19,6 @@ COPY --from=builder /app/account /app
 
 WORKDIR /app
 
-EXPOSE 8181
+EXPOSE 7001
 
-CMD ./app
+CMD ./account

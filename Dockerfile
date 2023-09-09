@@ -1,24 +1,37 @@
-FROM golang:1.20 AS builder
+# Stage 1: Build the Go application
+FROM golang:1.20 AS build
+# Set cgo_enabled to 1
+ENV CGO_ENABLED=1
 
-ENV GO111MODULE=on \
-    CGO_ENABLED=1 \
-    GOOS=linux \
-    GOARCH=amd64
-
+# Set the working directory inside the container
 WORKDIR /app
+
+# Copy go.mod and go.sum files to download dependencies
+COPY go.mod go.sum ./
+
+# Download Go module dependencies
+RUN go mod download
+
+# Copy the rest of the application code to the container
 COPY . .
 
-RUN go mod download
+# Build the Go application
 RUN go build -o account .
 
-FROM alpine:latest
+# Stage 2: Create a minimal runtime container using Alpine Linux
+FROM alpine:latest AS final
 
-RUN mkdir /app
-
-COPY --from=builder /app/account /app
-
+# Set the working directory inside the container
 WORKDIR /app
 
-EXPOSE 7002
+# Copy the built binary from the previous stage
+COPY --from=build /app/account .
 
-CMD ./account
+# Install GLIBC
+RUN apk add gcompat
+
+# Expose the port your application listens on (if applicable)
+# EXPOSE 8080
+
+# Run your application
+CMD ["./account"]

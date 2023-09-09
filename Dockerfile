@@ -1,10 +1,11 @@
 FROM golang:1.20 AS builder
 
-RUN mkdir /app
-RUN cd /app
+ENV GO111MODULE=on \
+    CGO_ENABLED=1 \
+    GOOS=linux \
+    GOARCH=amd64
 
 WORKDIR /app
-
 COPY . .
 
 RUN go mod download

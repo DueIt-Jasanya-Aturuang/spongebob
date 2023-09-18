@@ -41,9 +41,9 @@ func (u *User) ToResp(emailFormat string) *ResponseUser {
 }
 
 type UserRepo interface {
-	GetByID(c context.Context, id string) (User, error)
-	Update(c context.Context, user User) (User, error)
-	CheckPhoneNumberExists(c context.Context, id string, newPhoneNumber string) (exists bool, err error)
-	UpdateUsername(c context.Context, user User) (User, error)
+	GetByID(ctx context.Context, id string) (*User, error)
+	Update(ctx context.Context, user *User) error
+	CheckPhoneNumberExists(ctx context.Context, id string, newPhoneNumber string) (bool, error)
+	UpdateUsername(ctx context.Context, user *User) (bool, error)
 	UnitOfWorkRepository
 }

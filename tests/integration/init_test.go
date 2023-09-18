@@ -2,13 +2,15 @@ package integration
 
 import (
 	"database/sql"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	repository2 "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repository"
-	"github.com/minio/minio-go/v7"
-	uuid "github.com/satori/go.uuid"
 	"testing"
 	"time"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+	repository2 "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
+	"github.com/minio/minio-go/v7"
+	uuid "github.com/satori/go.uuid"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/repository"
 )
 
 var (

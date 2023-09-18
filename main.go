@@ -10,8 +10,8 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi"
 	cusmiddleware "github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/middleware"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/config"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repository"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/config"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/repository"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/usecase"
 )
 

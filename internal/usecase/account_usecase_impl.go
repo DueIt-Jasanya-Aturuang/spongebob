@@ -5,17 +5,20 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/response"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/utils/message"
 	"strings"
 	"time"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/response"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/utils/message"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/config"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/config"
 )
 
 type AccountUsecaseImpl struct {

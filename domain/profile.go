@@ -18,10 +18,10 @@ type Profile struct {
 
 //counterfeiter:generate -o ./../mocks . ProfileRepo
 type ProfileRepo interface {
-	GetByID(ctx context.Context, id string) (Profile, error)
-	GetByUserID(ctx context.Context, userID string) (Profile, error)
-	Store(ctx context.Context, profile Profile) error
-	Update(ctx context.Context, profile Profile) error
+	GetByID(ctx context.Context, id string) (*Profile, error)
+	GetByUserID(ctx context.Context, userID string) (*Profile, error)
+	Create(ctx context.Context, profile *Profile) (bool, error)
+	Update(ctx context.Context, profile *Profile) error
 	UnitOfWorkRepository
 }
 

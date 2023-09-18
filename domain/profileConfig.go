@@ -56,12 +56,12 @@ type ProfileConfigScheduler struct {
 	Time string
 }
 
-//counterfeiter:generate -o ./../mocks . ProfileCfgRepo
-type ProfileCfgRepo interface {
-	Store(ctx context.Context, profileCfg ProfileConfig) error
-	Update(ctx context.Context, profileCfg ProfileConfig) error
-	GetByNameAndID(ctx context.Context, profileID string, configName string) (ProfileConfig, error)
-	GetByScheduler(ctx context.Context, ProfileConfigScheduler ProfileConfigScheduler) ([]ProfileConfig, error)
+//counterfeiter:generate -o ./../mocks . ProfileConfigRepo
+type ProfileConfigRepo interface {
+	Create(ctx context.Context, profileCfg *ProfileConfig) (bool, error)
+	Update(ctx context.Context, profileCfg *ProfileConfig) error
+	GetByNameAndID(ctx context.Context, profileID string, configName string) (*ProfileConfig, error)
+	GetByScheduler(ctx context.Context, ProfileConfigScheduler ProfileConfigScheduler) (*[]ProfileConfig, error)
 	UnitOfWorkRepository
 }
 

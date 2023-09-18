@@ -1,10 +1,12 @@
 package middleware
 
 import (
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/response"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/config"
 	"net/http"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/response"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/config"
 )
 
 func IPMiddleware(next http.Handler) http.Handler {

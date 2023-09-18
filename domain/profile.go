@@ -1,10 +1,10 @@
-package model
+package domain
 
 import (
+	"context"
 	"database/sql"
 	"time"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -13,12 +13,16 @@ type Profile struct {
 	UserID    string
 	Quote     sql.NullString
 	Profesi   sql.NullString
-	CreatedAt int64
-	CreatedBy string
-	UpdatedAt int64
-	UpdatedBy sql.NullString
-	DeletedAt sql.NullInt64
-	DeletedBy sql.NullString
+	AuditInfo
+}
+
+//counterfeiter:generate -o ./../mocks . ProfileRepo
+type ProfileRepo interface {
+	GetByID(ctx context.Context, id string) (Profile, error)
+	GetByUserID(ctx context.Context, userID string) (Profile, error)
+	Store(ctx context.Context, profile Profile) error
+	Update(ctx context.Context, profile Profile) error
+	UnitOfWorkRepository
 }
 
 func (p *Profile) DefaultValue(userID string) *Profile {
@@ -28,16 +32,18 @@ func (p *Profile) DefaultValue(userID string) *Profile {
 		UserID:    userID,
 		Quote:     sql.NullString{},
 		Profesi:   sql.NullString{},
-		CreatedAt: time.Now().Unix(),
-		CreatedBy: id,
-		UpdatedAt: time.Now().Unix(),
-		UpdatedBy: sql.NullString{},
-		DeletedAt: sql.NullInt64{},
-		DeletedBy: sql.NullString{},
+		AuditInfo: AuditInfo{
+			CreatedAt: time.Now().Unix(),
+			CreatedBy: id,
+			UpdatedAt: time.Now().Unix(),
+			UpdatedBy: sql.NullString{},
+			DeletedAt: sql.NullInt64{},
+			DeletedBy: sql.NullString{},
+		},
 	}
 }
 
-func (p *Profile) ToResp() *dto.ProfileResp {
+func (p *Profile) ToResp() *ResponseProfile {
 	var quote string
 	var profesi string
 	if p.Quote.Valid {
@@ -52,7 +58,7 @@ func (p *Profile) ToResp() *dto.ProfileResp {
 		profesi = "null"
 	}
 
-	return &dto.ProfileResp{
+	return &ResponseProfile{
 		ProfileID: p.ProfileID,
 		Quote:     quote,
 		Profesi:   profesi,

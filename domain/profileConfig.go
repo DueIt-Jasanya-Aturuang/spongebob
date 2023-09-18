@@ -1,8 +1,19 @@
-package dto
+package domain
 
-import "C"
+import (
+	"context"
+)
 
-type CreateProfileCfgReq struct {
+type ProfileConfig struct {
+	ID          string
+	ProfileID   string
+	ConfigName  string
+	ConfigValue string
+	Status      string
+	AuditInfo
+}
+
+type RequestCreateProfileConfig struct {
 	ConfigValue  string   `json:"config_value"` // request body
 	Days         []string `json:"days"`         // request body
 	ConfigName   string   `json:"config_name"`  // request body
@@ -14,7 +25,7 @@ type CreateProfileCfgReq struct {
 	IanaTimezone string   // helper
 }
 
-type UpdateProfileCfgReq struct {
+type RequsetUpdateProfileConfig struct {
 	ConfigValue  string   `json:"config_value"` // request body
 	Days         []string `json:"days"`         // request body
 	Status       string   `json:"status"`       // request body
@@ -26,13 +37,13 @@ type UpdateProfileCfgReq struct {
 	IanaTimezone string   // helper
 }
 
-type GetProfileCfgReq struct {
+type RequestGetProfileConfig struct {
 	UserID     string // request header
 	ConfigName string // url parameter config-name
 	ProfileID  string // url 		parameter profile-id
 }
 
-type ProfileCfgResp struct {
+type ResponseProfileConfig struct {
 	ID          string `json:"profile_config_id"`
 	ProfileID   string `json:"profile_id"`
 	ConfigName  string `json:"config_name"`
@@ -40,7 +51,23 @@ type ProfileCfgResp struct {
 	Status      string `json:"status"`
 }
 
-type ProfileCfgSche struct {
+type ProfileConfigScheduler struct {
 	Day  string
 	Time string
+}
+
+//counterfeiter:generate -o ./../mocks . ProfileCfgRepo
+type ProfileCfgRepo interface {
+	Store(ctx context.Context, profileCfg ProfileConfig) error
+	Update(ctx context.Context, profileCfg ProfileConfig) error
+	GetByNameAndID(ctx context.Context, profileID string, configName string) (ProfileConfig, error)
+	GetByScheduler(ctx context.Context, ProfileConfigScheduler ProfileConfigScheduler) ([]ProfileConfig, error)
+	UnitOfWorkRepository
+}
+
+//counterfeiter:generate -o ./../mocks . ProfileCfgUsecase
+type ProfileCfgUsecase interface {
+	Create(ctx context.Context, req RequestCreateProfileConfig) (ResponseProfileConfig, error)
+	GetByNameAndID(ctx context.Context, req RequestGetProfileConfig) (ResponseProfileConfig, error)
+	Update(ctx context.Context, req RequsetUpdateProfileConfig) (ResponseProfileConfig, error)
 }

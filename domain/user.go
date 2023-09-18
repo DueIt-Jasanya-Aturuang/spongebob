@@ -1,9 +1,8 @@
-package model
+package domain
 
 import (
+	"context"
 	"database/sql"
-
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 )
 
 type User struct {
@@ -16,15 +15,10 @@ type User struct {
 	Password        string
 	PhoneNumber     sql.NullString
 	EmailVerifiedAt bool
-	CreatedAt       int64
-	CreatedBy       string
-	UpdatedAt       int64
-	UpdatedBy       sql.NullString
-	DeletedAt       sql.NullInt64
-	DeletedBy       sql.NullString
+	AuditInfo
 }
 
-func (u *User) ToResp(emailFormat string) *dto.UserResp {
+func (u *User) ToResp(emailFormat string) *ResponseUser {
 	var phoneNumber string
 
 	if u.PhoneNumber.Valid {
@@ -33,7 +27,7 @@ func (u *User) ToResp(emailFormat string) *dto.UserResp {
 		phoneNumber = "null"
 	}
 
-	return &dto.UserResp{
+	return &ResponseUser{
 		ID:              u.ID,
 		FullName:        u.FullName,
 		Gender:          u.Gender,
@@ -44,4 +38,12 @@ func (u *User) ToResp(emailFormat string) *dto.UserResp {
 		PhoneNumber:     phoneNumber,
 		EmailVerifiedAt: u.EmailVerifiedAt,
 	}
+}
+
+type UserRepo interface {
+	GetByID(c context.Context, id string) (User, error)
+	Update(c context.Context, user User) (User, error)
+	CheckPhoneNumberExists(c context.Context, id string, newPhoneNumber string) (exists bool, err error)
+	UpdateUsername(c context.Context, user User) (User, error)
+	UnitOfWorkRepository
 }

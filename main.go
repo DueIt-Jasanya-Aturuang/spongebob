@@ -2,17 +2,16 @@ package main
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog/log"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi"
-	cusmiddleware "github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/middleware"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/config"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repository"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest"
+	cusmiddleware "github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest/middleware"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/config"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_repository"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
 )
 
 func main() {
@@ -39,27 +38,26 @@ func main() {
 		panic(err)
 	}
 
-	uow := repository.NewUnitOfWorkImpl(pgConn)
-	profileRepoCfg := repository.NewProfileCfgRepoImpl(uow)
-	profileRepo := repository.NewProfileRepoImpl(uow)
-	userRepo := repository.NewUserRepoImpl(uow)
-	minioRepo := repository.NewMinioImpl(minioConn)
+	uow := _repository.NewUnitOfWorkRepositoryImpl(pgConn)
+	profileRepoCfg := _repository.NewProfileConfigRepoImpl(uow)
+	profileRepo := _repository.NewProfileRepoImpl(uow)
+	userRepo := _repository.NewUserRepoImpl(uow)
+	minioRepo := _repository.NewMinioImpl(minioConn)
 
-	accountUsecase := usecase.NewAccountUsecaseImpl(profileRepo, userRepo, minioRepo, 10*time.Second)
-	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepo, userRepo, 10*time.Second)
-	profileCfgUsecase := usecase.NewProfileCfgUsecaseImpl(profileRepo, profileRepoCfg, 10*time.Second)
+	accountUsecase := _usecase.NewAccountUsecaseImpl(profileRepo, userRepo, minioRepo)
+	profileCfgUsecase := _usecase.NewProfileConfigUsecaseImpl(profileRepo, profileRepoCfg)
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
 	r.Use(cusmiddleware.IPMiddleware)
 
-	accountHandler := restapi.NewAccountHandler(accountUsecase)
-	profileHandler := restapi.NewProfileHandler(profileUsecase)
-	profileCfgHandler := restapi.NewProfileCfgHandler(profileCfgUsecase)
+	accountHandler := rest.NewAccountHandler(accountUsecase)
+	profileCfgHandler := rest.NewProfileCfgHandler(profileCfgUsecase)
 
 	r.Put("/account/{profile-id}", accountHandler.UpdateAccount)
-	r.Get("/account/profile", profileHandler.GetProfileByID)
-	r.Post("/account/profile", profileHandler.StoreProfile)
+	r.Get("/account/profile", accountHandler.GetProfileByID)
+	r.Post("/account/profile", accountHandler.CreateProfile)
+
 	r.Post("/account/profile-config/{profile-id}", profileCfgHandler.CreateProfileCfg)
 	r.Get("/account/profile-config/{profile-id}/{config-name}", profileCfgHandler.GetProfileCfgByNameAndID)
 	r.Put("/account/profile-config/{profile-id}/{config-name}", profileCfgHandler.UpdateProfileCfg)

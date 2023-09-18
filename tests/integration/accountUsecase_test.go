@@ -9,17 +9,18 @@ import (
 	"time"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/config"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repository"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/usecase"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/config"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/repository"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
 )
 
 func AccountUpdateUSECASE(t *testing.T) {
 	config.MinIoBucket = "files"
 	minio := repository.NewMinioImpl(minioClient)
 	timeOut := 2 * time.Second
-	account := usecase.NewAccountUsecaseImpl(ProfileRepo, UserRepo, minio, timeOut)
+	account := _usecase.NewAccountUsecaseImpl(ProfileRepo, UserRepo, minio, timeOut)
 
 	fileContent := []byte("file content")
 	fileHeader := &multipart.FileHeader{

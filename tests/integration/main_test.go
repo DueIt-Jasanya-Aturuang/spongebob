@@ -5,9 +5,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/config"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/tests/integration/utils"
 	"github.com/ory/dockertest/v3"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/config"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/tests/integration/utils"
 )
 
 func TestMain(t *testing.M) {

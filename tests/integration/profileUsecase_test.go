@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
 	"github.com/stretchr/testify/assert"
 )
 
 func ProfileUsecase(t *testing.T) {
 	timeOut := 2 * time.Second
-	profile := usecase.NewProfileUsecaseImpl(ProfileRepo, UserRepo, timeOut)
+	profile := _usecase.NewProfileUsecaseImpl(ProfileRepo, UserRepo, timeOut)
 
 	t.Run("SUCCESS_StoreProfile", func(t *testing.T) {
 		profile, err := profile.StoreProfile(context.Background(), &dto.StoreProfileReq{

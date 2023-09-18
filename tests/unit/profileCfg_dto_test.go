@@ -1,10 +1,12 @@
 package unit
 
 import (
-	validation2 "github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/validation"
+	"testing"
+
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/stretchr/testify/assert"
-	"testing"
+
+	validation2 "github.com/DueIt-Jasanya-Aturuang/spongebob/api/validation"
 )
 
 func TestProfileCfgDTO(t *testing.T) {

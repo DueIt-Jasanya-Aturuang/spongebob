@@ -8,9 +8,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infrastructures/repository"
 	"github.com/minio/minio-go/v7"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/repository"
 )
 
 func Minio(t *testing.T) {

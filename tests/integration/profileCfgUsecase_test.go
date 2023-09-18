@@ -3,7 +3,7 @@ package integration
 import (
 	"context"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -13,7 +13,7 @@ func ProfileCfgUSECASE(t *testing.T) {
 	timeOut := 2 * time.Second
 	ctx := context.Background()
 
-	profileCfgUsecase := usecase.NewProfileCfgUsecaseImpl(ProfileRepo, ProfileCfgRepo, timeOut)
+	profileCfgUsecase := _usecase.NewProfileCfgUsecaseImpl(ProfileRepo, ProfileCfgRepo, timeOut)
 	req := dto.CreateProfileCfgReq{
 		ProfileID:   profileID_1,
 		ConfigValue: "19:00 Asia/Jakarta",

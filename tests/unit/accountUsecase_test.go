@@ -4,17 +4,19 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
 	"mime/multipart"
 	"net/http/httptest"
 	"testing"
 	"time"
 
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/converter"
+
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/mocks"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/usecase"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
 )
 
 func multipartFileHeader() *multipart.FileHeader {
@@ -54,7 +56,7 @@ func TestAccountUpdateUsecase(t *testing.T) {
 	timeOutCtx := 3 * time.Second
 	ctx := context.Background()
 	image := "user-images/public/asd.png"
-	accountUsecase := usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
+	accountUsecase := _usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
 
 	profile := model.Profile{
 		ProfileID: "profileid_1",
@@ -101,7 +103,7 @@ func TestAccountUpdateUsecase(t *testing.T) {
 	userRepoMock.GetUserByID(ctx, "userid_1")
 	userRepoMock.GetUserByIDReturns(user, nil)
 
-	profileConv, userConv := helpers.UpdateAccountToModel(&req, user.Image)
+	profileConv, userConv := converter.UpdateAccountToModel(&req, user.Image)
 	profileRepoMock.UpdateProfile(ctx, profileConv)
 	profileRepoMock.UpdateProfileReturns(profile, nil)
 
@@ -134,7 +136,7 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 	ctx := context.Background()
 	image := "/files/user-images/public/asd.png"
 
-	accountUsecase := usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
+	accountUsecase := _usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
 
 	profile := model.Profile{
 		ProfileID: "profileid_1",
@@ -182,7 +184,7 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 	userRepoMock.GetUserByID(ctx, "userid_1")
 	userRepoMock.GetUserByIDReturns(user, nil)
 
-	profileConv, userConv := helpers.UpdateAccountToModel(&req, user.Image)
+	profileConv, userConv := converter.UpdateAccountToModel(&req, user.Image)
 	profileRepoMock.UpdateProfile(ctx, profileConv)
 	profileRepoMock.UpdateProfileReturns(profile, nil)
 

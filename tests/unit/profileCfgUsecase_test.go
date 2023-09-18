@@ -5,15 +5,17 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
 	"testing"
 	"time"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/converter"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/mocks"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/usecase"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
 )
 
 func TestCreateProfileCfgUSECASE(t *testing.T) {
@@ -22,7 +24,7 @@ func TestCreateProfileCfgUSECASE(t *testing.T) {
 	timeOutCtx := 3 * time.Second
 	ctx := context.Background()
 
-	profileCfgUsecase := usecase.NewProfileCfgUsecaseImpl(profileRepoMock, profileCfgRepoMock, timeOutCtx)
+	profileCfgUsecase := _usecase.NewProfileCfgUsecaseImpl(profileRepoMock, profileCfgRepoMock, timeOutCtx)
 
 	request := dto.CreateProfileCfgReq{
 		ProfileID:   "profileid_1",
@@ -63,7 +65,7 @@ func TestCreateProfileCfgUSECASE(t *testing.T) {
 		profileRepoMock.GetProfileByID(ctx, request.ProfileID)
 		profileRepoMock.GetProfileByIDReturns(profile, nil)
 
-		profileCfgConv := helpers.CreateProfileCfgToModel(request, []byte("asd"))
+		profileCfgConv := converter.CreateProfileCfgToModel(request, []byte("asd"))
 		profileCfgRepoMock.StoreProfileCfg(ctx, profileCfgConv)
 		profileCfgRepoMock.StoreProfileCfgReturns(nil)
 
@@ -90,7 +92,7 @@ func TestCreateProfileCfgUSECASE(t *testing.T) {
 		profileRepoMock.GetProfileByID(ctx, request.ProfileID)
 		profileRepoMock.GetProfileByIDReturns(model.Profile{}, sql.ErrNoRows)
 
-		profileCfgConv := helpers.CreateProfileCfgToModel(request, []byte("asd"))
+		profileCfgConv := converter.CreateProfileCfgToModel(request, []byte("asd"))
 		profileCfgRepoMock.StoreProfileCfg(ctx, profileCfgConv)
 		profileCfgRepoMock.StoreProfileCfgReturns(nil)
 
@@ -111,7 +113,7 @@ func TestGetProfileCfgByNameAndIDUSECASE(t *testing.T) {
 	timeOutCtx := 3 * time.Second
 	ctx := context.Background()
 
-	profileCfgUsecase := usecase.NewProfileCfgUsecaseImpl(profileRepoMock, profileCfgRepoMock, timeOutCtx)
+	profileCfgUsecase := _usecase.NewProfileCfgUsecaseImpl(profileRepoMock, profileCfgRepoMock, timeOutCtx)
 
 	configValue, _ := json.Marshal(map[string]any{
 		"config_time_user":       "value",
@@ -195,7 +197,7 @@ func TestUpdateProfileCfgUSECASE(t *testing.T) {
 	timeOutCtx := 3 * time.Second
 	ctx := context.Background()
 
-	profileCfgUsecase := usecase.NewProfileCfgUsecaseImpl(profileRepoMock, profileCfgRepoMock, timeOutCtx)
+	profileCfgUsecase := _usecase.NewProfileCfgUsecaseImpl(profileRepoMock, profileCfgRepoMock, timeOutCtx)
 
 	request := dto.UpdateProfileCfgReq{
 		ProfileID:   "profileid_1",
@@ -260,7 +262,7 @@ func TestUpdateProfileCfgUSECASE(t *testing.T) {
 		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(profileCfg, nil)
 		assert.Equal(t, 1, profileCfgRepoMock.GetProfileCfgByNameAndIDCallCount())
 
-		profileCfgConv := helpers.UpdateProfileCfgToModel(request, []byte("asd"), "DAILY_NOTIF", "cfgid_1")
+		profileCfgConv := converter.UpdateProfileCfgToModel(request, []byte("asd"), "DAILY_NOTIF", "cfgid_1")
 		profileCfgRepoMock.UpdateProfileCfg(ctx, profileCfgConv)
 		profileCfgRepoMock.UpdateProfileCfgReturns(nil)
 		assert.Equal(t, 1, profileCfgRepoMock.UpdateProfileCfgCallCount())
@@ -285,7 +287,7 @@ func TestUpdateProfileCfgUSECASE(t *testing.T) {
 		profileCfgRepoMock.GetProfileCfgByNameAndID(ctx, "nil", "nil")
 		profileCfgRepoMock.GetProfileCfgByNameAndIDReturns(model.ProfileCfg{}, sql.ErrNoRows)
 
-		profileCfgConv := helpers.UpdateProfileCfgToModel(request, []byte("asd"), "DAILY_NOTIF", "cfgid_1")
+		profileCfgConv := converter.UpdateProfileCfgToModel(request, []byte("asd"), "DAILY_NOTIF", "cfgid_1")
 		profileCfgRepoMock.UpdateProfileCfg(ctx, profileCfgConv)
 		profileCfgRepoMock.UpdateProfileCfgReturns(nil)
 

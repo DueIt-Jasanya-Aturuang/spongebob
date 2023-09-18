@@ -58,7 +58,7 @@ func (h *ProfileHandler) StoreProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = validation.StoreProfileValidation(req)
+	err = validation.CreateProfileValidation(req)
 	if err != nil {
 		response.NewError(w, r, err)
 		return

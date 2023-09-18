@@ -1,4 +1,4 @@
-package response
+package helper
 
 import (
 	"encoding/json"
@@ -7,22 +7,26 @@ import (
 	"net/http"
 	"reflect"
 
+	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
+	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
 	"github.com/rs/zerolog/log"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helper/message"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/util"
 )
 
-func DecodeReq(r *http.Request, data any) error {
+func DecodeJson(r *http.Request, data any) error {
 	err := json.NewDecoder(r.Body).Decode(data)
 	if err == io.EOF {
-		return Err400(map[string][]string{
+		log.Warn().Msgf(util.LogErrDecode, err)
+		return _error.HttpErrMapOfSlices(map[string][]string{
 			"bad_request": {
-				"empty body request",
+				"tidak ada request body",
 			},
-		}, err)
+		}, response.CM06)
 	}
 
 	if err != nil {
+		log.Warn().Msgf(util.LogErrDecode, err)
 		return err
 	}
 
@@ -31,12 +35,8 @@ func DecodeReq(r *http.Request, data any) error {
 
 func ParserMultipartForm(r *http.Request, data any) error {
 	if err := r.ParseMultipartForm(3 << 20); err != nil {
-		log.Err(err).Msg(message.ErrParseForm)
-		return Err400(map[string][]string{
-			"unexpected": {
-				"unexpected end of multipart/form-data input",
-			},
-		}, err)
+		log.Warn().Msgf("failed parse multipart form data | err : %v", err)
+		return _error.HttpErrString("unexpected end of multipart/form-data input", response.CM11)
 	}
 
 	val := reflect.ValueOf(data).Elem()

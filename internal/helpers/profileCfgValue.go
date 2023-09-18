@@ -3,23 +3,15 @@ package helpers
 import (
 	"fmt"
 	"time"
-
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
 )
 
 func ConfigValue(configName, value, ianaTimezone string, days []string) (map[string]any, error) {
 	configValue := map[string]any{}
 
 	if configName == "DAILY_NOTIFY" {
-		layout, err := time.Parse("15:04", value)
-		if err != nil {
-			return nil, _usecase.InvalidTime
-		}
+		layout, _ := time.Parse("15:04", value)
 
-		loc, err := time.LoadLocation(ianaTimezone)
-		if err != nil {
-			return nil, _usecase.InvalidTime
-		}
+		loc, _ := time.LoadLocation(ianaTimezone)
 
 		timeLayout := time.Date(2006, 0o1, 0o2, layout.Hour(), layout.Minute(), 0, 0, loc)
 

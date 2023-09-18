@@ -1,25 +1,26 @@
 package rest
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
+	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/usecase"
-
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest/response"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/validation"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
 )
 
 type ProfileCfgHandler struct {
-	profileCfgUsecase usecase.ProfileCfgUsecase
+	profileCfgUsecase domain.ProfileConfigUsecase
 }
 
 func NewProfileCfgHandler(
-	profileCfgUsecase usecase.ProfileCfgUsecase,
+	profileCfgUsecase domain.ProfileConfigUsecase,
 ) *ProfileCfgHandler {
 	return &ProfileCfgHandler{
 		profileCfgUsecase: profileCfgUsecase,
@@ -27,11 +28,11 @@ func NewProfileCfgHandler(
 }
 
 func (h *ProfileCfgHandler) CreateProfileCfg(w http.ResponseWriter, r *http.Request) {
-	req := new(dto.CreateProfileCfgReq)
+	req := new(domain.RequestCreateProfileConfig)
 
-	err := response.DecodeReq(r, req)
+	err := helper.DecodeJson(r, req)
 	if err != nil {
-		response.NewError(w, r, err)
+		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
@@ -40,7 +41,7 @@ func (h *ProfileCfgHandler) CreateProfileCfg(w http.ResponseWriter, r *http.Requ
 
 	err = validation.CreateProfileCfg(req)
 	if err != nil {
-		response.NewError(w, r, err)
+		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
@@ -51,21 +52,27 @@ func (h *ProfileCfgHandler) CreateProfileCfg(w http.ResponseWriter, r *http.Requ
 		req.Value = req.ConfigValue
 	}
 
-	profileCfg, err := h.profileCfgUsecase.CreateProfileCfg(r.Context(), *req)
+	profileCfg, err := h.profileCfgUsecase.Create(r.Context(), req)
 	if err != nil {
-		response.NewError(w, r, err)
+		if errors.Is(err, _usecase.ProfileNotFound) {
+			err = _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
+		}
+		if errors.Is(err, _usecase.ProfileUserIDAndReqUserIDNotMatch) {
+			err = _error.HttpErrString(response.CodeCompanyName[response.CM05], response.CM05)
+		}
+		// conflict
+		if errors.Is(err, _usecase.ProfileConfigIsExist) {
+			err = _error.HttpErrString(response.CodeCompanyName[response.CM06], response.CM06)
+		}
+		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	resp := model.ResponseSuccess{
-		Data: profileCfg,
-	}
-
-	response.NewSucc(w, r, resp, 201)
+	helper.SuccessResponseEncode(w, profileCfg, "created profile config successfully")
 }
 
 func (h *ProfileCfgHandler) GetProfileCfgByNameAndID(w http.ResponseWriter, r *http.Request) {
-	req := new(dto.GetProfileCfgReq)
+	req := new(domain.RequestGetProfileConfig)
 
 	req.ConfigName = chi.URLParam(r, "config-name")
 	req.ProfileID = chi.URLParam(r, "profile-id")
@@ -73,29 +80,31 @@ func (h *ProfileCfgHandler) GetProfileCfgByNameAndID(w http.ResponseWriter, r *h
 
 	err := validation.GetProfileCfgValidation(req)
 	if err != nil {
-		response.NewError(w, r, err)
+		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	profileCfg, err := h.profileCfgUsecase.GetProfileCfgByNameAndID(r.Context(), *req)
+	profileCfg, err := h.profileCfgUsecase.GetByNameAndID(r.Context(), req)
 	if err != nil {
-		response.NewError(w, r, err)
+		if errors.Is(err, _usecase.ProfileNotFound) {
+			err = _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
+		}
+		if errors.Is(err, _usecase.ProfileUserIDAndReqUserIDNotMatch) {
+			err = _error.HttpErrString(response.CodeCompanyName[response.CM05], response.CM05)
+		}
+		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	resp := model.ResponseSuccess{
-		Data: profileCfg,
-	}
-
-	response.NewSucc(w, r, resp, 200)
+	helper.SuccessResponseEncode(w, profileCfg, "data profile config")
 }
 
 func (h *ProfileCfgHandler) UpdateProfileCfg(w http.ResponseWriter, r *http.Request) {
-	req := new(dto.UpdateProfileCfgReq)
+	req := new(domain.RequsetUpdateProfileConfig)
 
-	err := response.DecodeReq(r, req)
+	err := helper.DecodeJson(r, req)
 	if err != nil {
-		response.NewError(w, r, err)
+		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
@@ -105,7 +114,7 @@ func (h *ProfileCfgHandler) UpdateProfileCfg(w http.ResponseWriter, r *http.Requ
 
 	err = validation.UpdateProfileCfgValidate(req)
 	if err != nil {
-		response.NewError(w, r, err)
+		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
@@ -116,15 +125,20 @@ func (h *ProfileCfgHandler) UpdateProfileCfg(w http.ResponseWriter, r *http.Requ
 		req.Value = req.ConfigValue
 	}
 
-	profileCfg, err := h.profileCfgUsecase.UpdateProfileCfg(r.Context(), *req)
+	profileCfg, err := h.profileCfgUsecase.Update(r.Context(), req)
 	if err != nil {
-		response.NewError(w, r, err)
+		if errors.Is(err, _usecase.ProfileNotFound) {
+			err = _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
+		}
+		if errors.Is(err, _usecase.ProfileUserIDAndReqUserIDNotMatch) {
+			err = _error.HttpErrString(response.CodeCompanyName[response.CM05], response.CM05)
+		}
+		if errors.Is(err, _usecase.ProfileConfigNotFound) {
+			err = _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
+		}
+		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	resp := model.ResponseSuccess{
-		Data: profileCfg,
-	}
-
-	response.NewSucc(w, r, resp, 200)
+	helper.SuccessResponseEncode(w, profileCfg, "update profile config successfully")
 }

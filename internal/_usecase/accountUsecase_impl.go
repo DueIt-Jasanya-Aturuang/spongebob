@@ -77,7 +77,7 @@ func (a *AccountUsecaseImpl) UpdateAccount(ctx context.Context, req *domain.Requ
 	oldImage := user.Image
 	email := user.Email
 	reqImageCondition := req.Image != nil && req.Image.Size > 0
-	delImageCondition := !strings.Contains(oldImage, "default-male") && !strings.Contains(oldImage, "google")
+	delImageCondition := !strings.Contains(oldImage, "default-male") && !strings.Contains(oldImage, "google") && reqImageCondition
 	var newImageName string
 
 	if reqImageCondition {
@@ -103,18 +103,25 @@ func (a *AccountUsecaseImpl) UpdateAccount(ctx context.Context, req *domain.Requ
 				return err
 			}
 
-			if delImageCondition {
-				imageDelArr := strings.Split(oldImage, "/")
-				imageDel := fmt.Sprintf("/%s/%s/%s", imageDelArr[2], imageDelArr[3], imageDelArr[4])
-				if err = a.minioRepo.DeleteFile(ctx, imageDel); err != nil {
-					return err
-				}
-			}
-
 		}
 
 		return nil
 	})
+
+	if delImageCondition {
+		imageDelArr := strings.Split(oldImage, "/")
+		if len(imageDelArr) == 4 {
+			imageDel := fmt.Sprintf("/%s/%s/%s", imageDelArr[2], imageDelArr[3], imageDelArr[4])
+			if err = a.minioRepo.DeleteFile(ctx, imageDel); err != nil {
+				return nil, nil, err
+			}
+		}
+
+	}
+
+	if err != nil {
+		return nil, nil, err
+	}
 
 	emailFormat := helpers.EmailFormat(email)
 

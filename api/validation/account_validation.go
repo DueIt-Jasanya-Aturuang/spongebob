@@ -13,7 +13,7 @@ import (
 
 func CreateProfileValidation(req *domain.RequestCreateProfile) error {
 	if _, err := uuid.Parse(req.UserID); err != nil {
-		return _error.HttpErrString(string(response.CM04), response.CM04)
+		return _error.HttpErrString(response.CodeCompanyName[response.CM04], response.CM04)
 	}
 
 	return nil
@@ -21,7 +21,7 @@ func CreateProfileValidation(req *domain.RequestCreateProfile) error {
 
 func GetProfileValidation(req *domain.RequestGetProfile) error {
 	if _, err := uuid.Parse(req.UserID); err != nil {
-		return _error.HttpErrString(string(response.CM04), response.CM04)
+		return _error.HttpErrString(response.CodeCompanyName[response.CM04], response.CM04)
 	}
 
 	return nil
@@ -31,11 +31,11 @@ func UpdateAccountValidate(req *domain.RequestUpdateAccount) error {
 	errBadRequest := map[string][]string{}
 
 	if _, err := uuid.Parse(req.UserID); err != nil {
-		return _error.HttpErrString(string(response.CM04), response.CM04)
+		return _error.HttpErrString(response.CodeCompanyName[response.CM04], response.CM04)
 	}
 
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
-		return _error.HttpErrString(string(response.CM01), response.CM01)
+		return _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 	}
 
 	// fullName validation
@@ -72,9 +72,9 @@ func UpdateAccountValidate(req *domain.RequestUpdateAccount) error {
 	if req.PhoneNumber == "" {
 		errBadRequest["phone_number"] = append(errBadRequest["phone_number"], required)
 	}
-	phoneNumber := maxMinString(req.FullName, 8, 12)
+	phoneNumber := maxMinString(req.PhoneNumber, 8, 12)
 	if phoneNumber != "" {
-		errBadRequest["phone_number"] = append(errBadRequest["phone_number"], fullName)
+		errBadRequest["phone_number"] = append(errBadRequest["phone_number"], phoneNumber)
 	}
 
 	// quote validation

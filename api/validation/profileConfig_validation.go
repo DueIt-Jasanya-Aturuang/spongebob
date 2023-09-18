@@ -12,11 +12,11 @@ import (
 
 func GetProfileCfgValidation(req *domain.RequestGetProfileConfig) error {
 	if _, err := uuid.Parse(req.UserID); err != nil {
-		return _error.HttpErrString(string(response.CM04), response.CM04)
+		return _error.HttpErrString(response.CodeCompanyName[response.CM04], response.CM04)
 	}
 
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
-		return _error.HttpErrString(string(response.CM01), response.CM01)
+		return _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 	}
 
 	if req.ConfigName != "DAILY_NOTIFY" && req.ConfigName != "MONTHLY_PERIOD" {
@@ -30,11 +30,11 @@ func CreateProfileCfg(req *domain.RequestCreateProfileConfig) error {
 	errBadRequest := map[string][]string{}
 
 	if _, err := uuid.Parse(req.UserID); err != nil {
-		return _error.HttpErrString(string(response.CM04), response.CM04)
+		return _error.HttpErrString(response.CodeCompanyName[response.CM04], response.CM04)
 	}
 
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
-		return _error.HttpErrString(string(response.CM01), response.CM01)
+		return _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 	}
 
 	if req.ConfigName != "DAILY_NOTIFY" && req.ConfigName != "MONTHLY_PERIOD" {
@@ -81,11 +81,11 @@ func UpdateProfileCfgValidate(req *domain.RequsetUpdateProfileConfig) error {
 	errBadRequest := map[string][]string{}
 
 	if _, err := uuid.Parse(req.UserID); err != nil {
-		return _error.HttpErrString(string(response.CM04), response.CM04)
+		return _error.HttpErrString(response.CodeCompanyName[response.CM04], response.CM04)
 	}
 
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
-		return _error.HttpErrString(string(response.CM01), response.CM01)
+		return _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 	}
 
 	if req.ConfigName != "DAILY_NOTIFY" && req.ConfigName != "MONTHLY_PERIOD" {

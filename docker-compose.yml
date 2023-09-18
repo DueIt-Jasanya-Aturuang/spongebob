@@ -3,7 +3,7 @@ version: '3.3'
 services:
   account-svc:
     container_name: dueit_svc_account
-    image: 7b4cb20a3d60
+    image: 68f716144124
     ports:
       - '7001:7001'
     volumes:

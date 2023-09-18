@@ -66,8 +66,8 @@ type ProfileConfigRepo interface {
 }
 
 //counterfeiter:generate -o ./../mocks . ProfileCfgUsecase
-type ProfileCfgUsecase interface {
-	Create(ctx context.Context, req RequestCreateProfileConfig) (ResponseProfileConfig, error)
-	GetByNameAndID(ctx context.Context, req RequestGetProfileConfig) (ResponseProfileConfig, error)
-	Update(ctx context.Context, req RequsetUpdateProfileConfig) (ResponseProfileConfig, error)
+type ProfileConfigUsecase interface {
+	Create(ctx context.Context, req *RequestCreateProfileConfig) (*ResponseProfileConfig, error)
+	GetByNameAndID(ctx context.Context, req *RequestGetProfileConfig) (*ResponseProfileConfig, error)
+	Update(ctx context.Context, req *RequsetUpdateProfileConfig) (*ResponseProfileConfig, error)
 }

@@ -9,14 +9,14 @@ import (
 
 	domainmock "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/mocks"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestProfileGetByIDUSECASE(t *testing.T) {
 	profileRepoMock := &domainmock.FakeProfileRepo{}
 	userRepoMock := &domainmock.FakeUserRepo{}
-	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, userRepoMock, 5*time.Second)
+	profileUsecase := _usecase.NewProfileUsecaseImpl(profileRepoMock, userRepoMock, 5*time.Second)
 
 	profileMockData := model.Profile{}
 	profileMockData = *profileMockData.DefaultValue("userid1")
@@ -35,7 +35,7 @@ func TestProfileGetByIDUSECASE(t *testing.T) {
 func TestProfileGetByUserIDUSECASE(t *testing.T) {
 	profileRepoMock := &domainmock.FakeProfileRepo{}
 	userRepoMock := &domainmock.FakeUserRepo{}
-	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, userRepoMock, 5*time.Second)
+	profileUsecase := _usecase.NewProfileUsecaseImpl(profileRepoMock, userRepoMock, 5*time.Second)
 
 	profileMockData := model.Profile{}
 	profileMockData = *profileMockData.DefaultValue("userid1")
@@ -65,7 +65,7 @@ func TestProfileGetByUserIDUSECASE(t *testing.T) {
 func TestProfileGetByIDWithStoreUSECASE(t *testing.T) {
 	profileRepoMock := &domainmock.FakeProfileRepo{}
 	userRepoMock := &domainmock.FakeUserRepo{}
-	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepoMock, userRepoMock, 5*time.Second)
+	profileUsecase := _usecase.NewProfileUsecaseImpl(profileRepoMock, userRepoMock, 5*time.Second)
 
 	profileMockData := model.Profile{}
 	profileMockData = *profileMockData.DefaultValue("userid1")

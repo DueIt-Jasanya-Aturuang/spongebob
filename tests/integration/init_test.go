@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	repository2 "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/_repository"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	repository2 "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
 	"github.com/minio/minio-go/v7"
 	uuid "github.com/satori/go.uuid"
 

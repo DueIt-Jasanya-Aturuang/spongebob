@@ -8,11 +8,12 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog/log"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi"
-	cusmiddleware "github.com/DueIt-Jasanya-Aturuang/spongebob/delivery/restapi/middleware"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/config"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/repository"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/usecase"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest"
+	cusmiddleware "github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest/middleware"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/config"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
 )
 
 func main() {
@@ -45,17 +46,17 @@ func main() {
 	userRepo := repository.NewUserRepoImpl(uow)
 	minioRepo := repository.NewMinioImpl(minioConn)
 
-	accountUsecase := usecase.NewAccountUsecaseImpl(profileRepo, userRepo, minioRepo, 10*time.Second)
-	profileUsecase := usecase.NewProfileUsecaseImpl(profileRepo, userRepo, 10*time.Second)
-	profileCfgUsecase := usecase.NewProfileCfgUsecaseImpl(profileRepo, profileRepoCfg, 10*time.Second)
+	accountUsecase := _usecase.NewAccountUsecaseImpl(profileRepo, userRepo, minioRepo, 10*time.Second)
+	profileUsecase := _usecase.NewProfileUsecaseImpl(profileRepo, userRepo, 10*time.Second)
+	profileCfgUsecase := _usecase.NewProfileCfgUsecaseImpl(profileRepo, profileRepoCfg, 10*time.Second)
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
 	r.Use(cusmiddleware.IPMiddleware)
 
-	accountHandler := restapi.NewAccountHandler(accountUsecase)
-	profileHandler := restapi.NewProfileHandler(profileUsecase)
-	profileCfgHandler := restapi.NewProfileCfgHandler(profileCfgUsecase)
+	accountHandler := rest.NewAccountHandler(accountUsecase)
+	profileHandler := rest.NewProfileHandler(profileUsecase)
+	profileCfgHandler := rest.NewProfileCfgHandler(profileCfgUsecase)
 
 	r.Put("/account/{profile-id}", accountHandler.UpdateAccount)
 	r.Get("/account/profile", profileHandler.GetProfileByID)

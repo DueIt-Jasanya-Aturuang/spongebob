@@ -25,21 +25,21 @@ type RequestCreateProfile struct {
 }
 
 type ResponseProfile struct {
-	ProfileID string `json:"profile_id"`
-	Quote     string `json:"quote"`
-	Profesi   string `json:"profesi"`
+	ProfileID string  `json:"profile_id"`
+	Quote     *string `json:"quote"`
+	Profesi   *string `json:"profesi"`
 }
 
 type ResponseUser struct {
-	ID              string `json:"id"`
-	FullName        string `json:"full_name"`
-	Gender          string `json:"gender"`
-	Image           string `json:"image"`
-	Username        string `json:"username"`
-	Email           string `json:"email"`
-	EmailFormat     string `json:"email_format"`
-	PhoneNumber     string `json:"phone_number"`
-	EmailVerifiedAt bool   `json:"activated"`
+	ID              string  `json:"id"`
+	FullName        string  `json:"full_name"`
+	Gender          string  `json:"gender"`
+	Image           string  `json:"image"`
+	Username        string  `json:"username"`
+	Email           string  `json:"email"`
+	EmailFormat     string  `json:"email_format"`
+	PhoneNumber     *string `json:"phone_number"`
+	EmailVerifiedAt bool    `json:"activated"`
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
@@ -47,6 +47,6 @@ type ResponseUser struct {
 //counterfeiter:generate -o ./../mocks . AccountUsecase
 type AccountUsecase interface {
 	UpdateAccount(ctx context.Context, req *RequestUpdateAccount) (*ResponseUser, *ResponseProfile, error)
-	GetProfileByID(ctx context.Context, req *RequestGetProfile) (*ResponseProfile, error)
+	GetProfileByUserID(ctx context.Context, req *RequestGetProfile) (*ResponseProfile, error)
 	CreateProfile(ctx context.Context, req *RequestCreateProfile) (*ResponseProfile, error)
 }

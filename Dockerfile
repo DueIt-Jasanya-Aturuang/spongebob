@@ -1,7 +1,7 @@
 # Stage 1: Build the Go application
-FROM golang:1.20 AS build
+FROM golang:1.21 AS build
 # Set cgo_enabled to 1
-ENV CGO_ENABLED=1
+ENV CGO_ENABLED=0
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -26,9 +26,9 @@ WORKDIR /app
 
 # Copy the built binary from the previous stage
 COPY --from=build /app/account .
-
-# Install GLIBC
-RUN apk add gcompat
+#
+## Install GLIBC
+#RUN apk add gcompat
 
 # Expose the port your application listens on (if applicable)
 # EXPOSE 8080

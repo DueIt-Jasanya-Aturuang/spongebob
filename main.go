@@ -9,15 +9,15 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest"
 	cusmiddleware "github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest/middleware"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/config"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_repository"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
 )
 
 func main() {
-	config.LogInit()
-	config.EnvInit()
-	pgConn := config.NewPgConn()
+	infra.LogInit()
+	infra.EnvInit()
+	pgConn := infra.NewPgConn()
 	defer func() {
 		err := pgConn.Close()
 		if err != nil {
@@ -25,7 +25,7 @@ func main() {
 		}
 	}()
 
-	redisConn := config.NewRedisConn()
+	redisConn := infra.NewRedisConn()
 	defer func() {
 		err := redisConn.Client.Close()
 		if err != nil {
@@ -33,7 +33,7 @@ func main() {
 		}
 	}()
 
-	minioConn, err := config.NewMinioConn(config.MinIoEndpoint, config.MinIoID, config.MinIoSecretKey, config.MinIoSSL)
+	minioConn, err := infra.NewMinioConn(infra.MinIoEndpoint, infra.MinIoID, infra.MinIoSecretKey, infra.MinIoSSL)
 	if err != nil {
 		panic(err)
 	}
@@ -62,7 +62,7 @@ func main() {
 	r.Get("/account/profile-config/{profile-id}/{config-name}", profileCfgHandler.GetProfileCfgByNameAndID)
 	r.Put("/account/profile-config/{profile-id}/{config-name}", profileCfgHandler.UpdateProfileCfg)
 
-	err = http.ListenAndServe(config.AppPort, r)
+	err = http.ListenAndServe(infra.AppPort, r)
 	if err != nil {
 		panic(err)
 	}

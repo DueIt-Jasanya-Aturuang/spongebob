@@ -11,13 +11,14 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/config"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/repository"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
 )
 
 func AccountUpdateUSECASE(t *testing.T) {
-	config.MinIoBucket = "files"
+	infra.MinIoBucket = "files"
 	minio := repository.NewMinioImpl(minioClient)
 	timeOut := 2 * time.Second
 	account := _usecase.NewAccountUsecaseImpl(ProfileRepo, UserRepo, minio, timeOut)

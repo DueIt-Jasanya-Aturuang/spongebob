@@ -7,7 +7,7 @@ import (
 
 	"github.com/ory/dockertest/v3"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/config"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/tests/integration/utils"
 )
 
@@ -24,7 +24,7 @@ func TestMain(t *testing.M) {
 
 	minioResourece, endpoint := utils.MinioStart(utils.InitDocker())
 	resources = append(resources, minioResourece)
-	minioConn, err := config.NewMinioConn(endpoint, "MYACCESSKEY", "MYSECRETKEY", false)
+	minioConn, err := infra.NewMinioConn(endpoint, "MYACCESSKEY", "MYSECRETKEY", false)
 	if err != nil {
 		panic(err)
 	}

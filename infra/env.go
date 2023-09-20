@@ -1,4 +1,4 @@
-package config
+package infra
 
 import (
 	"os"
@@ -17,7 +17,7 @@ func EnvInit() {
 
 	AppPort = os.Getenv("APPLICATION_PORT")
 	AppStatus = os.Getenv("APPLICATION_STATUS")
-	//AppGracefull = os.Getenv("APPLICATION_GRACEFUL_MAX_SECOND")
+	// AppGracefull = os.Getenv("APPLICATION_GRACEFUL_MAX_SECOND")
 
 	PgHost = os.Getenv("DB_POSTGRESQL_HOST")
 	PgPort = os.Getenv("DB_POSTGRESQL_PORT")
@@ -42,14 +42,14 @@ func EnvInit() {
 	MinIoID = os.Getenv("MINIO_ID")
 	MinIoSecretKey = os.Getenv("MINIO_SECRETKEY")
 	MinIoEndpoint = os.Getenv("MINIO_ENDPOINT")
-	//MinIoPort = os.Getenv("MINIO_PORT")
+	// MinIoPort = os.Getenv("MINIO_PORT")
 	MinIoBucket = os.Getenv("MINIO_BUCKET")
 	MinIoSSL = minioSslBool
 
-	//DefaultImage = os.Getenv("DEFAULT_DEFAULT_IMAGE")
-	//AesCFB = os.Getenv("DEFAULT_AES_CFB_KEY")
-	//AesCBC = os.Getenv("DEFAULT_AES_CBC_KEY")
-	//AesCBCIV = os.Getenv("DEFAULT_AES_CBC_IV_KEY")
+	// DefaultImage = os.Getenv("DEFAULT_DEFAULT_IMAGE")
+	// AesCFB = os.Getenv("DEFAULT_AES_CFB_KEY")
+	// AesCBC = os.Getenv("DEFAULT_AES_CBC_KEY")
+	// AesCBCIV = os.Getenv("DEFAULT_AES_CBC_IV_KEY")
 
 	log.Info().Msg("config initialization successfully")
 }
@@ -57,7 +57,7 @@ func EnvInit() {
 var (
 	AppPort   string
 	AppStatus string
-	//AppGracefull string
+	// AppGracefull string
 
 	PgHost string
 	PgPort string
@@ -78,8 +78,8 @@ var (
 	MinIoSSL       bool
 	//  MinIoPort      string
 
-	//DefaultImage string
-	//AesCFB       string
-	//AesCBC       string
-	//AesCBCIV     string
+	// DefaultImage string
+	// AesCFB       string
+	// AesCBC       string
+	// AesCBCIV     string
 )

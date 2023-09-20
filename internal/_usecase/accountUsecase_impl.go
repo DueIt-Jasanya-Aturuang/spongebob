@@ -11,7 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/config"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/converter"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
 )
@@ -85,7 +85,7 @@ func (a *AccountUsecaseImpl) UpdateAccount(ctx context.Context, req *domain.Requ
 		newImageName = a.minioRepo.GenerateFileName(fileExt, "user-images/public/")
 	}
 
-	profile, user = converter.UpdateAccountToModel(req, fmt.Sprintf("/%s/%s", config.MinIoBucket, newImageName))
+	profile, user = converter.UpdateAccountToModel(req, fmt.Sprintf("/%s/%s", infra.MinIoBucket, newImageName))
 
 	err = a.profileRepo.StartTx(ctx, helpers.LevelReadCommitted(), func() error {
 		err = a.profileRepo.Update(ctx, profile)

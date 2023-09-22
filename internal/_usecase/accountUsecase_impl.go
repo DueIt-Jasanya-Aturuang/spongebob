@@ -75,10 +75,10 @@ func (a *AccountUsecaseImpl) UpdateAccount(ctx context.Context, req *domain.Requ
 	}
 
 	oldImage := user.Image
+	newImageName := user.Image
 	email := user.Email
 	reqImageCondition := req.Image != nil && req.Image.Size > 0
 	delImageCondition := !strings.Contains(oldImage, "default-male") && !strings.Contains(oldImage, "google") && reqImageCondition
-	var newImageName string
 
 	if reqImageCondition {
 		fileExt := filepath.Ext(req.Image.Filename)

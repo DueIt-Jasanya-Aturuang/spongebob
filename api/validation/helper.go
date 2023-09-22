@@ -88,7 +88,7 @@ func checkConfigValue(name, value string) string {
 
 		_, err = time.LoadLocation(valueSplit[1])
 		if err != nil {
-			return fmt.Sprintf("invalid location 19:20 Asia/Jakarta")
+			return fmt.Sprintf(invalidConfigValue, "19:20 Asia/Jakarta")
 		}
 	} else {
 		valueInt, err := strconv.Atoi(value)

@@ -54,21 +54,21 @@ func main() {
 	accountHandler := rest.NewAccountHandler(accountUsecase)
 	profileCfgHandler := rest.NewProfileCfgHandler(profileCfgUsecase)
 
-	r.Get("/account/profile", accountHandler.GetProfileByUserID)
-	r.Post("/account/profile", accountHandler.CreateProfile)
-
-	r.Post("/account/otorisasi", accountHandler.Otorisasi)
-
 	r.Group(func(r chi.Router) {
-		r.Use(cusmiddleware.AccountMiddlewareInHeader)
+		r.Use(cusmiddleware.SetAuthorization)
 
-		r.Put("/account/{profile-id}", accountHandler.UpdateAccount)
+		r.Get("/account/profile", accountHandler.GetProfileByUserID)
+		r.Post("/account/profile", accountHandler.CreateProfile)
 
-		r.Post("/account/profile-config/{profile-id}", profileCfgHandler.CreateProfileCfg)
-		r.Get("/account/profile-config/{profile-id}/{config-name}", profileCfgHandler.GetProfileCfgByNameAndID)
-		r.Put("/account/profile-config/{profile-id}/{config-name}", profileCfgHandler.UpdateProfileCfg)
+		r.Post("/account/otorisasi", accountHandler.Otorisasi)
+
+		r.Put("/account", accountHandler.UpdateAccount)
+
+		r.Post("/account/profile-config", profileCfgHandler.CreateProfileCfg)
+		r.Get("/account/profile-config/{config-name}", profileCfgHandler.GetProfileCfgByNameAndID)
+		r.Put("/account/profile-config/{config-name}", profileCfgHandler.UpdateProfileCfg)
 	})
-	
+
 	err = http.ListenAndServe(infra.AppPort, r)
 	if err != nil {
 		panic(err)

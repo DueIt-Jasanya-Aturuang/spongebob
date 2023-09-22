@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
 
@@ -36,7 +35,7 @@ func (h *AccountHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req.UserID = r.Header.Get("User-ID")
-	req.ProfileID = chi.URLParam(r, "profile-id")
+	req.ProfileID = r.Header.Get("Profile-ID")
 
 	err = validation.UpdateAccountValidate(req)
 	if err != nil {

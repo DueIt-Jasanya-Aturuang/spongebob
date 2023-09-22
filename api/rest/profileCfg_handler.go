@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
+	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/validation"
@@ -37,7 +38,7 @@ func (h *ProfileCfgHandler) CreateProfileCfg(w http.ResponseWriter, r *http.Requ
 	}
 
 	req.UserID = r.Header.Get("User-ID")
-	req.ProfileID = chi.URLParam(r, "profile-id")
+	req.ProfileID = r.Header.Get("Profile-ID")
 
 	err = validation.CreateProfileCfg(req)
 	if err != nil {
@@ -62,7 +63,7 @@ func (h *ProfileCfgHandler) CreateProfileCfg(w http.ResponseWriter, r *http.Requ
 		}
 		// conflict
 		if errors.Is(err, _usecase.ProfileConfigIsExist) {
-			err = _error.HttpErrString(response.CodeCompanyName[response.CM06], response.CM06)
+			err = _error.HttpErrString("profile config sudah dibuat", response.CM06)
 		}
 		helper.ErrorResponseEncode(w, err)
 		return
@@ -76,7 +77,7 @@ func (h *ProfileCfgHandler) GetProfileCfgByNameAndID(w http.ResponseWriter, r *h
 	req := new(domain.RequestGetProfileConfig)
 
 	req.ConfigName = chi.URLParam(r, "config-name")
-	req.ProfileID = chi.URLParam(r, "profile-id")
+	req.ProfileID = r.Header.Get("Profile-ID")
 	req.UserID = r.Header.Get("User-ID")
 
 	err := validation.GetProfileCfgValidation(req)
@@ -102,6 +103,7 @@ func (h *ProfileCfgHandler) GetProfileCfgByNameAndID(w http.ResponseWriter, r *h
 }
 
 func (h *ProfileCfgHandler) UpdateProfileCfg(w http.ResponseWriter, r *http.Request) {
+	log.Info().Msgf("head | %s", r.Header.Get("test"))
 	req := new(domain.RequsetUpdateProfileConfig)
 
 	err := helper.DecodeJson(r, req)
@@ -111,7 +113,7 @@ func (h *ProfileCfgHandler) UpdateProfileCfg(w http.ResponseWriter, r *http.Requ
 	}
 
 	req.ConfigName = chi.URLParam(r, "config-name")
-	req.ProfileID = chi.URLParam(r, "profile-id")
+	req.ProfileID = r.Header.Get("Profile-ID")
 	req.UserID = r.Header.Get("User-ID")
 
 	err = validation.UpdateProfileCfgValidate(req)

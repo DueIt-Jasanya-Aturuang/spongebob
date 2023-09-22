@@ -71,10 +71,11 @@ func (h *AccountHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 		"profile": profile,
 	}
 
+	w.Header().Del("Profile-ID")
 	helper.SuccessResponseEncode(w, data, "successfully update akun")
 }
 
-func (h *AccountHandler) GetProfileByID(w http.ResponseWriter, r *http.Request) {
+func (h *AccountHandler) GetProfileByUserID(w http.ResponseWriter, r *http.Request) {
 	req := new(domain.RequestGetProfile)
 
 	userId := r.Header.Get("User-ID")
@@ -97,6 +98,32 @@ func (h *AccountHandler) GetProfileByID(w http.ResponseWriter, r *http.Request) 
 	}
 
 	helper.SuccessResponseEncode(w, profile, "data profile")
+}
+
+func (h *AccountHandler) Otorisasi(w http.ResponseWriter, r *http.Request) {
+	req := new(domain.RequestGetProfile)
+
+	userId := r.Header.Get("User-ID")
+
+	req.UserID = userId
+
+	err := validation.GetProfileValidation(req)
+	if err != nil {
+		helper.ErrorResponseEncode(w, err)
+		return
+	}
+
+	profile, err := h.accountUsecase.GetProfileByUserID(r.Context(), req)
+	if err != nil {
+		if errors.Is(err, _usecase.ProfileNotFound) {
+			err = _error.HttpErrString("invalid your profile", response.CM05)
+		}
+		helper.ErrorResponseEncode(w, err)
+		return
+	}
+
+	w.Header().Set("Profile-ID", profile.ProfileID)
+	helper.SuccessResponseEncode(w, nil, "ok")
 }
 
 func (h *AccountHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {

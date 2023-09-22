@@ -3,6 +3,7 @@ package middleware
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
 
@@ -16,6 +17,19 @@ func IPMiddleware(next http.Handler) http.Handler {
 			helper.ErrorResponseEncode(w, _error.HttpErrString(string(response.CM05), response.CM05))
 			return
 		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func AccountMiddlewareInHeader(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		profileIDUrlParam := chi.URLParam(r, "profile-id")
+		profileIDHeader := r.Header.Get("Profile-ID")
+		if profileIDHeader != profileIDUrlParam {
+			helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile account", response.CM05))
+			return
+		}
+
 		next.ServeHTTP(w, r)
 	})
 }

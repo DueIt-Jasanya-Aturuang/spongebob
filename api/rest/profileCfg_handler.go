@@ -68,6 +68,7 @@ func (h *ProfileCfgHandler) CreateProfileCfg(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	w.Header().Del("Profile-ID")
 	helper.SuccessResponseEncode(w, profileCfg, "created profile config successfully")
 }
 
@@ -96,6 +97,7 @@ func (h *ProfileCfgHandler) GetProfileCfgByNameAndID(w http.ResponseWriter, r *h
 		return
 	}
 
+	w.Header().Del("Profile-ID")
 	helper.SuccessResponseEncode(w, profileCfg, "data profile config")
 }
 
@@ -140,5 +142,6 @@ func (h *ProfileCfgHandler) UpdateProfileCfg(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	w.Header().Del("Profile-ID")
 	helper.SuccessResponseEncode(w, profileCfg, "update profile config successfully")
 }

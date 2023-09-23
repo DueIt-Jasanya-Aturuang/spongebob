@@ -10,8 +10,8 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/converter"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/converter"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/helpers"
 )
 
 type ProfileConfigUsecaseImpl struct {

@@ -12,8 +12,8 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/converter"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/converter"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/helpers"
 )
 
 type AccountUsecaseImpl struct {

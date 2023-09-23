@@ -3,14 +3,16 @@ package unit
 import (
 	"context"
 	"database/sql"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"testing"
 	"time"
 
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
+
 	domainmock "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/mocks"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_usecase"
 )
 
 func TestProfileGetByIDUSECASE(t *testing.T) {

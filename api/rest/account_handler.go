@@ -10,7 +10,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/validation"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_usecase"
 )
 
 type AccountHandler struct {

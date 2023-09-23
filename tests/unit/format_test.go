@@ -2,8 +2,9 @@ package unit
 
 import (
 	"fmt"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helpers"
 	"testing"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/helpers"
 
 	"github.com/stretchr/testify/assert"
 )

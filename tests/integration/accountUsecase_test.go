@@ -14,7 +14,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/repository"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_usecase"
 )
 
 func AccountUpdateUSECASE(t *testing.T) {

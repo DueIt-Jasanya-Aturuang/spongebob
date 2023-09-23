@@ -10,8 +10,8 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest"
 	cusmiddleware "github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest/middleware"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_repository"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_repository"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_usecase"
 )
 
 func main() {

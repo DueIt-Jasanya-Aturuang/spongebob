@@ -9,14 +9,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/converter"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/converter"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/mocks"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_usecase"
 )
 
 func multipartFileHeader() *multipart.FileHeader {

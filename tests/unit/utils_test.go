@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/helper"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/helper"
 )
 
 func TestRandomChar(t *testing.T) {

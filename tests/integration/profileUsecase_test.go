@@ -2,12 +2,14 @@ package integration
 
 import (
 	"context"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"testing"
 	"time"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/internal/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
+
 	"github.com/stretchr/testify/assert"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_usecase"
 )
 
 func ProfileUsecase(t *testing.T) {

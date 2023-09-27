@@ -58,7 +58,8 @@ func main() {
 		r.Use(cusmiddleware.SetAuthorization)
 
 		r.Get("/account/profile", accountHandler.GetProfileByUserID)
-		r.Post("/account/profile", accountHandler.CreateProfile)
+		r.Post("/account/profile/5410801c-faaf-4776-95be-56472e044820", accountHandler.CreateProfile)
+		r.Get("/account/profile/5410801c-faaf-4776-95be-56472e044820", accountHandler.GetProfileByUserID)
 
 		r.Post("/account/otorisasi", accountHandler.Otorisasi)
 

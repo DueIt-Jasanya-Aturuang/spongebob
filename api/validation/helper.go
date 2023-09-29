@@ -83,13 +83,13 @@ func checkConfigValue(name, value string) string {
 
 		_, err := time.Parse("15:04", valueSplit[0])
 		if err != nil {
-			log.Warn.Msgf("failed parse time : %v",err)
+			log.Warn().Msgf("failed parse time : %v",err)
 			return fmt.Sprintf(invalidConfigValue, "19:20 Asia/Jakarta")
 		}
 
 		_, err = time.LoadLocation(valueSplit[1])
 		if err != nil {
-			log.Warn.Msgf("failed load location : %v",err)
+			log.Warn().Msgf("failed load location : %v",err)
 			return fmt.Sprintf(invalidConfigValue, "19:20 Asia/Jakarta")
 		}
 	} else {

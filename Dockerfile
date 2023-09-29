@@ -29,6 +29,7 @@ COPY --from=build /app/account .
 #
 ## Install GLIBC
 #RUN apk add gcompat
+RUN apk update && apk --no-cache add tzdata
 
 # Expose the port your application listens on (if applicable)
 # EXPOSE 8080

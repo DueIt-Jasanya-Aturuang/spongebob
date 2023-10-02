@@ -9,14 +9,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/converter"
-
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/mocks"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase/converter"
 )
 
 func multipartFileHeader() *multipart.FileHeader {
@@ -56,7 +55,7 @@ func TestAccountUpdateUsecase(t *testing.T) {
 	timeOutCtx := 3 * time.Second
 	ctx := context.Background()
 	image := "user-images/public/asd.png"
-	accountUsecase := _usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
+	accountUsecase := usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
 
 	profile := model.Profile{
 		ProfileID: "profileid_1",
@@ -136,7 +135,7 @@ func TestAccounUpdateWithDeleteFileUsecase(t *testing.T) {
 	ctx := context.Background()
 	image := "/files/user-images/public/asd.png"
 
-	accountUsecase := _usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
+	accountUsecase := usecase.NewAccountUsecaseImpl(profileRepoMock, userRepoMock, minioRepoMock, timeOutCtx)
 
 	profile := model.Profile{
 		ProfileID: "profileid_1",

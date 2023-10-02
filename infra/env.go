@@ -17,6 +17,7 @@ func EnvInit() {
 
 	AppPort = os.Getenv("APPLICATION_PORT")
 	AppStatus = os.Getenv("APPLICATION_STATUS")
+	AppApiKeyAccount = os.Getenv("APPLICATION_KEY_ACCOUNT")
 	// AppGracefull = os.Getenv("APPLICATION_GRACEFUL_MAX_SECOND")
 
 	PgHost = os.Getenv("DB_POSTGRESQL_HOST")
@@ -55,8 +56,9 @@ func EnvInit() {
 }
 
 var (
-	AppPort   string
-	AppStatus string
+	AppPort          string
+	AppStatus        string
+	AppApiKeyAccount string
 	// AppGracefull string
 
 	PgHost string

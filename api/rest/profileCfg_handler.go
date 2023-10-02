@@ -13,7 +13,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/validation"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase"
 )
 
 type ProfileCfgHandler struct {
@@ -55,14 +55,14 @@ func (h *ProfileCfgHandler) CreateProfileCfg(w http.ResponseWriter, r *http.Requ
 
 	profileCfg, err := h.profileCfgUsecase.Create(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, _usecase.ProfileNotFound) {
+		if errors.Is(err, usecase.ProfileNotFound) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 		}
-		if errors.Is(err, _usecase.ProfileUserIDAndReqUserIDNotMatch) {
+		if errors.Is(err, usecase.ProfileUserIDAndReqUserIDNotMatch) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM05], response.CM05)
 		}
 		// conflict
-		if errors.Is(err, _usecase.ProfileConfigIsExist) {
+		if errors.Is(err, usecase.ProfileConfigIsExist) {
 			err = _error.HttpErrString("profile config sudah dibuat", response.CM06)
 		}
 		helper.ErrorResponseEncode(w, err)
@@ -88,10 +88,10 @@ func (h *ProfileCfgHandler) GetProfileCfgByNameAndID(w http.ResponseWriter, r *h
 
 	profileCfg, err := h.profileCfgUsecase.GetByNameAndID(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, _usecase.ProfileNotFound) {
+		if errors.Is(err, usecase.ProfileNotFound) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 		}
-		if errors.Is(err, _usecase.ProfileUserIDAndReqUserIDNotMatch) {
+		if errors.Is(err, usecase.ProfileUserIDAndReqUserIDNotMatch) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM05], response.CM05)
 		}
 		helper.ErrorResponseEncode(w, err)
@@ -131,13 +131,13 @@ func (h *ProfileCfgHandler) UpdateProfileCfg(w http.ResponseWriter, r *http.Requ
 
 	profileCfg, err := h.profileCfgUsecase.Update(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, _usecase.ProfileNotFound) {
+		if errors.Is(err, usecase.ProfileNotFound) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 		}
-		if errors.Is(err, _usecase.ProfileUserIDAndReqUserIDNotMatch) {
+		if errors.Is(err, usecase.ProfileUserIDAndReqUserIDNotMatch) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM05], response.CM05)
 		}
-		if errors.Is(err, _usecase.ProfileConfigNotFound) {
+		if errors.Is(err, usecase.ProfileConfigNotFound) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 		}
 		helper.ErrorResponseEncode(w, err)

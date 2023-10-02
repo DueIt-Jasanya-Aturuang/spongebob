@@ -14,14 +14,14 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra/repository"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase"
 )
 
 func AccountUpdateUSECASE(t *testing.T) {
 	infra.MinIoBucket = "files"
 	minio := repository.NewMinioImpl(minioClient)
 	timeOut := 2 * time.Second
-	account := _usecase.NewAccountUsecaseImpl(ProfileRepo, UserRepo, minio, timeOut)
+	account := usecase.NewAccountUsecaseImpl(ProfileRepo, UserRepo, minio, timeOut)
 
 	fileContent := []byte("file content")
 	fileHeader := &multipart.FileHeader{

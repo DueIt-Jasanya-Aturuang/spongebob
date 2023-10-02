@@ -1,4 +1,4 @@
-package _usecase
+package usecase
 
 import (
 	"context"
@@ -10,8 +10,8 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/converter"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/helpers"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase/converter"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase/helpers"
 )
 
 type ProfileConfigUsecaseImpl struct {

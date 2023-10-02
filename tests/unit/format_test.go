@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/helpers"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase/helpers"
 )
 
 func TestFormatEmail(t *testing.T) {

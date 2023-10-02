@@ -7,7 +7,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/helpers"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase/helpers"
 )
 
 func UpdateAccountToModel(req *domain.RequestUpdateAccount, image string) (*domain.Profile, *domain.User) {

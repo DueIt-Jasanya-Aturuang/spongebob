@@ -1,4 +1,4 @@
-package _usecase
+package usecase
 
 import (
 	"context"
@@ -12,8 +12,8 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/converter"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/helpers"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase/converter"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase/helpers"
 )
 
 type AccountUsecaseImpl struct {

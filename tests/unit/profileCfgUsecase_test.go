@@ -8,14 +8,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/converter"
-
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/dto"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/mocks"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_usecase"
+
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase/converter"
 )
 
 func TestCreateProfileCfgUSECASE(t *testing.T) {

@@ -10,8 +10,8 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest"
 	cusmiddleware "github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest/middleware"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_repository"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_usecase"
+	repository2 "github.com/DueIt-Jasanya-Aturuang/spongebob/repository"
+	_usecase2 "github.com/DueIt-Jasanya-Aturuang/spongebob/usecase"
 )
 
 func main() {
@@ -38,18 +38,19 @@ func main() {
 		panic(err)
 	}
 
-	uow := _repository.NewUnitOfWorkRepositoryImpl(pgConn)
-	profileRepoCfg := _repository.NewProfileConfigRepoImpl(uow)
-	profileRepo := _repository.NewProfileRepoImpl(uow)
-	userRepo := _repository.NewUserRepoImpl(uow)
-	minioRepo := _repository.NewMinioImpl(minioConn)
+	uow := repository2.NewUnitOfWorkRepositoryImpl(pgConn)
+	profileRepoCfg := repository2.NewProfileConfigRepoImpl(uow)
+	profileRepo := repository2.NewProfileRepoImpl(uow)
+	userRepo := repository2.NewUserRepoImpl(uow)
+	minioRepo := repository2.NewMinioImpl(minioConn)
 
-	accountUsecase := _usecase.NewAccountUsecaseImpl(profileRepo, userRepo, minioRepo)
-	profileCfgUsecase := _usecase.NewProfileConfigUsecaseImpl(profileRepo, profileRepoCfg)
+	accountUsecase := _usecase2.NewAccountUsecaseImpl(profileRepo, userRepo, minioRepo)
+	profileCfgUsecase := _usecase2.NewProfileConfigUsecaseImpl(profileRepo, profileRepoCfg)
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
 	r.Use(cusmiddleware.IPMiddleware)
+	r.Use(cusmiddleware.CheckApiKey)
 
 	accountHandler := rest.NewAccountHandler(accountUsecase)
 	profileCfgHandler := rest.NewProfileCfgHandler(profileCfgUsecase)

@@ -10,7 +10,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/validation"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase"
 )
 
 type AccountHandler struct {
@@ -45,16 +45,16 @@ func (h *AccountHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 
 	user, profile, err := h.accountUsecase.UpdateAccount(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, _usecase.ProfileNotFound) {
+		if errors.Is(err, usecase.ProfileNotFound) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 		}
-		if errors.Is(err, _usecase.UserNotFound) {
+		if errors.Is(err, usecase.UserNotFound) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM04], response.CM04)
 		}
-		if errors.Is(err, _usecase.ProfileUserIDAndReqUserIDNotMatch) {
+		if errors.Is(err, usecase.ProfileUserIDAndReqUserIDNotMatch) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM05], response.CM05)
 		}
-		if errors.Is(err, _usecase.PhoneNumberIsExist) {
+		if errors.Is(err, usecase.PhoneNumberIsExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"phone_number": {
 					err.Error(),
@@ -89,7 +89,7 @@ func (h *AccountHandler) GetProfileByUserID(w http.ResponseWriter, r *http.Reque
 
 	profile, err := h.accountUsecase.GetProfileByUserID(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, _usecase.ProfileNotFound) {
+		if errors.Is(err, usecase.ProfileNotFound) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 		}
 		helper.ErrorResponseEncode(w, err)
@@ -114,7 +114,7 @@ func (h *AccountHandler) Otorisasi(w http.ResponseWriter, r *http.Request) {
 
 	profile, err := h.accountUsecase.GetProfileByUserID(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, _usecase.ProfileNotFound) {
+		if errors.Is(err, usecase.ProfileNotFound) {
 			err = _error.HttpErrString("invalid your profile", response.CM05)
 		}
 		helper.ErrorResponseEncode(w, err)
@@ -142,7 +142,7 @@ func (h *AccountHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
 
 	profile, err := h.accountUsecase.CreateProfile(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, _usecase.UserNotFound) {
+		if errors.Is(err, usecase.UserNotFound) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM04], response.CM04)
 		}
 		helper.ErrorResponseEncode(w, err)

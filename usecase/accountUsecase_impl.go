@@ -172,7 +172,7 @@ func (a *AccountUsecaseImpl) CreateProfile(ctx context.Context, req *domain.Requ
 		}
 
 		if exist {
-			log.Warn().Msgf("user sudah memiliki profile tapi create lagi | data : ", req)
+			log.Warn().Msgf("user sudah memiliki profile tapi create lagi | data : %v", req)
 		}
 		return nil
 	})

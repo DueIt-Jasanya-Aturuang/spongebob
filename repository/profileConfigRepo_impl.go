@@ -165,11 +165,14 @@ func (p *ProfileConfigRepoImpl) GetByNameAndID(ctx context.Context, profileID st
 	return &profileCfg, nil
 }
 
-func (p *ProfileConfigRepoImpl) GetByScheduler(ctx context.Context, ProfileConfigScheduler domain.ProfileConfigScheduler) (*[]domain.ProfileConfig, error) {
+func (p *ProfileConfigRepoImpl) GetBySchedulerDailyNotify(ctx context.Context, ProfileConfigScheduler domain.ProfileConfigScheduler) (*[]domain.ProfileConfig, error) {
 	query := `SELECT id, profile_id, config_name, config_value, status, created_at, created_by, 
        				 updated_at, updated_by, deleted_at, deleted_by
-              FROM dueit.m_user_config 
-              WHERE (config_value->>'config_time_notify')::time >= $1::time AND config_value->'days' ? $2`
+              FROM dueit.m_user_config AS muc
+              WHERE (config_value->>'config_time_notify')::time = $1::time AND config_value->'days' ? $2
+				AND NOT EXISTS (
+					SELECT 1 FROM dueit.m_notification AS mn WHERE mn.user_config_id = muc.id
+				)`
 
 	conn, err := p.GetConn()
 	if err != nil {

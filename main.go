@@ -1,7 +1,11 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -9,6 +13,7 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest"
 	cusmiddleware "github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest/middleware"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra"
 	repository2 "github.com/DueIt-Jasanya-Aturuang/spongebob/repository"
 	_usecase2 "github.com/DueIt-Jasanya-Aturuang/spongebob/usecase"
@@ -43,9 +48,27 @@ func main() {
 	profileRepo := repository2.NewProfileRepoImpl(uow)
 	userRepo := repository2.NewUserRepoImpl(uow)
 	minioRepo := repository2.NewMinioImpl(minioConn)
+	notificationRepo := repository2.NewNotificationRepoImpl(uow)
 
 	accountUsecase := _usecase2.NewAccountUsecaseImpl(profileRepo, userRepo, minioRepo)
-	profileCfgUsecase := _usecase2.NewProfileConfigUsecaseImpl(profileRepo, profileRepoCfg)
+	profileCfgUsecase := _usecase2.NewProfileConfigUsecaseImpl(profileRepo, profileRepoCfg, notificationRepo)
+
+	timeTick := time.Tick(10 * time.Second)
+	go func() {
+		for range timeTick {
+			fmt.Println(fmt.Sprintf("%02d:%02d", time.Now().UTC().Hour(), time.Now().UTC().Minute()))
+
+			err = profileCfgUsecase.GetBySchedulerDailyNotify(context.Background(), domain.ProfileConfigScheduler{
+				Day:  strings.ToLower(time.Now().UTC().Weekday().String()),
+				Time: fmt.Sprintf("%02d:%02d", time.Now().UTC().Hour(), time.Now().UTC().Minute()),
+			})
+
+			if err != nil {
+				log.Warn().Msgf("failed push notification daily notif user | err : %v", err)
+			}
+		}
+	}()
+
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)

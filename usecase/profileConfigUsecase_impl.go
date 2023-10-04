@@ -6,7 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
+	"github.com/oklog/ulid/v2"
 	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
@@ -17,15 +19,18 @@ import (
 type ProfileConfigUsecaseImpl struct {
 	profileRepo    domain.ProfileRepo
 	profileCfgRepo domain.ProfileConfigRepo
+	notifRepo      domain.NotificationRepo
 }
 
 func NewProfileConfigUsecaseImpl(
 	profileRepo domain.ProfileRepo,
 	profileCfgRepo domain.ProfileConfigRepo,
+	notifRepo domain.NotificationRepo,
 ) domain.ProfileConfigUsecase {
 	return &ProfileConfigUsecaseImpl{
 		profileRepo:    profileRepo,
 		profileCfgRepo: profileCfgRepo,
+		notifRepo:      notifRepo,
 	}
 }
 
@@ -193,4 +198,61 @@ func (p *ProfileConfigUsecaseImpl) Update(ctx context.Context, req *domain.Requs
 	resp := converter.ProfileConfigModelToResponse(profileCfgConv, req.ConfigValue)
 
 	return resp, nil
+}
+
+func (p *ProfileConfigUsecaseImpl) GetBySchedulerDailyNotify(ctx context.Context, ProfileConfigScheduler domain.ProfileConfigScheduler) error {
+	err := p.profileCfgRepo.OpenConn(ctx)
+	if err != nil {
+		return err
+	}
+
+	profileConfigs, err := p.profileCfgRepo.GetBySchedulerDailyNotify(ctx, ProfileConfigScheduler)
+	if err != nil {
+		return err
+	}
+
+	if len(*profileConfigs) < 1 {
+		return nil
+	}
+
+	notify, err := p.notifRepo.GetNotifHelperByName(ctx, (*profileConfigs)[0].ConfigName)
+
+	for _, profileConfig := range *profileConfigs {
+		formatConfigValue := map[string]any{}
+		err = json.Unmarshal([]byte(profileConfig.ConfigValue), &formatConfigValue)
+		if err != nil {
+			return err
+		}
+
+		err = p.profileCfgRepo.StartTx(ctx, helpers.LevelReadCommitted(), func() error {
+			err = p.notifRepo.Create(ctx, &domain.Notification{
+				ID:           ulid.Make().String(),
+				ProfileID:    profileConfig.ProfileID,
+				UserConfigID: profileConfig.ID,
+				Message:      notify.Message,
+				Status:       "unread",
+				Title:        notify.Title,
+				Icon:         notify.Message,
+				AuditInfo: domain.AuditInfo{
+					CreatedAt: time.Now().Unix(),
+					CreatedBy: profileConfig.ProfileID,
+					UpdatedAt: time.Now().Unix(),
+				},
+			})
+			if err != nil {
+				return err
+			}
+
+			// 	push to fmc
+
+			return nil
+		})
+
+		if err != nil {
+			return err
+		}
+
+	}
+
+	return nil
 }

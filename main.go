@@ -30,13 +30,13 @@ func main() {
 		}
 	}()
 
-	redisConn := infra.NewRedisConn()
-	defer func() {
-		err := redisConn.Client.Close()
-		if err != nil {
-			log.Err(err).Msg("ERROR CLOSE REDIS CONN")
-		}
-	}()
+	// redisConn := infra.NewRedisConn()
+	// defer func() {
+	// 	err := redisConn.Client.Close()
+	// 	if err != nil {
+	// 		log.Err(err).Msg("ERROR CLOSE REDIS CONN")
+	// 	}
+	// }()
 
 	minioConn, err := infra.NewMinioConn(infra.MinIoEndpoint, infra.MinIoID, infra.MinIoSecretKey, infra.MinIoSSL)
 	if err != nil {
@@ -53,7 +53,7 @@ func main() {
 	accountUsecase := _usecase2.NewAccountUsecaseImpl(profileRepo, userRepo, minioRepo)
 	profileCfgUsecase := _usecase2.NewProfileConfigUsecaseImpl(profileRepo, profileRepoCfg, notificationRepo)
 
-	timeTick := time.Tick(10 * time.Second)
+	timeTick := time.Tick(1 * time.Minute)
 	go func() {
 		for range timeTick {
 			fmt.Println(fmt.Sprintf("%02d:%02d", time.Now().UTC().Hour(), time.Now().UTC().Minute()))

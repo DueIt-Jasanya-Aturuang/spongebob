@@ -85,7 +85,13 @@ func (p *ProfileConfigUsecaseImpl) Create(ctx context.Context, req *domain.Reque
 		return nil, err
 	}
 
-	resp := converter.ProfileConfigModelToResponse(profileConfig, req.ConfigValue)
+	var days []string
+	switch req.ConfigName {
+	case "DAILY_NOTIFY":
+		days = formatConfigValue["days"].([]string)
+	}
+
+	resp := converter.ProfileConfigModelToResponse(profileConfig, req.ConfigValue, days)
 	return resp, nil
 }
 
@@ -127,14 +133,20 @@ func (p *ProfileConfigUsecaseImpl) GetByNameAndID(ctx context.Context, req *doma
 	}
 
 	var configValue string
+	var days []string
 	switch req.ConfigName {
 	case "DAILY_NOTIFY":
 		configValue = fmt.Sprintf("%s %s", formatConfigValue["config_time_user"], formatConfigValue["config_timezone_user"])
+		daysInterface := formatConfigValue["days"].([]interface{})
+		days = make([]string, len(daysInterface))
+		for i, d := range daysInterface {
+			days[i] = d.(string)
+		}
 	case "MONTHLY_PERIOD":
 		configValue = fmt.Sprintf("%s", formatConfigValue["config_date"])
 	}
 
-	resp := converter.ProfileConfigModelToResponse(profileCfg, configValue)
+	resp := converter.ProfileConfigModelToResponse(profileCfg, configValue, days)
 	return resp, nil
 }
 
@@ -195,7 +207,13 @@ func (p *ProfileConfigUsecaseImpl) Update(ctx context.Context, req *domain.Requs
 		return nil, err
 	}
 
-	resp := converter.ProfileConfigModelToResponse(profileCfgConv, req.ConfigValue)
+	var days []string
+	switch req.ConfigName {
+	case "DAILY_NOTIFY":
+		days = formatConfigValue["days"].([]string)
+	}
+
+	resp := converter.ProfileConfigModelToResponse(profileCfgConv, req.ConfigValue, days)
 
 	return resp, nil
 }

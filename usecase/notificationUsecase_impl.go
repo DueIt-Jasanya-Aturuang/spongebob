@@ -42,7 +42,15 @@ func (n *NotificationUsecaseImpl) UpdateStatus(ctx context.Context, id, profileI
 	notif.UpdatedAt = time.Now().Unix()
 	notif.UpdatedBy = helpers.NewNullString(profileID)
 
-	err = n.notifRepo.Update(ctx, notif)
+	err = n.notifRepo.StartTx(ctx, helpers.LevelReadCommitted(), func() error {
+		err = n.notifRepo.Update(ctx, notif)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +66,15 @@ func (n *NotificationUsecaseImpl) DeleteByIDAndProfileID(ctx context.Context, id
 	}
 	defer n.notifRepo.CloseConn()
 
-	err = n.notifRepo.Delete(ctx, id, profileID)
+	err = n.notifRepo.StartTx(ctx, helpers.LevelReadCommitted(), func() error {
+		err = n.notifRepo.Delete(ctx, id, profileID)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
@@ -73,7 +89,15 @@ func (n *NotificationUsecaseImpl) DeleteAllByProfileID(ctx context.Context, prof
 	}
 	defer n.notifRepo.CloseConn()
 
-	err = n.notifRepo.DeleteAllByProfileID(ctx, profileID)
+	err = n.notifRepo.StartTx(ctx, helpers.LevelReadCommitted(), func() error {
+		err = n.notifRepo.DeleteAllByProfileID(ctx, profileID)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
@@ -91,6 +115,10 @@ func (n *NotificationUsecaseImpl) GetAllByProfileID(ctx context.Context, req *do
 	notifications, err := n.notifRepo.GetAllByProfileID(ctx, req)
 	if err != nil {
 		return nil, "", err
+	}
+
+	if len(*notifications) < 1 {
+		return nil, "", nil
 	}
 
 	var responses []domain.ResponseNotification

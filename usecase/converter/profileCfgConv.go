@@ -4,13 +4,13 @@ import (
 	"database/sql"
 	"time"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
 )
 
 func CreateProfileCfgToModel(req *domain.RequestCreateProfileConfig, configValue []byte) *domain.ProfileConfig {
-	id := uuid.NewV4().String()
+	id := ulid.Make().String()
 	return &domain.ProfileConfig{
 		ID:          id,
 		ProfileID:   req.ProfileID,

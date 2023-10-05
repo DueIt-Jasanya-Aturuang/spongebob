@@ -218,7 +218,7 @@ func (p *ProfileConfigUsecaseImpl) Update(ctx context.Context, req *domain.Requs
 	return resp, nil
 }
 
-func (p *ProfileConfigUsecaseImpl) GetBySchedulerDailyNotify(ctx context.Context, ProfileConfigScheduler domain.ProfileConfigScheduler) error {
+func (p *ProfileConfigUsecaseImpl) SchedulerDailyNotify(ctx context.Context, ProfileConfigScheduler domain.ProfileConfigScheduler) error {
 	err := p.profileCfgRepo.OpenConn(ctx)
 	if err != nil {
 		return err
@@ -274,4 +274,9 @@ func (p *ProfileConfigUsecaseImpl) GetBySchedulerDailyNotify(ctx context.Context
 	}
 
 	return nil
+}
+
+func (p *ProfileConfigUsecaseImpl) SchedulerMonthlyPeriode(ctx context.Context, tgl int, id string) (string, error) {
+	// TODO implement me
+	panic("implement me")
 }

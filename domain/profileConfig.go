@@ -63,6 +63,7 @@ type ProfileConfigRepo interface {
 	Update(ctx context.Context, profileCfg *ProfileConfig) error
 	GetByNameAndID(ctx context.Context, profileID string, configName string) (*ProfileConfig, error)
 	GetBySchedulerDailyNotify(ctx context.Context, ProfileConfigScheduler ProfileConfigScheduler) (*[]ProfileConfig, error)
+	GetBySchedulerMonthlyPeriode(ctx context.Context, tgl int, id string) (*[]ProfileConfig, error)
 	UnitOfWorkRepository
 }
 
@@ -71,5 +72,6 @@ type ProfileConfigUsecase interface {
 	Create(ctx context.Context, req *RequestCreateProfileConfig) (*ResponseProfileConfig, error)
 	GetByNameAndID(ctx context.Context, req *RequestGetProfileConfig) (*ResponseProfileConfig, error)
 	Update(ctx context.Context, req *RequsetUpdateProfileConfig) (*ResponseProfileConfig, error)
-	GetBySchedulerDailyNotify(ctx context.Context, ProfileConfigScheduler ProfileConfigScheduler) error
+	SchedulerDailyNotify(ctx context.Context, ProfileConfigScheduler ProfileConfigScheduler) error
+	SchedulerMonthlyPeriode(ctx context.Context, tgl int, id string) (string, error)
 }

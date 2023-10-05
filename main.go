@@ -57,8 +57,7 @@ func main() {
 	go func() {
 		for range timeTick {
 			fmt.Println(fmt.Sprintf("%02d:%02d", time.Now().UTC().Hour(), time.Now().UTC().Minute()))
-
-			err = profileCfgUsecase.GetBySchedulerDailyNotify(context.Background(), domain.ProfileConfigScheduler{
+			err = profileCfgUsecase.SchedulerDailyNotify(context.Background(), domain.ProfileConfigScheduler{
 				Day:  strings.ToLower(time.Now().UTC().Weekday().String()),
 				Time: fmt.Sprintf("%02d:%02d", time.Now().UTC().Hour(), time.Now().UTC().Minute()),
 			})

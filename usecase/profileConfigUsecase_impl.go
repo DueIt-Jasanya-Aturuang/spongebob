@@ -223,6 +223,7 @@ func (p *ProfileConfigUsecaseImpl) GetBySchedulerDailyNotify(ctx context.Context
 	if err != nil {
 		return err
 	}
+ defer p.profileCfgRepo.CloseConn()
 
 	profileConfigs, err := p.profileCfgRepo.GetBySchedulerDailyNotify(ctx, ProfileConfigScheduler)
 	if err != nil {

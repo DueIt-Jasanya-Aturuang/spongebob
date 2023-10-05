@@ -53,9 +53,21 @@ func main() {
 	accountUsecase := _usecase2.NewAccountUsecaseImpl(profileRepo, userRepo, minioRepo)
 	profileCfgUsecase := _usecase2.NewProfileConfigUsecaseImpl(profileRepo, profileRepoCfg, notificationRepo)
 
-	timeTick := time.Tick(1 * time.Minute)
+	var id *string
+	day := time.Now().Day()
 	go func() {
-		for range timeTick {
+		for range time.Tick(1 * time.Minute) {
+			id, err = profileCfgUsecase.SchedulerMonthlyPeriode(context.Background(), day, id)
+			if err != nil {
+				// log.Warn().Msgf("failed push notification monthly notif user | err : %v", err)
+			}
+
+			log.Info().Msgf("id user : %v", id)
+		}
+	}()
+
+	go func() {
+		for range time.Tick(1 * time.Minute) {
 			fmt.Println(fmt.Sprintf("%02d:%02d", time.Now().UTC().Hour(), time.Now().UTC().Minute()))
 			err = profileCfgUsecase.SchedulerDailyNotify(context.Background(), domain.ProfileConfigScheduler{
 				Day:  strings.ToLower(time.Now().UTC().Weekday().String()),

@@ -73,5 +73,5 @@ type ProfileConfigUsecase interface {
 	GetByNameAndID(ctx context.Context, req *RequestGetProfileConfig) (*ResponseProfileConfig, error)
 	Update(ctx context.Context, req *RequsetUpdateProfileConfig) (*ResponseProfileConfig, error)
 	SchedulerDailyNotify(ctx context.Context, ProfileConfigScheduler ProfileConfigScheduler) error
-	SchedulerMonthlyPeriode(ctx context.Context, tgl int, id string) (string, error)
+	SchedulerMonthlyPeriode(ctx context.Context, tgl int, id *string) (*string, error)
 }

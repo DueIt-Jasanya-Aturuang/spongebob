@@ -223,7 +223,7 @@ func (p *ProfileConfigUsecaseImpl) SchedulerDailyNotify(ctx context.Context, Pro
 	if err != nil {
 		return err
 	}
- defer p.profileCfgRepo.CloseConn()
+	defer p.profileCfgRepo.CloseConn()
 
 	profileConfigs, err := p.profileCfgRepo.GetBySchedulerDailyNotify(ctx, ProfileConfigScheduler)
 	if err != nil {
@@ -276,7 +276,66 @@ func (p *ProfileConfigUsecaseImpl) SchedulerDailyNotify(ctx context.Context, Pro
 	return nil
 }
 
-func (p *ProfileConfigUsecaseImpl) SchedulerMonthlyPeriode(ctx context.Context, tgl int, id string) (string, error) {
-	// TODO implement me
-	panic("implement me")
+func (p *ProfileConfigUsecaseImpl) SchedulerMonthlyPeriode(ctx context.Context, tgl int, id *string) (*string, error) {
+	err := p.profileCfgRepo.OpenConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer p.profileCfgRepo.CloseConn()
+
+	var profileConfigs *[]domain.ProfileConfig
+	if id != nil {
+		profileConfigs, err = p.profileCfgRepo.GetBySchedulerMonthlyPeriode(ctx, tgl, *id)
+	} else {
+		profileConfigs, err = p.profileCfgRepo.GetBySchedulerMonthlyPeriode(ctx, tgl, "")
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if len(*profileConfigs) < 1 {
+		return nil, nil
+	}
+
+	notify, err := p.notifRepo.GetNotifHelperByName(ctx, (*profileConfigs)[0].ConfigName)
+
+	for _, profileConfig := range *profileConfigs {
+		formatConfigValue := map[string]any{}
+		err = json.Unmarshal([]byte(profileConfig.ConfigValue), &formatConfigValue)
+		if err != nil {
+			return nil, err
+		}
+
+		err = p.profileCfgRepo.StartTx(ctx, helpers.LevelReadCommitted(), func() error {
+			err = p.notifRepo.Create(ctx, &domain.Notification{
+				ID:           ulid.Make().String(),
+				ProfileID:    profileConfig.ProfileID,
+				UserConfigID: profileConfig.ID,
+				Message:      notify.Message,
+				Status:       "unread",
+				Title:        notify.Title,
+				Icon:         notify.Message,
+				AuditInfo: domain.AuditInfo{
+					CreatedAt: time.Now().Unix(),
+					CreatedBy: profileConfig.ProfileID,
+					UpdatedAt: time.Now().Unix(),
+				},
+			})
+			if err != nil {
+				return err
+			}
+
+			// 	push to fmc
+
+			return nil
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
+	cursor := (*profileConfigs)[len(*profileConfigs)-1].ID
+	return &cursor, nil
 }

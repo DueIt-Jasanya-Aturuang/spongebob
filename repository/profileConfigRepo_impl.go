@@ -168,10 +168,10 @@ func (p *ProfileConfigRepoImpl) GetByNameAndID(ctx context.Context, profileID st
 func (p *ProfileConfigRepoImpl) GetBySchedulerDailyNotify(ctx context.Context, ProfileConfigScheduler domain.ProfileConfigScheduler) (*[]domain.ProfileConfig, error) {
 	query := `SELECT id, profile_id, config_name, config_value, status
               FROM dueit.m_user_config AS muc
-              WHERE (config_value->>'config_time_notify')::time = $1::time AND config_value->'days' ? $2 AND status='on'
+              WHERE (config_value->>'config_time_notify')::time = $1::time AND config_value->'days' ? $2 AND status='on' AND config_name='DAILY_NOTIFY'
 				AND NOT EXISTS (
 					SELECT 1 FROM dueit.m_notification AS mn WHERE mn.user_config_id = muc.id
-				) ORDER BY desc`
+				)`
 
 	conn, err := p.GetConn()
 	if err != nil {
@@ -222,12 +222,15 @@ func (p *ProfileConfigRepoImpl) GetBySchedulerDailyNotify(ctx context.Context, P
 func (p *ProfileConfigRepoImpl) GetBySchedulerMonthlyPeriode(ctx context.Context, tgl int, id string) (*[]domain.ProfileConfig, error) {
 	query := `SELECT id, profile_id, config_name, config_value, status
               FROM dueit.m_user_config AS muc
-              WHERE (config_value->>'config_date')::int = $1::int AND status='on'
-				AND NOT EXISTS (
+              WHERE (config_value->>'config_date') IS NOT NULL
+              AND (config_value->>'config_date')::int = $1 
+              AND status='on' 
+              AND config_name='MONTHLY_PERIOD'
+			  AND NOT EXISTS (
 					SELECT 1 FROM dueit.m_notification AS mn WHERE mn.user_config_id = muc.id
 				)`
 	if id != "" {
-		query += ` AND id > ` + id
+		query += ` AND id > '` + id + `'`
 	}
 	query += ` ORDER BY id ASC LIMIT 10`
 

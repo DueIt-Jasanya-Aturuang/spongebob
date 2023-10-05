@@ -16,10 +16,10 @@ type NotificationRepo interface {
 }
 
 type NotificationUsecase interface {
-	Update(ctx context.Context, id, profileID string) error
+	UpdateStatus(ctx context.Context, id, profileID string) (*ResponseNotification, error)
 	DeleteByIDAndProfileID(ctx context.Context, id string, profileID string) error
 	DeleteAllByProfileID(ctx context.Context, profileID string) error
-	GetAllByProfileID(ctx context.Context, req *RequestGetAllByPaginate) (*[]ResponseNotification, error)
+	GetAllByProfileID(ctx context.Context, req *RequestGetAllByPaginate) (*[]ResponseNotification, string, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseNotification, error)
 }
 

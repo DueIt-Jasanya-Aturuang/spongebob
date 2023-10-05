@@ -168,10 +168,14 @@ func (p *ProfileConfigRepoImpl) GetByNameAndID(ctx context.Context, profileID st
 func (p *ProfileConfigRepoImpl) GetBySchedulerDailyNotify(ctx context.Context, ProfileConfigScheduler domain.ProfileConfigScheduler) (*[]domain.ProfileConfig, error) {
 	query := `SELECT id, profile_id, config_name, config_value, status
               FROM dueit.m_user_config AS muc
-              WHERE (config_value->>'config_time_notify')::time = $1::time AND config_value->'days' ? $2 AND status='on' AND config_name='DAILY_NOTIFY'
-				AND NOT EXISTS (
-					SELECT 1 FROM dueit.m_notification AS mn WHERE mn.user_config_id = muc.id
-				)`
+              WHERE (config_value->>'config_time_notify')::time = $1::time 
+              AND config_value->'days' ? $2 
+              AND status='on' 
+              AND config_name='DAILY_NOTIFY'
+			  AND NOT EXISTS (
+				SELECT 1 FROM dueit.m_notification AS mn WHERE mn.user_config_id = muc.id
+				AND DATE_TRUNC('day', to_timestamp(mn.created_at)::date) = current_date
+			  )`
 
 	conn, err := p.GetConn()
 	if err != nil {
@@ -227,8 +231,9 @@ func (p *ProfileConfigRepoImpl) GetBySchedulerMonthlyPeriode(ctx context.Context
               AND status='on' 
               AND config_name='MONTHLY_PERIOD'
 			  AND NOT EXISTS (
-					SELECT 1 FROM dueit.m_notification AS mn WHERE mn.user_config_id = muc.id
-				)`
+				SELECT 1 FROM dueit.m_notification AS mn WHERE mn.user_config_id = muc.id
+				AND DATE_TRUNC('day', to_timestamp(mn.created_at)::date) = current_date
+			  )`
 	if id != "" {
 		query += ` AND id > '` + id + `'`
 	}

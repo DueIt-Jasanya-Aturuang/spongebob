@@ -34,7 +34,7 @@ func CreateProfileCfg(req *domain.RequestCreateProfileConfig) error {
 	}
 
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
-		return _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
+		return _error.HttpErrString(response.CodeCompanyName[response.CM04], response.CM04)
 	}
 
 	if req.ConfigName != "DAILY_NOTIFY" && req.ConfigName != "MONTHLY_PERIOD" {

@@ -52,6 +52,7 @@ func main() {
 
 	accountUsecase := _usecase2.NewAccountUsecaseImpl(profileRepo, userRepo, minioRepo)
 	profileCfgUsecase := _usecase2.NewProfileConfigUsecaseImpl(profileRepo, profileRepoCfg, notificationRepo)
+	notificationUsecase := _usecase2.NewNotificationUsecaseImpl(notificationRepo)
 
 	var id *string
 	day := time.Now().Day()
@@ -88,6 +89,7 @@ func main() {
 
 	accountHandler := rest.NewAccountHandler(accountUsecase)
 	profileCfgHandler := rest.NewProfileCfgHandler(profileCfgUsecase)
+	notificationHandler := rest.NewNotificationHandlerImpl(notificationUsecase)
 
 	r.Group(func(r chi.Router) {
 		r.Use(cusmiddleware.SetAuthorization)
@@ -103,6 +105,12 @@ func main() {
 		r.Post("/account/profile-config", profileCfgHandler.CreateProfileCfg)
 		r.Get("/account/profile-config/{config-name}", profileCfgHandler.GetProfileCfgByNameAndID)
 		r.Put("/account/profile-config/{config-name}", profileCfgHandler.UpdateProfileCfg)
+
+		r.Get("/account/notif", notificationHandler.GetAllByProfileID)
+		r.Get("/account/notif/{id}", notificationHandler.GetByIDAndProfileID)
+		r.Put("/account/notif/status/{id}", notificationHandler.UpdateStatus)
+		r.Delete("/account/notif/{id}", notificationHandler.DeleteByIDAndProfileID)
+		r.Delete("/account/notif", notificationHandler.DeleteAllProfileID)
 	})
 
 	err = http.ListenAndServe(infra.AppPort, r)

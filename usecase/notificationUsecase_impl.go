@@ -24,12 +24,6 @@ func NewNotificationUsecaseImpl(
 }
 
 func (n *NotificationUsecaseImpl) UpdateStatus(ctx context.Context, id, profileID string) (*domain.ResponseNotification, error) {
-	err := n.notifRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer n.notifRepo.CloseConn()
-
 	notif, err := n.notifRepo.GetByIDAndProfileID(ctx, id, profileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -60,14 +54,8 @@ func (n *NotificationUsecaseImpl) UpdateStatus(ctx context.Context, id, profileI
 }
 
 func (n *NotificationUsecaseImpl) DeleteByIDAndProfileID(ctx context.Context, id string, profileID string) error {
-	err := n.notifRepo.OpenConn(ctx)
-	if err != nil {
-		return err
-	}
-	defer n.notifRepo.CloseConn()
-
-	err = n.notifRepo.StartTx(ctx, helpers.LevelReadCommitted(), func() error {
-		err = n.notifRepo.Delete(ctx, id, profileID)
+	err := n.notifRepo.StartTx(ctx, helpers.LevelReadCommitted(), func() error {
+		err := n.notifRepo.Delete(ctx, id, profileID)
 		if err != nil {
 			return err
 		}
@@ -83,14 +71,8 @@ func (n *NotificationUsecaseImpl) DeleteByIDAndProfileID(ctx context.Context, id
 }
 
 func (n *NotificationUsecaseImpl) DeleteAllByProfileID(ctx context.Context, profileID string) error {
-	err := n.notifRepo.OpenConn(ctx)
-	if err != nil {
-		return err
-	}
-	defer n.notifRepo.CloseConn()
-
-	err = n.notifRepo.StartTx(ctx, helpers.LevelReadCommitted(), func() error {
-		err = n.notifRepo.DeleteAllByProfileID(ctx, profileID)
+	err := n.notifRepo.StartTx(ctx, helpers.LevelReadCommitted(), func() error {
+		err := n.notifRepo.DeleteAllByProfileID(ctx, profileID)
 		if err != nil {
 			return err
 		}
@@ -106,12 +88,6 @@ func (n *NotificationUsecaseImpl) DeleteAllByProfileID(ctx context.Context, prof
 }
 
 func (n *NotificationUsecaseImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllByPaginate) (*[]domain.ResponseNotification, string, error) {
-	err := n.notifRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, "", err
-	}
-	defer n.notifRepo.CloseConn()
-
 	notifications, err := n.notifRepo.GetAllByProfileID(ctx, req)
 	if err != nil {
 		return nil, "", err
@@ -134,12 +110,6 @@ func (n *NotificationUsecaseImpl) GetAllByProfileID(ctx context.Context, req *do
 }
 
 func (n *NotificationUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.ResponseNotification, error) {
-	err := n.notifRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer n.notifRepo.CloseConn()
-
 	notif, err := n.notifRepo.GetByIDAndProfileID(ctx, id, profileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

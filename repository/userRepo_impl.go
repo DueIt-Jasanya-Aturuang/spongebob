@@ -26,12 +26,12 @@ func (u *UserRepoImpl) GetByID(ctx context.Context, id string) (*domain.User, er
        		  		 created_at, created_by, updated_at, updated_by, deleted_at, deleted_by 
 			  FROM auth.m_users WHERE id = $1 AND deleted_at IS NULL`
 
-	conn, err := u.GetConn()
+	db, err := u.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err
@@ -110,12 +110,12 @@ func (u *UserRepoImpl) CheckPhoneNumberExists(ctx context.Context, id string, ne
 	query := `SELECT EXISTS (SELECT 1 FROM auth.m_users WHERE phone_number = $1 AND id<>$2 AND deleted_at IS NULL)`
 	var exist bool
 
-	conn, err := u.GetConn()
+	db, err := u.GetDB()
 	if err != nil {
 		return false, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return false, err

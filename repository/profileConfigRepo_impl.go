@@ -126,12 +126,12 @@ func (p *ProfileConfigRepoImpl) GetByNameAndID(ctx context.Context, profileID st
                      created_by, updated_at, updated_by, deleted_at, deleted_by
 			  FROM dueit.m_user_config WHERE profile_id = $1 AND config_name = $2`
 
-	conn, err := p.GetConn()
+	db, err := p.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrExecContext, err)
 		return nil, err
@@ -177,12 +177,12 @@ func (p *ProfileConfigRepoImpl) GetBySchedulerDailyNotify(ctx context.Context, P
 				AND DATE_TRUNC('day', to_timestamp(mn.created_at)::date) = current_date
 			  )`
 
-	conn, err := p.GetConn()
+	db, err := p.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrExecContext, err)
 		return nil, err
@@ -239,12 +239,12 @@ func (p *ProfileConfigRepoImpl) GetBySchedulerMonthlyPeriode(ctx context.Context
 	}
 	query += ` ORDER BY id ASC LIMIT 10`
 
-	conn, err := p.GetConn()
+	db, err := p.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrExecContext, err)
 		return nil, err

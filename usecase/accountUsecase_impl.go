@@ -35,12 +35,6 @@ func NewAccountUsecaseImpl(
 }
 
 func (a *AccountUsecaseImpl) UpdateAccount(ctx context.Context, req *domain.RequestUpdateAccount) (*domain.ResponseUser, *domain.ResponseProfile, error) {
-	err := a.profileRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer a.profileRepo.CloseConn()
-
 	profile, err := a.profileRepo.GetByID(ctx, req.ProfileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -130,12 +124,6 @@ func (a *AccountUsecaseImpl) UpdateAccount(ctx context.Context, req *domain.Requ
 }
 
 func (a *AccountUsecaseImpl) GetProfileByUserID(ctx context.Context, req *domain.RequestGetProfile) (*domain.ResponseProfile, error) {
-	err := a.profileRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer a.profileRepo.CloseConn()
-
 	profile, err := a.profileRepo.GetByUserID(ctx, req.UserID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -149,13 +137,7 @@ func (a *AccountUsecaseImpl) GetProfileByUserID(ctx context.Context, req *domain
 }
 
 func (a *AccountUsecaseImpl) CreateProfile(ctx context.Context, req *domain.RequestCreateProfile) (*domain.ResponseProfile, error) {
-	err := a.profileRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer a.profileRepo.CloseConn()
-
-	_, err = a.userRepo.GetByID(ctx, req.UserID)
+	_, err := a.userRepo.GetByID(ctx, req.UserID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, UserNotFound

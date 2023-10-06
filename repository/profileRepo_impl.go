@@ -26,12 +26,12 @@ func (p *ProfileRepoImpl) GetByID(ctx context.Context, id string) (*domain.Profi
        				 updated_at, updated_by, deleted_at, deleted_by 
 			  FROM dueit.m_profiles WHERE id = $1 AND deleted_at IS NULL`
 
-	conn, err := p.GetConn()
+	db, err := p.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err
@@ -69,12 +69,12 @@ func (p *ProfileRepoImpl) GetByUserID(ctx context.Context, userID string) (*doma
        				 updated_at, updated_by, deleted_at, deleted_by 
 			  FROM dueit.m_profiles WHERE user_id = $1 AND deleted_at IS NULL`
 
-	conn, err := p.GetConn()
+	db, err := p.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err

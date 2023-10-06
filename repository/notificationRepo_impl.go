@@ -175,12 +175,12 @@ func (n *NotificationRepoImpl) GetAllByProfileID(ctx context.Context, req *domai
 	}
 	query += `ORDER BY id ` + req.Order + ` LIMIT 10`
 
-	conn, err := n.GetConn()
+	db, err := n.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err
@@ -242,12 +242,12 @@ func (n *NotificationRepoImpl) GetByIDAndProfileID(ctx context.Context, id strin
        					updated_by, deleted_at, deleted_by
 				FROM dueit.m_notification WHERE id=$1 AND profile_id=$2 AND deleted_at IS NULL`
 
-	conn, err := n.GetConn()
+	db, err := n.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err
@@ -289,12 +289,12 @@ func (n *NotificationRepoImpl) GetNotifHelperByName(ctx context.Context, name st
        					updated_by, deleted_at, deleted_by
 				FROM dueit.h_notify_message WHERE name=$1 AND deleted_at IS NULL LIMIT 1`
 
-	conn, err := n.GetConn()
+	db, err := n.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err

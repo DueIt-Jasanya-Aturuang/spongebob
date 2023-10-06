@@ -35,12 +35,6 @@ func NewProfileConfigUsecaseImpl(
 }
 
 func (p *ProfileConfigUsecaseImpl) Create(ctx context.Context, req *domain.RequestCreateProfileConfig) (*domain.ResponseProfileConfig, error) {
-	err := p.profileCfgRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer p.profileCfgRepo.CloseConn()
-
 	profile, err := p.profileRepo.GetByID(ctx, req.ProfileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -96,12 +90,6 @@ func (p *ProfileConfigUsecaseImpl) Create(ctx context.Context, req *domain.Reque
 }
 
 func (p *ProfileConfigUsecaseImpl) GetByNameAndID(ctx context.Context, req *domain.RequestGetProfileConfig) (*domain.ResponseProfileConfig, error) {
-	err := p.profileCfgRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer p.profileCfgRepo.CloseConn()
-
 	profile, err := p.profileRepo.GetByID(ctx, req.ProfileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -151,12 +139,6 @@ func (p *ProfileConfigUsecaseImpl) GetByNameAndID(ctx context.Context, req *doma
 }
 
 func (p *ProfileConfigUsecaseImpl) Update(ctx context.Context, req *domain.RequsetUpdateProfileConfig) (*domain.ResponseProfileConfig, error) {
-	err := p.profileCfgRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer p.profileCfgRepo.CloseConn()
-
 	profile, err := p.profileRepo.GetByID(ctx, req.ProfileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -219,12 +201,6 @@ func (p *ProfileConfigUsecaseImpl) Update(ctx context.Context, req *domain.Requs
 }
 
 func (p *ProfileConfigUsecaseImpl) SchedulerDailyNotify(ctx context.Context, ProfileConfigScheduler domain.ProfileConfigScheduler) error {
-	err := p.profileCfgRepo.OpenConn(ctx)
-	if err != nil {
-		return err
-	}
-	defer p.profileCfgRepo.CloseConn()
-
 	profileConfigs, err := p.profileCfgRepo.GetBySchedulerDailyNotify(ctx, ProfileConfigScheduler)
 	if err != nil {
 		return err
@@ -277,13 +253,9 @@ func (p *ProfileConfigUsecaseImpl) SchedulerDailyNotify(ctx context.Context, Pro
 }
 
 func (p *ProfileConfigUsecaseImpl) SchedulerMonthlyPeriode(ctx context.Context, tgl int, id *string) (*string, error) {
-	err := p.profileCfgRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer p.profileCfgRepo.CloseConn()
-
 	var profileConfigs *[]domain.ProfileConfig
+	var err error
+
 	if id != nil {
 		profileConfigs, err = p.profileCfgRepo.GetBySchedulerMonthlyPeriode(ctx, tgl, *id)
 	} else {

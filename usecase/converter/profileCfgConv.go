@@ -39,7 +39,7 @@ func UpdateProfileCfgToModel(req *domain.RequsetUpdateProfileConfig, configValue
 	}
 }
 
-func ProfileConfigModelToResponse(m *domain.ProfileConfig, configValue string, days []string) *domain.ResponseProfileConfig {
+func ProfileConfigModelToResponse(m *domain.ProfileConfig, configValue string, days []string, token string) *domain.ResponseProfileConfig {
 	return &domain.ResponseProfileConfig{
 		ID:          m.ID,
 		ProfileID:   m.ProfileID,
@@ -47,5 +47,6 @@ func ProfileConfigModelToResponse(m *domain.ProfileConfig, configValue string, d
 		ConfigValue: configValue,
 		Status:      m.Status,
 		Days:        days,
+		Token:       token,
 	}
 }

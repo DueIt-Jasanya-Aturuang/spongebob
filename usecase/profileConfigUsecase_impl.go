@@ -85,7 +85,7 @@ func (p *ProfileConfigUsecaseImpl) Create(ctx context.Context, req *domain.Reque
 		days = formatConfigValue["days"].([]string)
 	}
 
-	resp := converter.ProfileConfigModelToResponse(profileConfig, req.ConfigValue, days)
+	resp := converter.ProfileConfigModelToResponse(profileConfig, req.ConfigValue, days, req.Token)
 	return resp, nil
 }
 
@@ -134,7 +134,7 @@ func (p *ProfileConfigUsecaseImpl) GetByNameAndID(ctx context.Context, req *doma
 		configValue = fmt.Sprintf("%s", formatConfigValue["config_date"])
 	}
 
-	resp := converter.ProfileConfigModelToResponse(profileCfg, configValue, days)
+	resp := converter.ProfileConfigModelToResponse(profileCfg, configValue, days, formatConfigValue["token"].(string))
 	return resp, nil
 }
 
@@ -195,7 +195,7 @@ func (p *ProfileConfigUsecaseImpl) Update(ctx context.Context, req *domain.Requs
 		days = formatConfigValue["days"].([]string)
 	}
 
-	resp := converter.ProfileConfigModelToResponse(profileCfgConv, req.ConfigValue, days)
+	resp := converter.ProfileConfigModelToResponse(profileCfgConv, req.ConfigValue, days, req.Token)
 
 	return resp, nil
 }

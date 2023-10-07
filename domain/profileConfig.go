@@ -50,6 +50,7 @@ type ResponseProfileConfig struct {
 	ConfigValue string   `json:"config_value"`
 	Status      string   `json:"status"`
 	Days        []string `json:"days,omitempty"`
+	Token       string   `json:"token"`
 }
 
 type ProfileConfigScheduler struct {

@@ -16,10 +16,9 @@ const DefaultIconDailyNotify = "default icon"
 const DefaultTitleDailyNotify = "default title"
 const DailyNotify = "DAILY_NOTIFY"
 
-const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-var NewUlid = ulid.Make().String()
-
+func NewUlid() string {
+	return ulid.Make().String()
+}
 func ParseUlid(u string) error {
 	if _, err := ulid.Parse(u); err != nil {
 		log.Info().Msgf("failed parse ulid | err : %v", err)

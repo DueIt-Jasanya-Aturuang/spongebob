@@ -59,7 +59,7 @@ type ResponseProfileConfig struct {
 
 func (req *RequestCreateProfileConfig) ToModel(configValue []byte) *repository.ProfileConfig {
 	return &repository.ProfileConfig{
-		ID:          util.NewUlid,
+		ID:          util.NewUlid(),
 		ProfileID:   req.ProfileID,
 		ConfigName:  req.ConfigName,
 		ConfigValue: string(configValue),

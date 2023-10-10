@@ -42,7 +42,7 @@ func (p *ProfileConfigUsecaseImpl) SchedulerDailyNotify(ctx context.Context, min
 
 		err = p.profileCfgRepo.StartTx(ctx, repository.LevelReadCommitted(), func() error {
 			err = p.notifRepo.Create(ctx, &repository.Notification{
-				ID:           util.NewUlid,
+				ID:           util.NewUlid(),
 				ProfileID:    profileConfig.ProfileID,
 				UserConfigID: profileConfig.ID,
 				Message:      notificationHelper.Message,

@@ -1,6 +1,7 @@
 package util
 
 import (
+	"github.com/google/uuid"
 	"github.com/oklog/ulid/v2"
 	"github.com/rs/zerolog/log"
 )
@@ -29,7 +30,7 @@ func ParseUlid(u string) error {
 }
 
 func ParseUUID(u string) error {
-	if _, err := ulid.Parse(u); err != nil {
+	if _, err := uuid.Parse(u); err != nil {
 		log.Info().Msgf("failed parse uuid | err : %v", err)
 		return err
 	}

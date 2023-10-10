@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain/model"
-	repository2 "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository"
+	repository2 "github.com/DueIt-Jasanya-Aturuang/spongebob/domain/repository_old"
 	"github.com/minio/minio-go/v7"
 	uuid "github.com/satori/go.uuid"
 

@@ -2,27 +2,35 @@ package main
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
 	"time"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/cors"
+	"github.com/minio/minio-go/v7"
 	"github.com/rs/zerolog/log"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest"
-	cusmiddleware "github.com/DueIt-Jasanya-Aturuang/spongebob/api/rest/middleware"
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/domain"
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/infra"
-	repository2 "github.com/DueIt-Jasanya-Aturuang/spongebob/repository"
-	_usecase2 "github.com/DueIt-Jasanya-Aturuang/spongebob/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/presentation/rapi"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/repository/minio_repository"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/repository/notification_repository"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/repository/profileConfig_repository"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/repository/profile_repository"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/repository/uow_repository"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/repository/user_repository"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase/account_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase/notification_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase/profileConfig_usecase"
 )
 
 func main() {
 	infra.LogInit()
 	infra.EnvInit()
+
 	pgConn := infra.NewPgConn()
 	defer func() {
 		err := pgConn.Close()
@@ -31,35 +39,18 @@ func main() {
 		}
 	}()
 
-	// redisConn := infra.NewRedisConn()
-	// defer func() {
-	// 	err := redisConn.Client.Close()
-	// 	if err != nil {
-	// 		log.Err(err).Msg("ERROR CLOSE REDIS CONN")
-	// 	}
-	// }()
-
 	minioConn, err := infra.NewMinioConn(infra.MinIoEndpoint, infra.MinIoID, infra.MinIoSecretKey, infra.MinIoSSL)
 	if err != nil {
 		panic(err)
 	}
 
-	uow := repository2.NewUnitOfWorkRepositoryImpl(pgConn)
-	profileRepoCfg := repository2.NewProfileConfigRepoImpl(uow)
-	profileRepo := repository2.NewProfileRepoImpl(uow)
-	userRepo := repository2.NewUserRepoImpl(uow)
-	minioRepo := repository2.NewMinioImpl(minioConn)
-	notificationRepo := repository2.NewNotificationRepoImpl(uow)
-
-	accountUsecase := _usecase2.NewAccountUsecaseImpl(profileRepo, userRepo, minioRepo)
-	profileCfgUsecase := _usecase2.NewProfileConfigUsecaseImpl(profileRepo, profileRepoCfg, notificationRepo)
-	notificationUsecase := _usecase2.NewNotificationUsecaseImpl(notificationRepo)
+	depen := dependency(pgConn, minioConn)
 
 	var id *string
 	day := time.Now().Day()
 	go func() {
 		for range time.Tick(1 * time.Minute) {
-			id, err = profileCfgUsecase.SchedulerMonthlyPeriode(context.Background(), day, id)
+			id, err = depen.ProfileConfigUsecase.SchedulerMonthlyPeriode(context.Background(), day, id)
 			if err != nil {
 				// log.Warn().Msgf("failed push notification monthly notif user | err : %v", err)
 			}
@@ -71,10 +62,11 @@ func main() {
 	go func() {
 		for range time.Tick(1 * time.Minute) {
 			fmt.Println(fmt.Sprintf("%02d:%02d", time.Now().UTC().Hour(), time.Now().UTC().Minute()))
-			err = profileCfgUsecase.SchedulerDailyNotify(context.Background(), domain.ProfileConfigScheduler{
-				Day:  strings.ToLower(time.Now().UTC().Weekday().String()),
-				Time: fmt.Sprintf("%02d:%02d", time.Now().UTC().Hour(), time.Now().UTC().Minute()),
-			})
+			err = depen.ProfileConfigUsecase.SchedulerDailyNotify(
+				context.Background(),
+				fmt.Sprintf("%02d:%02d", time.Now().UTC().Hour(), time.Now().UTC().Minute()),
+				strings.ToLower(time.Now().UTC().Weekday().String()),
+			)
 
 			if err != nil {
 				log.Warn().Msgf("failed push notification daily notif user | err : %v", err)
@@ -82,48 +74,50 @@ func main() {
 		}
 	}()
 
-	r := chi.NewRouter()
-
-	r.Use(middleware.Logger)
-	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "App-ID", "User-ID", "Type", "X-Key", "X-Api-Key", "Profile-ID", "Activasi"},
-		ExposedHeaders:   []string{"Authorization", "App-ID", "User-ID", "Type"},
-		AllowCredentials: false,
-		MaxAge:           300,
-	}))
-	r.Use(cusmiddleware.IPMiddleware)
-	r.Use(cusmiddleware.CheckApiKey)
-
-	accountHandler := rest.NewAccountHandler(accountUsecase)
-	profileCfgHandler := rest.NewProfileCfgHandler(profileCfgUsecase)
-	notificationHandler := rest.NewNotificationHandlerImpl(notificationUsecase)
-
-	r.Group(func(r chi.Router) {
-		r.Use(cusmiddleware.SetAuthorization)
-
-		r.Get("/account/profile", accountHandler.GetProfileByUserID)
-		r.Post("/account/profile/5410801c-faaf-4776-95be-56472e044820", accountHandler.CreateProfile)
-		r.Get("/account/profile/5410801c-faaf-4776-95be-56472e044820", accountHandler.GetProfileByUserID)
-
-		r.Post("/account/otorisasi", accountHandler.Otorisasi)
-
-		r.Put("/account", accountHandler.UpdateAccount)
-
-		r.Post("/account/profile-config", profileCfgHandler.CreateProfileCfg)
-		r.Get("/account/profile-config/{config-name}", profileCfgHandler.GetProfileCfgByNameAndID)
-		r.Put("/account/profile-config/{config-name}", profileCfgHandler.UpdateProfileCfg)
-
-		r.Get("/account/notif", notificationHandler.GetAllByProfileID)
-		r.Get("/account/notif/{id}", notificationHandler.GetByIDAndProfileID)
-		r.Put("/account/notif/status/{id}", notificationHandler.UpdateStatus)
-		r.Delete("/account/notif/{id}", notificationHandler.DeleteByIDAndProfileID)
-		r.Delete("/account/notif", notificationHandler.DeleteAllProfileID)
+	httpServer, err := rapi.NewPresenter(rapi.PresenterConfig{
+		Dependency: depen,
 	})
-
-	err = http.ListenAndServe(infra.AppPort, r)
 	if err != nil {
-		panic(err)
+		log.Fatal().Msgf("creating new presenter: %s", err.Error())
+	}
+
+	exitSignal := make(chan os.Signal, 1)
+	signal.Notify(exitSignal, os.Interrupt)
+	go func() {
+		<-exitSignal
+		log.Info().Msg("Interrupt signal received, exiting...")
+
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), time.Minute)
+		defer shutdownCancel()
+
+		err := httpServer.Shutdown(shutdownCtx)
+		if err != nil {
+			log.Err(err).Msg("shutting down HTTP server")
+		}
+	}()
+
+	log.Info().Msgf("Server is running on port %s", infra.AppPort)
+	err = httpServer.ListenAndServe()
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal().Msgf("serving HTTP server: %s", err.Error())
+	}
+}
+
+func dependency(db *sql.DB, client *minio.Client) *rapi.Dependency {
+	uow := uow_repository.NewUnitOfWorkRepositoryImpl(db)
+	profileConfigRepo := profileConfig_repository.NewProfileConfigRepositoryImpl(uow)
+	profileRepo := profile_repository.NewProfileRepositoryImpl(uow)
+	userRepo := user_repository.NewUserRepositoryImpl(uow)
+	minioRepo := minio_repository.NewMinioRepositoryImpl(client)
+	notificationRepo := notification_repository.NewNotificationRepositoryImpl(uow)
+
+	accountUsecase := account_usecase.NewAccountUsecaseImpl(profileRepo, userRepo, minioRepo)
+	profileCfgUsecase := profileConfig_usecase.NewProfileConfigUsecaseImpl(profileRepo, profileConfigRepo, notificationRepo)
+	notificationUsecase := notification_usecase.NewNotificationUsecaseImpl(notificationRepo)
+
+	return &rapi.Dependency{
+		AccountUsecase:       accountUsecase,
+		NotificationUsecase:  notificationUsecase,
+		ProfileConfigUsecase: profileCfgUsecase,
 	}
 }

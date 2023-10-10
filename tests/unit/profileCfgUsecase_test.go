@@ -15,7 +15,7 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/spongebob/pkg/_usecase"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase/converter"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase_old/converter"
 )
 
 func TestCreateProfileCfgUSECASE(t *testing.T) {

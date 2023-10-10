@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase/helpers"
+	"github.com/DueIt-Jasanya-Aturuang/spongebob/usecase_old/helpers"
 )
 
 func TestFormatEmail(t *testing.T) {

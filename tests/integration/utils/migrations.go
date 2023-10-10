@@ -58,7 +58,7 @@ func StartMigration(url string, db *sql.DB) {
 	}
 
 	migrates, err = migrate.NewWithDatabaseInstance(
-		"file://helper/jasanya-auth",
+		"file://parse/jasanya-auth",
 		"postgres", driver)
 	if err != nil {
 		fmt.Println(err)

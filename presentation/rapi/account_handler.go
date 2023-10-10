@@ -155,14 +155,19 @@ func (p *Presenter) Otorisasi(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Presenter) CreateProfile(w http.ResponseWriter, r *http.Request) {
-	userID := r.Header.Get("User-ID")
+	req := new(schema.RequestCreateProfile)
+	err := parse.DecodeJson(r, req)
+	if err != nil {
+		parse.ErrorResponseEncode(w, err)
+		return
+	}
 
-	if err := util.ParseUUID(userID); err != nil {
+	if err = util.ParseUUID(req.UserID); err != nil {
 		parse.ErrorResponseEncode(w, _error.HttpErrString("invalid user id", response.CM04))
 		return
 	}
 
-	profile, err := p.accountUsecase.CreateProfile(r.Context(), userID)
+	profile, err := p.accountUsecase.CreateProfile(r.Context(), req.UserID)
 	if err != nil {
 		if errors.Is(err, usecase.UserNotFound) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM04], response.CM04)

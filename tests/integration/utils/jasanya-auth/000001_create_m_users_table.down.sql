@@ -1,4 +1,0 @@
-DROP TABLE IF EXISTS m_access;
-DROP TABLE IF EXISTS m_roles;
-DROP TABLE IF EXISTS m_users;
-DROP TYPE IF EXISTS gender_enum;

@@ -22,12 +22,10 @@ func (a *AccountUsecaseImpl) CreateProfile(ctx context.Context, userID string) (
 
 	profileResp, err := a.GetProfileByUserID(ctx, userID)
 	if err != nil {
-		if !errors.Is(err, usecase.ProfileNotFound) {
-			return nil, err
-		}
+		return nil, err
 	}
 
-	if errors.Is(err, usecase.ProfileNotFound) {
+	if profileResp != nil {
 		return profileResp, nil
 	}
 

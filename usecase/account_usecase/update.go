@@ -58,9 +58,10 @@ func (a *AccountUsecaseImpl) UpdateAccount(ctx context.Context, req *usecase.Req
 	if reqImageCondition {
 		fileExt := filepath.Ext(req.Image.Filename)
 		newImageName = a.minioRepo.GenerateFileName(fileExt, "user-images/public/")
+		newImageName = fmt.Sprintf("/%s/%s", infra.MinIoBucket, newImageName)
 	}
 
-	profile, user = req.ToModel(fmt.Sprintf("/%s/%s", infra.MinIoBucket, newImageName))
+	profile, user = req.ToModel(newImageName)
 
 	err = a.profileRepo.StartTx(ctx, repository.LevelReadCommitted(), func() error {
 		err = a.profileRepo.Update(ctx, profile)

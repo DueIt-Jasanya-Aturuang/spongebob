@@ -114,6 +114,7 @@ func (p *Presenter) GetAllByProfileID(w http.ResponseWriter, r *http.Request) {
 			"cursor":       "",
 			"notification": nil,
 		}, "data notification")
+		return
 	}
 
 	var notifResps []schema.ResponseNotification

@@ -109,6 +109,13 @@ func (p *Presenter) GetAllByProfileID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if notifications == nil {
+		parse.SuccessResponseEncode(w, map[string]any{
+			"cursor":       "",
+			"notification": nil,
+		}, "data notification")
+	}
+
 	var notifResps []schema.ResponseNotification
 	var notifResp *schema.ResponseNotification
 

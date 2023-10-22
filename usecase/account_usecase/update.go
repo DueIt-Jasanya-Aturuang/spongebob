@@ -51,6 +51,7 @@ func (a *AccountUsecaseImpl) UpdateAccount(ctx context.Context, req *usecase.Req
 
 	oldImage := user.Image
 	newImageName := user.Image
+ var imageUpload string
 	email := user.Email
 	reqImageCondition := req.Image != nil && req.Image.Size > 0
 	delImageCondition := !strings.Contains(oldImage, "default-male") && !strings.Contains(oldImage, "google") && reqImageCondition
@@ -58,6 +59,7 @@ func (a *AccountUsecaseImpl) UpdateAccount(ctx context.Context, req *usecase.Req
 	if reqImageCondition {
 		fileExt := filepath.Ext(req.Image.Filename)
 		newImageName = a.minioRepo.GenerateFileName(fileExt, "user-images/public/")
+  imageUpload = newImageName
 		newImageName = fmt.Sprintf("/%s/%s", infra.MinIoBucket, newImageName)
 	}
 
@@ -75,7 +77,7 @@ func (a *AccountUsecaseImpl) UpdateAccount(ctx context.Context, req *usecase.Req
 		}
 
 		if reqImageCondition {
-			if err = a.minioRepo.UploadFile(ctx, req.Image, newImageName); err != nil {
+			if err = a.minioRepo.UploadFile(ctx, req.Image, imageUpload); err != nil {
 				return err
 			}
 
